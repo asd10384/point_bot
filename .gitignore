@@ -1,0 +1,6 @@
+
+node_modules
+
+.env
+googlettsapi.json
+package-lock.json
