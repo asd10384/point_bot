@@ -7,7 +7,7 @@ module.exports = {
     name: 'ping',
     aliases: ['핑'],
     description: '핑 확인',
-    async run (client = new Client, message = new Message, args = Array) {
+    async run (client = new Client, message = new Message, args = Array, sdb = Object) {
         var pp = db.get(`dp.prefix.${message.member.id}`);
         if (pp == (null || undefined)) {
             await db.set(`db.prefix.${message.member.id}`, process.env.prefix);

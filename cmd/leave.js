@@ -8,18 +8,20 @@ const per = new MessageEmbed()
     .setColor('RED');
 
 module.exports = {
-    name: '',
-    aliases: [''],
-    description: '',
+    name: 'leave',
+    aliases: ['떠나기'],
+    description: '음성대화방에서 나가기',
     async run (client = new Client, message = new Message, args = Array, sdb = Object) {
         var pp = db.get(`dp.prefix.${message.member.id}`);
         if (pp == (null || undefined)) {
             await db.set(`db.prefix.${message.member.id}`, process.env.prefix);
             pp = process.env.prefix;
         }
-        if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, Number(process.env.deletetime)));
+        // if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, Number(process.env.deletetime)));
 
-        
+        try {
+            message.guild.me.voice.channel.leave();
+        } catch (err) {}
     },
 };
 

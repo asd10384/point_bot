@@ -1,8 +1,8 @@
 
 require('dotenv').config();
 const { User, Message } = require('discord.js');
-const { Schema, model, connect } = require('mongoose');
-
+const { Schema, model, models, connect } = require('mongoose');
+const map = new Map();
 connect(process.env.mongourl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -17,21 +17,18 @@ module.exports = {
         user: set_user,
         server: set_server,
     },
-    get: {
-        server: get_server,
-    },
 };
 
 function module_user() {
-    const dataSchema = Schema({
+    var dataSchema = Schema({
         name: String,
         userID: String,
         tts: Boolean
     });
-    return model('Mandl_user', dataSchema);
+    return models.Mandl_user || model('Mandl_user', dataSchema);
 }
 function module_server() {
-    const dataSchema = Schema({
+    var dataSchema = Schema({
         serverid: String,
         channelid: String,
         voicechannelid: String,
@@ -51,11 +48,11 @@ function module_server() {
         anser_time: Number,
         anser: Number
     });
-    return model('Mandl_server', dataSchema);
+    return models.Mandl_server || model('Mandl_server', dataSchema);
 }
 
 async function set_user(user = new User) {
-    const data = userdata(); //모듈
+    var data = module_user(); //모듈
     const newdata = new data({
         name: user.username,
         userID: user.id,
@@ -64,7 +61,7 @@ async function set_user(user = new User) {
     return newdata.save().catch(err => console.log(err));
 }
 async function set_server(message = new Message) {
-    const data = serverdata(); //모듈
+    var data = module_server(); //모듈
     const newdata = new data({
         serverid: message.guild.id,
         channelid: '',
@@ -87,17 +84,4 @@ async function set_server(message = new Message) {
         anser: 0
     });
     return newdata.save().catch(err => console.log(err));
-}
-
-async function get_server(message = new Message) {
-    const data = serverdata(); //모듈
-    data.findOne({
-        serverid: message.guild.id
-    }, async function (err, data) {
-        if (err) console.log(err);
-        if (!data) {
-            await set.serverdata(message);
-        }
-        return true;
-    });
 }

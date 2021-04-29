@@ -8,18 +8,31 @@ const per = new MessageEmbed()
     .setColor('RED');
 
 module.exports = {
-    name: '',
-    aliases: [''],
-    description: '',
+    name: 'ttsset',
+    aliases: ['tts설정'],
+    description: 'tts채널을 만들고 봇과 연결함',
     async run (client = new Client, message = new Message, args = Array, sdb = Object) {
         var pp = db.get(`dp.prefix.${message.member.id}`);
         if (pp == (null || undefined)) {
             await db.set(`db.prefix.${message.member.id}`, process.env.prefix);
             pp = process.env.prefix;
         }
+        const dfprefix = process.env.prefix;
         if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, Number(process.env.deletetime)));
 
-        
+        return message.guild.channels.create(`💬텍스트음성변환`, { // ${client.user.username}-음악퀴즈채널
+            type: 'text',
+            topic: `봇을 사용한뒤 ${dfprefix}leave 명령어를 입력해 내보내 주세요.`
+        }).then(channel => {
+            sdb.ttsid = channel.id;
+            sdb.save().catch(err => console.log(err));
+            var tts = new MessageEmbed()
+                .setTitle(`채팅을 읽어줍니다.`)
+                .setDescription(`이 채팅방에 채팅을 치시면 봇이 읽어줍니다.`)
+                .setFooter(`기본 명령어 : ${dfprefix}tts`)
+                .setColor('ORANGE');
+            channel.send(tts);
+        });
     },
 };
 

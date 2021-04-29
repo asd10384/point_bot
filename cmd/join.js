@@ -8,9 +8,9 @@ const per = new MessageEmbed()
     .setColor('RED');
 
 module.exports = {
-    name: 'help',
-    aliases: ['h','명령어','도움말'],
-    description: '명령어 확인',
+    name: 'join',
+    aliases: ['참가'],
+    description: '음성대화방에 참가',
     async run (client = new Client, message = new Message, args = Array, sdb = Object) {
         var pp = db.get(`dp.prefix.${message.member.id}`);
         if (pp == (null || undefined)) {
@@ -19,20 +19,23 @@ module.exports = {
         }
         // if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, Number(process.env.deletetime)));
 
-        const commands = client.commands.array();
-        const embed = new MessageEmbed()
-            .setTitle(`\` ${client.user.username} \` 명령어`)
-            .setDescription(`명령어 [같은 명령어]\n명령어 설명`)
-            .setColor('ORANGE');
         
-        commands.forEach((cmd) => {
-            embed.addField(
-                `**${pp}${cmd.name} [${cmd.aliases ? cmd.aliases : ''}]**`,
-                `${cmd.description}`,
-                true
-            );
-        });
-        return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*3));
+        const help = new MessageEmbed()
+            .setTitle(`${pp}join [voice channel id]`)
+            .setColor('RANDOM');
+        const vc = new MessageEmbed()
+            .setTitle(`음성채널을 찾을수 없습니다.`)
+            .setColor('RANDOM');
+
+        if (!args[0]) return message.channel.send(help).then(m => msgdelete(m, Number(process.env.deletetime)));
+        
+        const channelid = args[0];
+        const channel = client.channels.cache.get(channelid);
+        try {
+            channel.join();
+        } catch (error) {
+            return message.channel.send(vc).then(m => msgdelete(m, Number(process.env.deletetime)));
+        }
     },
 };
 
