@@ -23,7 +23,14 @@ function module_user() {
     var dataSchema = Schema({
         name: String,
         userID: String,
-        tts: Boolean
+        tts: Boolean,
+        selfcheck: {
+            area: String,
+            school: String,
+            name: String,
+            birthday: String,
+            password: String,
+        },
     });
     return models.Mandl_user || model('Mandl_user', dataSchema);
 }
@@ -57,6 +64,13 @@ async function set_user(user = new User) {
         name: user.username,
         userID: user.id,
         tts: true,
+        selfcheck: {
+            area: '',
+            school: '',
+            name: '',
+            birthday: '',
+            password: '',
+        },
     });
     return newdata.save().catch(err => console.log(err));
 }

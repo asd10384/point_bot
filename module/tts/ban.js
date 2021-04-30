@@ -23,6 +23,7 @@ async function ban(client = new Client, message = new Message, args = Array, sdb
         if (err) console.log(err);
         if (!udb) {
             await MDB.set.user(message.member.user);
+            return await ban(client, message, args, sdb);
         }
         if (args[1]) {
             var muser = message.guild.members.cache.get(args[1].replace(/[^0-9]/g, ''));
@@ -75,6 +76,7 @@ async function unban(client = new Client, message = new Message, args = Array, s
         if (err) console.log(err);
         if (!udb) {
             await MDB.set.user(message.member.user);
+            return await unban(client, message, args, sdb);
         }
         if (args[1]) {
             var muser = message.guild.members.cache.get(args[1].replace(/[^0-9]/g, ''));

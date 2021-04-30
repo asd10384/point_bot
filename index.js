@@ -53,6 +53,8 @@ client.on('message', async (message) => {
         if (err) console.log(err);
         if (!sdb) {
             await set_server(message);
+        } else {
+            12
         }
         // 채팅 채널 연결
         var ttsid = sdb.ttsid;

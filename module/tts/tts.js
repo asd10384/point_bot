@@ -10,9 +10,12 @@ const ytdl = require('ytdl-core');
 var checkyturl = /(?:http:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?(.+)/;
 var checkytid = /(?:http:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?/gi;
 
+const { GoogleAuth } = require('google-auth-library');
 const TTS = require('@google-cloud/text-to-speech');
 const ttsclient = new TTS.TextToSpeechClient({
-    keyFile: 'googlettsapi.json'
+    auth: new GoogleAuth({
+        keyFile: 'googlettsapi.json',
+    })
 });
 
 module.exports = {
