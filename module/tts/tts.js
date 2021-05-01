@@ -3,13 +3,9 @@ require('dotenv').config();
 const db = require('quick.db');
 const { writeFile } = require('fs');
 const { MessageEmbed, Client, Message, Channel } = require('discord.js');
+const { broadcast, play } = require('./play');
 const MDB = require('../../MDB/data');
 const udata = MDB.module.user();
-
-const TTS = require('@google-cloud/text-to-speech');
-const ttsclient = new TTS.TextToSpeechClient({
-    keyFile: 'googlettsapi.json',
-});
 
 const ytdl = require('ytdl-core');
 var checkyturl = /(?:http:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?(.+)/;
@@ -19,26 +15,24 @@ const vcerr = new MessageEmbed()
     .setTitle(`먼저 봇을 음성에 넣고 사용해 주십시오.`)
     .setDescription(`${process.env.prefix}join [voice channel id]`)
     .setColor('RANDOM');
+const yterr = new MessageEmbed()
+    .setTitle(`\` 주소 오류 \``)
+    .setDescription(`영상을 찾을수 없습니다.`)
+    .setColor('RED');
 
 module.exports = {
     tts,
-    play,
-    broadcast,
 };
 
 // 기본
-async function tts(client = new Client, message = new Message, args = Array, sdb = Object) {
-    const yterr = new MessageEmbed()
-        .setTitle(`\` 주소 오류 \``)
-        .setDescription(`영상을 찾을수 없습니다.`)
-        .setColor('RED');
-    
+async function tts(client = new Client, message = new Message, args = Array, sdb = Object) {    
     udata.findOne({
         userID: message.member.user.id
     }, async (err, udb) => {
         if (err) console.log(err);
         if (!udb) {
             await MDB.set.user(message.member.user);
+            return await tts(client, message, args, sdb);
         }
         var ttsboolen = await (udb.tts) ? true : false;
         if (!ttsboolen) return msgdelete(message, 20);
@@ -50,6 +44,7 @@ async function tts(client = new Client, message = new Message, args = Array, sdb
             return message.channel.send(yterr).then(m => msgdelete(m, Number(process.env.deletetime)));
         }
         if (sdb.tts) {
+            db.set(`db.${message.guild.id}.tts.timertime`, 600);
             var channel;
             try {
                 if (message.member.voice.channel) {
@@ -58,9 +53,9 @@ async function tts(client = new Client, message = new Message, args = Array, sdb
                     channel = message.guild.voice.channel;
                 }
                 if (url.text) {
-                    return await play(message, channel, url.url, url.options);
+                    return await play(message, sdb, channel, url.url, url.options);
                 }
-                return await broadcast(message, channel, url.url, url.options);
+                return await broadcast(message, sdb, channel, url.url, url.options);
             } catch (err) {
                 console.log(err);
                 return message.channel.send(vcerr).then(m => msgdelete(m, Number(process.env.deletetime)));
@@ -104,42 +99,6 @@ async function geturl(message = new Message, text = String, options = Object) {
     };
 }
 // 유튜브 URL 생성 끝
-
-// TEXT -> tts.WAV로 변경
-async function play(message = new Message, channel = new Channel, text = String, options = Object) {
-    const response = await ttsclient.synthesizeSpeech({
-        input: {text: text},
-        voice: {
-            languageCode: 'ko-KR',
-            name: 'ko-KR-Standard-A'
-        },
-        audioConfig: {
-            audioEncoding: 'MP3', // 형식
-            speakingRate: 0.905, // 속도
-            pitch: 0, // 피치
-            // sampleRateHertz: 16000, // 헤르츠
-            // effectsProfileId: ['medium-bluetooth-speaker-class-device'] // 효과 https://cloud.google.com/text-to-speech/docs/audio-profiles
-        },
-    });
-    options['volume'] = 0.7;
-
-    var fileurl = `tts.wav`;
-    writeFile(fileurl, response[0].audioContent, async (err) => {
-        await broadcast(message, channel, fileurl, options);
-    });
-}
-// TEXT -> tts.WAV로 변경 끝
-
-// 출력
-async function broadcast(message = new Message, channel = new Channel, url = String, options = Object) {
-    channel.join().then(connection => {
-        const dispatcher = connection.play(url, options);
-        // dispatcher.on("finish", async () => {
-        //     return;
-        // });
-    });
-}
-// 출력 끝
 
 function msg (text) {
     text = text.replace(/\?/gi, '물음표') || text;
