@@ -6,17 +6,19 @@ const { MessageEmbed, Client, Message, Channel } = require('discord.js');
 const MDB = require('../../MDB/data');
 const udata = MDB.module.user();
 
+const TTS = require('@google-cloud/text-to-speech');
+const ttsclient = new TTS.TextToSpeechClient({
+    keyFile: 'googlettsapi.json',
+});
+
 const ytdl = require('ytdl-core');
 var checkyturl = /(?:http:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?(.+)/;
 var checkytid = /(?:http:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?/gi;
 
-const { GoogleAuth } = require('google-auth-library');
-const TTS = require('@google-cloud/text-to-speech');
-const ttsclient = new TTS.TextToSpeechClient({
-    auth: new GoogleAuth({
-        keyFile: 'googlettsapi.json',
-    })
-});
+const vcerr = new MessageEmbed()
+    .setTitle(`먼저 봇을 음성에 넣고 사용해 주십시오.`)
+    .setDescription(`${process.env.prefix}join [voice channel id]`)
+    .setColor('RANDOM');
 
 module.exports = {
     tts,
@@ -50,9 +52,9 @@ async function tts(client = new Client, message = new Message, args = Array, sdb
         if (sdb.tts) {
             var channel;
             try {
-                if (!!message.member.voice.channel) {
+                if (message.member.voice.channel) {
                     channel = message.member.voice.channel;
-                } else if (!!message.guild.me.voice.channel) {
+                } else if (message.guild.me.voice.channel) {
                     channel = message.guild.voice.channel;
                 }
                 if (url.text) {
@@ -60,6 +62,7 @@ async function tts(client = new Client, message = new Message, args = Array, sdb
                 }
                 return await broadcast(message, channel, url.url, url.options);
             } catch (err) {
+                console.log(err);
                 return message.channel.send(vcerr).then(m => msgdelete(m, Number(process.env.deletetime)));
             }
         } else {
@@ -104,7 +107,7 @@ async function geturl(message = new Message, text = String, options = Object) {
 
 // TEXT -> tts.WAV로 변경
 async function play(message = new Message, channel = new Channel, text = String, options = Object) {
-    const [response] = await ttsclient.synthesizeSpeech({
+    const response = await ttsclient.synthesizeSpeech({
         input: {text: text},
         voice: {
             languageCode: 'ko-KR',
@@ -121,7 +124,7 @@ async function play(message = new Message, channel = new Channel, text = String,
     options['volume'] = 0.7;
 
     var fileurl = `tts.wav`;
-    writeFile(fileurl, response.audioContent, async (err) => {
+    writeFile(fileurl, response[0].audioContent, async (err) => {
         await broadcast(message, channel, fileurl, options);
     });
 }
