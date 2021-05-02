@@ -79,6 +79,7 @@ async function end(client = new Client, message = new Message, sdb = MDB.object.
     await allmsgdelete(client, sdb, 2000);
 }
 async function start(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel) {
+    console.log(1);
     await start_em(client, message, args, sdb, vchannel, {
         first: true,
     });
@@ -87,6 +88,7 @@ async function start(client = new Client, message = new Message, args = Array, s
 async function start_em(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, opt = {
     first: Boolean,
 }) {
+    console.log(2);
     var data = sdb.musicquiz;
     const url = `${process.env.mqsite}/music_list.js`;
     request(url, async (err, res, body) => {
@@ -236,8 +238,11 @@ async function start_em(client = new Client, message = new Message, args = Array
                 c.messages.fetch(data.msg.npid).then(m => {
                     m.edit(np);
                 });
-            } catch(err) {}
+            } catch(err) {
+                console.log(err);
+            }
         } else {
+            console.log(err);
             return await end(client, message, sdb);
         }
     });
