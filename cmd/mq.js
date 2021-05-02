@@ -56,8 +56,7 @@ module.exports = {
             
             if (!sdb.musicquiz.start.embed) {
                 sdb.musicquiz.start.embed = true;
-                await mq.start(client, message, args, sdb, vchannel);
-                return await sdb.save().catch((err) => console.log(err));
+                return await mq.start(client, message, args, sdb, vchannel);
             } else {
                 emerr.setDescription(`
                     이미 음악퀴즈 시작을 입력하셨습니다.
