@@ -16,10 +16,12 @@ const ttscheck = new MessageEmbed()
     .setColor('RED');
 
 // 밴
-async function ban(client = new Client, message = new Message, args = Array, sdb = Object) {    
+async function ban(client = new Client, message = new Message, args = Array, sdb = MDB.object.server) {    
     udata.findOne({
         userID: message.member.user.id
-    }, async (err, udb) => {
+    }, async (err, db) => {
+        var udb = MDB.object.user;
+        udb = db;
         if (err) console.log(err);
         if (!udb) {
             await MDB.set.user(message.member.user);
@@ -50,7 +52,7 @@ async function ban(client = new Client, message = new Message, args = Array, sdb
                     ttscheck.setTitle(`\` ${user.username} \`님의 TTS 설정`)
                         .setDescription(`${date['time']['2']}\n이후로 \` 밴 \` 되셨습니다.`);
                     return message.channel.send(ttscheck).then(m => {
-                        if (!sdb.ttsid === message.channel.id) {
+                        if (!sdb.tts.ttschannelid === message.channel.id) {
                             msgdelete(m, Number(process.env.deletetime)+3000);
                         }
                     });
@@ -69,10 +71,12 @@ async function ban(client = new Client, message = new Message, args = Array, sdb
 // 밴 끝
 
 // 언밴
-async function unban(client = new Client, message = new Message, args = Array, sdb = Object) {    
+async function unban(client = new Client, message = new Message, args = Array, sdb = MDB.object.server) {    
     udata.findOne({
         userID: message.member.user.id
-    }, async (err, udb) => {
+    }, async (err, db) => {
+        var udb = MDB.object.user;
+        udb = db;
         if (err) console.log(err);
         if (!udb) {
             await MDB.set.user(message.member.user);
@@ -103,7 +107,7 @@ async function unban(client = new Client, message = new Message, args = Array, s
                     ttscheck.setTitle(`\` ${user.username} \`님의 TTS 설정`)
                         .setDescription(`${date['time']['2']}\n이후로 \` 해제 \` 되셨습니다.`);
                     return message.channel.send(ttscheck).then(m => {
-                        if (!sdb.ttsid === message.channel.id) {
+                        if (!sdb.tts.ttschannelid === message.channel.id) {
                             msgdelete(m, Number(process.env.deletetime)+3000);
                         }
                     });

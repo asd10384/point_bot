@@ -5,6 +5,7 @@ const client = new Client({partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'USER']}
 const { readdirSync } = require('fs');
 const { join } = require('path');
 const db = require('quick.db');
+const { ansermsg } = require('./module/musicquiz/ansermsg');
 
 // env
 const dfprefix = process.env.prefix;
@@ -49,21 +50,23 @@ client.on('message', async (message) => {
 
     await sdata.findOne({
         serverid: message.guild.id
-    }, async (err, sdb) => {
+    }, async (err, db) => {
+        var sdb = MDB.object.server;
+        sdb = db;
         if (err) console.log(err);
         if (!sdb) {
             await MDB.set.server(message);
         } else {
             // 채팅 채널 연결
-            var ttsid = sdb.ttsid;
+            var ttsid = sdb.tts.ttschannelid;
             if (ttsid == null || ttsid == undefined) {
                 ttsid = '0';
             }
-            var musicquizid = sdb.channelid;
+            var musicquizid = sdb.musicquiz.mqchannelid;
             if (musicquizid == null || musicquizid == undefined) {
                 musicquizid = '0';
             }
-    
+
             // prefix 입력시
             if (message.content.startsWith(prefix)) {
                 const args = message.content.slice(prefix.length).trim().split(/ +/g);
@@ -77,14 +80,14 @@ client.on('message', async (message) => {
                     await command.run(client, message, args, sdb);
                 } catch(error) {
                     if (commandName == '' || commandName == ';' || commandName == undefined || commandName == null) return ;
-                    console.log(error);
+                    // 코드 확인 console.log(error);
                     const embed = new MessageEmbed()
                         .setColor('DARK_RED')
                         .setDescription(`\` ${commandName} \` 이라는 명령어를 찾을수 없습니다.`)
                         .setFooter(` ${prefix}help 를 입력해 명령어를 확인해 주세요.`);
                     message.channel.send(embed).then(m => msgdelete(m, deletetime));
                 } finally {
-                    return msgdelete(message, 300);
+                    return msgdelete(message, 150);
                 }
             } else {
                 var args = message.content.trim().split(/ +/g);
@@ -93,8 +96,8 @@ client.on('message', async (message) => {
                     command = client.commands.get('tts');
                 }
                 if (musicquizid == message.channel.id) {
-                    if (sdb.start == true) {
-                        command = client.commands.get('musicanser');
+                    if (sdb.musicquiz.start.start == true) {
+                        return await ansermsg(client, message, args, sdb);
                     } else {
                         command = client.commands.get('musicquiz');
                         msgdelete(message, 100);
@@ -114,6 +117,7 @@ function msgdelete(m = new Message, t = Number) {
     }, t);
 }
 
+const { reac } = require('./client/reaction');
 client.on('messageReactionAdd', async (reaction, user) => {
-    await creaction(client, reaction, user);
+    await reac(client, reaction, user);
 });

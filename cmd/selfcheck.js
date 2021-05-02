@@ -17,7 +17,7 @@ module.exports = {
     name: 'selfcheck',
     aliases: ['자가진단'],
     description: '자동 자가진단',
-    async run (client = new Client, message = new Message, args = Array, sdb = Object) {
+    async run (client = new Client, message = new Message, args = Array, sdb = MDB.object.server) {
         var pp = db.get(`dp.prefix.${message.member.id}`);
         if (pp == (null || undefined)) {
             await db.set(`db.prefix.${message.member.id}`, process.env.prefix);
@@ -27,7 +27,9 @@ module.exports = {
 
         udata.findOne({
             userID: message.member.user.id
-        }, async (err, udb) => {
+        }, async (err, db) => {
+            var udb = MDB.object.user;
+            udb = db;
             if (err) console.log(err);
             if (!udb) {
                 await MDB.set.user(message.member.user);

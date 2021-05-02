@@ -1,5 +1,6 @@
 
 require('dotenv').config();
+const MDB = require('../../MDB/data');
 const { writeFile } = require('fs');
 const timer = require('./timer');
 var checktimer = false;
@@ -16,7 +17,7 @@ module.exports = {
 };
 
 // TEXT -> tts.WAV로 변경
-async function play(message = new Message, sdb = Object, channel = new Channel, text = String, options = Object) {
+async function play(message = new Message, sdb = MDB.object.server, channel = new Channel, text = String, options = Object) {
     const response = await ttsclient.synthesizeSpeech({
         input: {text: text},
         voice: {

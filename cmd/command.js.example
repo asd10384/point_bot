@@ -2,6 +2,7 @@
 require('dotenv').config();
 const db = require('quick.db');
 const { MessageEmbed, Client, Message } = require('discord.js');
+const MDB = require('../MDB/data');
 
 /*
 const MDB = require('../../MDB/data');
@@ -9,7 +10,9 @@ const udata = MDB.module.user();
 
 udata.findOne({
     userID: message.member.user.id
-}, async (err, udb) => {
+}, async (err, db) => {
+    var udb = MDB.object.user;
+    udb = db;
     if (err) console.log(err);
     if (!udb) {
         await MDB.set.user(message.member.user);
@@ -27,7 +30,7 @@ module.exports = {
     name: '',
     aliases: [''],
     description: '',
-    async run (client = new Client, message = new Message, args = Array, sdb = Object) {
+    async run (client = new Client, message = new Message, args = Array, sdb = MDB.object.server) {
         var pp = db.get(`dp.prefix.${message.member.id}`);
         if (pp == (null || undefined)) {
             await db.set(`db.prefix.${message.member.id}`, process.env.prefix);

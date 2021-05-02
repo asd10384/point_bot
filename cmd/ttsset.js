@@ -2,6 +2,7 @@
 require('dotenv').config();
 const db = require('quick.db');
 const { MessageEmbed, Client, Message } = require('discord.js');
+const MDB = require('../MDB/data');
 
 const per = new MessageEmbed()
     .setTitle(`이 명령어를 사용할 권한이 없습니다.`)
@@ -11,7 +12,7 @@ module.exports = {
     name: 'ttsset',
     aliases: ['tts설정'],
     description: 'tts채널을 만들고 봇과 연결함',
-    async run (client = new Client, message = new Message, args = Array, sdb = Object) {
+    async run (client = new Client, message = new Message, args = Array, sdb = MDB.object.server) {
         var pp = db.get(`dp.prefix.${message.member.id}`);
         if (pp == (null || undefined)) {
             await db.set(`db.prefix.${message.member.id}`, process.env.prefix);
@@ -24,7 +25,7 @@ module.exports = {
             type: 'text',
             topic: `봇을 사용한뒤 ${dfprefix}leave 명령어를 입력해 내보내 주세요.`
         }).then(channel => {
-            sdb.ttsid = channel.id;
+            sdb.tts.ttschannelid = channel.id;
             sdb.save().catch(err => console.log(err));
             var tts = new MessageEmbed()
                 .setTitle(`채팅을 읽어줍니다.`)

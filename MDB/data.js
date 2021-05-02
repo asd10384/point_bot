@@ -8,7 +8,7 @@ connect(process.env.mongourl, {
     useUnifiedTopology: true,
 });
 
-module.exports = {
+const out = {
     module: {
         user: module_user,
         server: module_server,
@@ -17,44 +17,79 @@ module.exports = {
         user: set_user,
         server: set_server,
     },
+    object: {
+        user: {
+            name: String,
+            userID: String,
+            tts: Boolean,
+            selfcheck: {
+                area: String,
+                school: String,
+                name: String,
+                birthday: String,
+                password: String,
+            },
+        },
+        server: {
+            serverid: String,
+            musicquiz: {
+                mqchannelid: String,
+                vcid: String,
+                user: {
+                    hint: Array,
+                    skip: Array,
+                    score: Object,
+                },
+                anser: {
+                    list: Array,
+                    anser: Number,
+                    time: Number,
+                },
+                msg: {
+                    listid: String,
+                    npid: String,
+                    scoreid: String,
+                },
+                music: {
+                    name: Array,
+                    vocal: Array,
+                    link: Array,
+                    count: Number,
+                    skipcount: Number,
+                },
+                start: {
+                    start: Boolean,
+                    embed: Boolean,
+                    user: Boolean,
+                    hint: Boolean,
+                },
+                page: {
+                    click: Number,
+                    now: Number,
+                    p1: Number,
+                    p2: Number,
+                    p3: Number,
+                    p4: Number,
+                    slide: Number,
+                },
+            },
+            tts: {
+                ttschannelid: String,
+                tts: Boolean,
+            },
+            role: Array,
+        },
+    },
 };
 
+module.exports = out;
+
 function module_user() {
-    var dataSchema = Schema({
-        name: String,
-        userID: String,
-        tts: Boolean,
-        selfcheck: {
-            area: String,
-            school: String,
-            name: String,
-            birthday: String,
-            password: String,
-        },
-    });
+    var dataSchema = Schema(out.object.user);
     return models.Mandl_user || model('Mandl_user', dataSchema);
 }
 function module_server() {
-    var dataSchema = Schema({
-        serverid: String,
-        channelid: String,
-        voicechannelid: String,
-        listid: String,
-        npid: String,
-        scoreid: String,
-        ttsid: String,
-        name: Array,
-        vocal: Array,
-        link: Array,
-        count: Number,
-        skip: Number,
-        start: Boolean,
-        tts: Boolean,
-        role: Array,
-        anser_list: Array,
-        anser_time: Number,
-        anser: Number
-    });
+    var dataSchema = Schema(out.object.server);
     return models.Mandl_server || model('Mandl_server', dataSchema);
 }
 
@@ -78,24 +113,51 @@ async function set_server(message = new Message) {
     var data = module_server(); //모듈
     const newdata = new data({
         serverid: message.guild.id,
-        channelid: '',
-        voicechannelid: '',
-        listid: '',
-        npid: '',
-        scoreid: '',
-        ttsid: '',
-        name: [],
-        vocal: [],
-        link: [],
-        count: 0,
-        skip: 0,
-        start: false,
-        sthas: false,
-        tts: true,
-        role: [],
-        anser_list: ['제목', '가수', '제목-가수', '가수-제목'],
-        anser_time: 10,
-        anser: 0
+        musicquiz: {
+            mqchannelid: '',
+            vcid: '',
+            user: {
+                hint: [],
+                skip: [],
+                score: {},
+            },
+            anser: {
+                list: ['제목', '가수', '제목-가수', '가수-제목'],
+                anser: 0,
+                time: 10,
+            },
+            msg: {
+                listid: '',
+                npid: '',
+                scoreid: '',
+            },
+            music: {
+                name: [],
+                vocal: [],
+                link: [],
+                count: 0,
+                skipcount: 0,
+            },
+            start: {
+                start: false,
+                embed: false,
+                user: false,
+                hint: false,
+            },
+            page: {
+                click: 0,
+                now: 0,
+                p1: 0,
+                p2: 0,
+                p3: 0,
+                p4: 0,
+                slide: 0,
+            },
+        },
+        tts: {
+            ttschannelid: '',
+            tts: true,
+        },
     });
     return newdata.save().catch(err => console.log(err));
 }

@@ -25,10 +25,12 @@ module.exports = {
 };
 
 // 기본
-async function tts(client = new Client, message = new Message, args = Array, sdb = Object) {    
+async function tts(client = new Client, message = new Message, args = Array, sdb = MDB.object.server) {    
     udata.findOne({
         userID: message.member.user.id
-    }, async (err, udb) => {
+    }, async (err, db) => {
+        var udb = MDB.object.user;
+        udb = db;
         if (err) console.log(err);
         if (!udb) {
             await MDB.set.user(message.member.user);
@@ -43,7 +45,7 @@ async function tts(client = new Client, message = new Message, args = Array, sdb
         if (url.url == 'youtubelinkerror') {
             return message.channel.send(yterr).then(m => msgdelete(m, Number(process.env.deletetime)));
         }
-        if (sdb.tts) {
+        if (sdb.tts.tts) {
             db.set(`db.${message.guild.id}.tts.timertime`, 600);
             var channel;
             try {
@@ -127,7 +129,7 @@ function msg (text) {
     return text;
 }
 function msgdelete(m = new Message, t = Number) {
-    setTimeout(function() {
+    setTimeout(() => {
         try {
             m.delete();
         } catch(err) {}

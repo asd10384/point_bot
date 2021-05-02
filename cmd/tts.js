@@ -2,6 +2,8 @@
 require('dotenv').config();
 const db = require('quick.db');
 const { MessageEmbed, Client, Message } = require('discord.js');
+const MDB = require('../MDB/data');
+
 const tts = require('../module/tts/tts');
 const ban = require('../module/tts/ban');
 
@@ -13,7 +15,7 @@ module.exports = {
     name: 'tts',
     aliases: ['ㅅㅅㄴ'],
     description: `${process.env.prefix}tts help`,
-    async run (client = new Client, message = new Message, args = Array, sdb = Object, chat = false) {
+    async run (client = new Client, message = new Message, args = Array, sdb = MDB.object.server, chat = false) {
         var pp = db.get(`dp.prefix.${message.member.id}`);
         if (pp == (null || undefined)) {
             await db.set(`db.prefix.${message.member.id}`, process.env.prefix);
