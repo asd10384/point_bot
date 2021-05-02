@@ -76,7 +76,7 @@ async function end(client = new Client, message = new Message, sdb = MDB.object.
         });
     } catch(err) {}
 
-    await allmsgdelete(client, sdb, 2000);
+    await allmsgdelete(client, sdb, 1000);
 }
 async function start(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel) {
     await start_em(client, message, args, sdb, vchannel, {
