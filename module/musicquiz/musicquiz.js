@@ -405,7 +405,9 @@ async function ready(client = new Client, message = new Message, args = Array, s
     if (!ulist.complite) {
         await end(client, message, sdb);
         emerr.setDescription(`아직 이 퀴즈가 완성되지 않았습니다.`);
-        return message.channel.send(emerr).then(m => msgdelete(m, Number(process.env.deletetime)));
+        return setTimeout(async () => {
+            return message.channel.send(emerr).then(m => msgdelete(m, Number(process.env.deletetime)));
+        }, 1250);
     }
     sdb.musicquiz.start.user = false;
     sdb.musicquiz.user.hint = [];
