@@ -35,3 +35,8 @@ github + heroku
 
 * [tkrmagid](https://github.com/asd10384) - 봇 제작
 * [Kacarong](https://github.com/Kacarong) - 음악퀴즈 사이트 제작
+
+## musicquiz site / 음악퀴즈 사이트
+
+* 현재 사용하고있는 음악을 가져오는 사이트는 개인적으로 만든 사이트 입니다.
+* 따로 공개하고있진 않습니다.
