@@ -80,7 +80,8 @@ client.on('message', async (message) => {
                     await command.run(client, message, args, sdb);
                 } catch(error) {
                     if (commandName == '' || commandName == ';' || commandName == undefined || commandName == null) return ;
-                    // 코드 확인 console.log(error);
+                    // 코드 확인
+                    // console.log(error);
                     const embed = new MessageEmbed()
                         .setColor('DARK_RED')
                         .setDescription(`\` ${commandName} \` 이라는 명령어를 찾을수 없습니다.`)
