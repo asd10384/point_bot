@@ -4,8 +4,6 @@ const db = require('quick.db');
 const { MessageEmbed, Client, Message, Channel } = require('discord.js');
 const MDB = require('../../MDB/data');
 
-const msg = require('./msg');
-
 module.exports = {
     score,
 };
@@ -23,11 +21,11 @@ async function score(client = new Client, message = new Message, args = [], sdb 
         text = `**1.** 없음\n`;
     }
     const em = new MessageEmbed()
-        .setTitle(`** [ 음악퀴즈 스코어 ] **`)
+        .setTitle(`** [ 퀴즈 스코어 ] **`)
         .setDescription(`
             ${text}
 
-            스킵한 노래 : ${skip}곡
+            스킵한 문제 : ${skip}개
         `)
         .setFooter(`스코어는 다음퀴즈 전까지 사라지지 않습니다.`)
         .setColor('ORANGE');

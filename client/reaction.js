@@ -5,8 +5,8 @@ const db = require('quick.db');
 const MDB = require('../MDB/data');
 const sdata = MDB.module.server();
 
-const mq = require('../module/musicquiz/musicquiz');
-const { hint, skip } = require('../module/musicquiz/user');
+const quiz = require('../module/quiz/quiz');
+const { hint, skip } = require('../module/quiz/user');
 
 const dfprefix = process.env.prefix;
 
@@ -38,7 +38,7 @@ async function go(client = new Client, reaction = new ReactionCollector, user = 
             await MDB.set.server(message);
             return await reac(client, reaction, user);
         } else {
-            if (reaction.message.channel.id === sdb.musicquiz.mqchannelid) {
+            if (reaction.message.channel.id === sdb.musicquiz.quizchannelid) {
                 if (name === '💡') {
                     if (sdb.musicquiz.start.user) {
                         reaction.users.remove(user);
@@ -80,7 +80,7 @@ async function go(client = new Client, reaction = new ReactionCollector, user = 
                 if (!vchannel) {
                     var vchannel = message.member.voice.channel;
                 }
-                return await mq.start_em(client, message, [], sdb, vchannel, {first: false});
+                return await quiz.start_em(client, message, [], sdb, vchannel, {first: false});
             }
         }
     });

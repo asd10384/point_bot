@@ -4,7 +4,7 @@ const db = require('quick.db');
 const { MessageEmbed, Client, Message, Channel, User } = require('discord.js');
 const MDB = require('../../MDB/data');
 
-const mq = require('./musicquiz');
+const quiz = require('./quiz');
 
 const em = new MessageEmbed()
     .setColor('ORANGE');
@@ -32,7 +32,7 @@ async function hint(client = new Client, message = new Message, args = Array, sd
     try {
         usercount = Math.floor(message.guild.me.voice.channel.members.size / 2);
     } catch(err) {
-        await mq.end(client, message, sdb);
+        await quiz.end(client, message, sdb);
     }
     var hint = sdb.musicquiz.user.hint;
     const userid = user.id;
@@ -87,7 +87,7 @@ async function skip(client = new Client, message = new Message, args = Array, sd
     try {
         usercount = Math.floor(message.guild.me.voice.channel.members.size / 2);
     } catch(err) {
-        return await mq.end(client, message, sdb);
+        return await quiz.end(client, message, sdb);
     }
     var skip = sdb.musicquiz.user.skip;
     const userid = user.id;
@@ -101,7 +101,7 @@ async function skip(client = new Client, message = new Message, args = Array, sd
     if (skip.length >= usercount) {
         sdb.musicquiz.user.skip = [];
         await sdb.save().catch((err) => console.log(err));
-        return await mq.anser(client, message, ['스킵'], sdb);
+        return await quiz.anser(client, message, ['스킵'], sdb);
     }
     sdb.musicquiz.user.skip = skip;
     await sdb.save().catch((err) => console.log(err));

@@ -4,7 +4,7 @@ const db = require('quick.db');
 const { MessageEmbed, Client, Message, Channel } = require('discord.js');
 const MDB = require('../../MDB/data');
 
-const mq = require('./musicquiz');
+const quiz = require('./quiz');
 const { hint, skip } = require('./user');
 
 module.exports = {
@@ -28,7 +28,7 @@ async function ansermsg(client = new Client, message = new Message, args = Array
     if (text == anser_text) {
         sdb.musicquiz.start.user = false;
         await sdb.save().catch((err) => console.log(err));
-        return await mq.anser(client, message, args, sdb);
+        return await quiz.anser(client, message, args, sdb);
     }
     if (text == '힌트' || text == 'hint') {
         return await hint(client, message, args, sdb, message.member.user);

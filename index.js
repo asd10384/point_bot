@@ -5,7 +5,7 @@ const client = new Client({partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'USER']}
 const { readdirSync } = require('fs');
 const { join } = require('path');
 const db = require('quick.db');
-const { ansermsg } = require('./module/musicquiz/ansermsg');
+const { ansermsg } = require('./module/quiz/ansermsg');
 
 // env
 const dfprefix = process.env.prefix;
@@ -40,7 +40,7 @@ client.on('message', async (message) => {
     // 봇이나 디엠 메시지 무시
     if (message.author.bot) return;
     if (message.channel.type === 'dm') return;
-    
+
     // prefix 설정
     var prefix = await db.get(`db.prefix.${message.member.id}`);
     if (prefix == (null || undefined)) {
@@ -100,7 +100,7 @@ client.on('message', async (message) => {
                     if (sdb.musicquiz.start.start == true) {
                         return await ansermsg(client, message, args, sdb);
                     } else {
-                        command = client.commands.get('musicquiz');
+                        command = client.commands.get('quiz');
                         msgdelete(message, 100);
                     }
                 }
