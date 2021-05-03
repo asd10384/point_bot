@@ -18,7 +18,7 @@ async function voice (message = new Message, sdb = MDB.object.server) {
             vchannel: undefined
         };
     }
-    sdb.musicquiz.vcid = vchannel.id;
+    sdb.quiz.vcid = vchannel.id;
     await sdb.save().catch((err) => console.log(err));
     return {
         success: true,

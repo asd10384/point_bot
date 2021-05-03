@@ -9,8 +9,8 @@ module.exports = {
 };
 
 async function score(client = new Client, message = new Message, args = [], sdb = MDB.object.server) {
-    var score = sdb.musicquiz.user.score;
-    var skip = sdb.musicquiz.music.skipcount;
+    var score = sdb.quiz.user.score;
+    var skip = sdb.quiz.quiz.skipcount;
     var text = '';
     var i = 1;
     for (s in score) {
@@ -30,8 +30,8 @@ async function score(client = new Client, message = new Message, args = [], sdb 
         .setFooter(`스코어는 다음퀴즈 전까지 사라지지 않습니다.`)
         .setColor('ORANGE');
     try {
-        var c = client.channels.cache.get(sdb.musicquiz.mqchannelid);
-        c.messages.fetch(sdb.musicquiz.msg.scoreid).then(m => {
+        var c = client.channels.cache.get(sdb.quiz.qzchannelid);
+        c.messages.fetch(sdb.quiz.msg.scoreid).then(m => {
             m.edit(em);
         });
     } catch(err) {}

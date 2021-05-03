@@ -14,11 +14,11 @@ module.exports = {
 async function ansermsg(client = new Client, message = new Message, args = Array, sdb = MDB.object.server) {
     const text = args.join(' ').trim().toLowerCase();
 
-    var count = sdb.musicquiz.music.count;
-    var name = sdb.musicquiz.music.name[count];
-    var vocal = sdb.musicquiz.music.vocal[count];
+    var count = sdb.quiz.quiz.count;
+    var name = sdb.quiz.quiz.name[count];
+    var vocal = sdb.quiz.quiz.vocal[count];
 
-    const anser = sdb.musicquiz.anser.anser;
+    const anser = sdb.quiz.anser.anser;
     var anser_text = '';
     if (anser == 0) anser_text = `${name}`.trim().toLowerCase();
     if (anser == 1) anser_text = `${vocal}`.trim().toLowerCase();
@@ -26,7 +26,7 @@ async function ansermsg(client = new Client, message = new Message, args = Array
     if (anser == 3) anser_text = `${vocal}-${name}`.trim().toLowerCase();
 
     if (text == anser_text) {
-        sdb.musicquiz.start.user = false;
+        sdb.quiz.start.user = false;
         await sdb.save().catch((err) => console.log(err));
         return await quiz.anser(client, message, args, sdb);
     }

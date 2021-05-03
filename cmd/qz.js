@@ -54,8 +54,8 @@ module.exports = {
             var vchannel = await check.voice(message, sdb);
             if (!vchannel.success) return message.channel.send(vchannelerr).then(m => msgdelete(m, Number(process.env.deletetime)));
             
-            if (!sdb.musicquiz.start.embed) {
-                sdb.musicquiz.start.embed = true;
+            if (!sdb.quiz.start.embed) {
+                sdb.quiz.start.embed = true;
                 return await quiz.start(client, message, args, sdb, vchannel);
             } else {
                 emerr.setDescription(`
@@ -68,7 +68,7 @@ module.exports = {
             }
         }
         if (args[0] == '종료' || args[0] == 'stop') {
-            sdb.musicquiz.start.embed = false;
+            sdb.quiz.start.embed = false;
             await quiz.end(client, message, sdb);
             return await sdb.save().catch((err) => console.log(err));
         }
@@ -83,7 +83,7 @@ module.exports = {
         }
         if (args[0] == '기본설정') {
             if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, Number(process.env.deletetime)));
-            client.commands.get('musicquizset').run(client, message, args, sdb);
+            client.commands.get('qzset').run(client, message, args, sdb);
         }
         if (args[0] == '도움말' || args[0] == '명령어' || args[0] == 'help' || args[0] == 'info') {
             const help = new MessageEmbed()

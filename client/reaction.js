@@ -8,8 +8,6 @@ const sdata = MDB.module.server();
 const quiz = require('../module/quiz/quiz');
 const { hint, skip } = require('../module/quiz/user');
 
-const dfprefix = process.env.prefix;
-
 module.exports = {
     reac,
 };
@@ -38,15 +36,15 @@ async function go(client = new Client, reaction = new ReactionCollector, user = 
             await MDB.set.server(message);
             return await reac(client, reaction, user);
         } else {
-            if (reaction.message.channel.id === sdb.musicquiz.quizchannelid) {
+            if (reaction.message.channel.id === sdb.quiz.qzchannelid) {
                 if (name === '💡') {
-                    if (sdb.musicquiz.start.user) {
+                    if (sdb.quiz.start.user) {
                         reaction.users.remove(user);
                         return await hint(client, message, [], sdb, user);
                     }
                 }
                 if (name === '⏭️') {
-                    if (sdb.musicquiz.start.user) {
+                    if (sdb.quiz.start.user) {
                         reaction.users.remove(user);
                         return await skip(client, message, ['스킵'], sdb, user);
                     }
@@ -55,27 +53,27 @@ async function go(client = new Client, reaction = new ReactionCollector, user = 
                 if (name === '1️⃣' || name === '2️⃣' || name === '3️⃣' || name === '4️⃣' || name === '5️⃣') {
                     reaction.users.remove(user);
                     var num = (name === '1️⃣') ? 1 : (name === '2️⃣') ? 2 : (name === '3️⃣') ? 3 : (name === '4️⃣') ? 4 : 5;
-                    sdb.musicquiz.page.click = num;
-                    sdb.musicquiz.page.now = sdb.musicquiz.page.now+1;
-                    if (sdb.musicquiz.page.now-1 <= 1) sdb.musicquiz.page.p1 = num;
-                    if (sdb.musicquiz.page.now-1 == 2) sdb.musicquiz.page.p2 = num;
-                    if (sdb.musicquiz.page.now-1 == 3) sdb.musicquiz.page.p3 = num;
-                    if (sdb.musicquiz.page.now-1 == 4) sdb.musicquiz.page.p4 = num;
-                    if (sdb.musicquiz.page.now-1 == 5) sdb.musicquiz.page.p5 = num;
+                    sdb.quiz.page.click = num;
+                    sdb.quiz.page.now = sdb.quiz.page.now+1;
+                    if (sdb.quiz.page.now-1 <= 1) sdb.quiz.page.p1 = num;
+                    if (sdb.quiz.page.now-1 == 2) sdb.quiz.page.p2 = num;
+                    if (sdb.quiz.page.now-1 == 3) sdb.quiz.page.p3 = num;
+                    if (sdb.quiz.page.now-1 == 4) sdb.quiz.page.p4 = num;
+                    if (sdb.quiz.page.now-1 == 5) sdb.quiz.page.p5 = num;
                 }
                 if (name === '↩️') {
                     reaction.users.remove(user);
-                    if (sdb.musicquiz.page.now <= 1) return;
-                    sdb.musicquiz.page.now = sdb.musicquiz.page.now-1;
+                    if (sdb.quiz.page.now <= 1) return;
+                    sdb.quiz.page.now = sdb.quiz.page.now-1;
                 }
                 if (name === '⬅️' || name === '➡️') {
                     reaction.users.remove(user);
-                    if (sdb.musicquiz.page.slide <= 0) return;
-                    sdb.musicquiz.page.slide = sdb.musicquiz.page.slide - (name == '➡️') ? 1 : -1;
+                    if (sdb.quiz.page.slide <= 0) return;
+                    sdb.quiz.page.slide = sdb.quiz.page.slide - (name == '➡️') ? 1 : -1;
                 }
                 await sdb.save().catch((err) => console.log(err));
                 try {
-                    var vchannel = client.channels.cache.get(sdb.musicquiz.vcid);
+                    var vchannel = client.channels.cache.get(sdb.quiz.vcid);
                 } catch(err) {}
                 if (!vchannel) {
                     var vchannel = message.member.voice.channel;

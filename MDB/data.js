@@ -32,8 +32,8 @@ const out = {
         },
         server: {
             serverid: String,
-            musicquiz: {
-                mqchannelid: String,
+            quiz: {
+                qzchannelid: String,
                 vcid: String,
                 user: {
                     hint: Array,
@@ -50,7 +50,7 @@ const out = {
                     npid: String,
                     scoreid: String,
                 },
-                music: {
+                quiz: {
                     name: Array,
                     vocal: Array,
                     link: Array,
@@ -113,8 +113,8 @@ async function set_server(message = new Message) {
     var data = module_server(); //모듈
     const newdata = new data({
         serverid: message.guild.id,
-        musicquiz: {
-            mqchannelid: '',
+        quiz: {
+            qzchannelid: '',
             vcid: '',
             user: {
                 hint: [],
@@ -131,7 +131,7 @@ async function set_server(message = new Message) {
                 npid: '',
                 scoreid: '',
             },
-            music: {
+            quiz: {
                 name: [],
                 vocal: [],
                 link: [],

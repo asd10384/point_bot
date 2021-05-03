@@ -15,13 +15,13 @@ module.exports = {
 };
 
 async function hint(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, user = new User) {
-    if (!sdb.musicquiz.start.user) return;
-    if (!sdb.musicquiz.start.hint) return;
-    var count = sdb.musicquiz.music.count;
-    var name = sdb.musicquiz.music.name[count];
-    var vocal = sdb.musicquiz.music.vocal[count];
+    if (!sdb.quiz.start.user) return;
+    if (!sdb.quiz.start.hint) return;
+    var count = sdb.quiz.quiz.count;
+    var name = sdb.quiz.quiz.name[count];
+    var vocal = sdb.quiz.quiz.vocal[count];
 
-    const ansernum = sdb.musicquiz.anser.anser;
+    const ansernum = sdb.quiz.anser.anser;
     anser = '';
     if (ansernum == 0) anser = `${name}`.trim().toLowerCase();
     if (ansernum == 1) anser = `${vocal}`.trim().toLowerCase();
@@ -34,7 +34,7 @@ async function hint(client = new Client, message = new Message, args = Array, sd
     } catch(err) {
         await quiz.end(client, message, sdb);
     }
-    var hint = sdb.musicquiz.user.hint;
+    var hint = sdb.quiz.user.hint;
     const userid = user.id;
     var text = '';
     if (hint.includes(userid)) {
@@ -44,8 +44,8 @@ async function hint(client = new Client, message = new Message, args = Array, sd
         text = `**${user.username}** 님이 힌트를 요청했습니다.`;
     }
     if (hint.length >= usercount || (args[0] && args[0] == '관리자')) {
-        sdb.musicquiz.start.hint = false;
-        sdb.musicquiz.user.hint = [];
+        sdb.quiz.start.hint = false;
+        sdb.quiz.user.hint = [];
         await sdb.save().catch((err) => console.log(err));
         const tcount = anser.replace(/-/g,'').replace(/ /g,'').length;
         var rndlist = [];
@@ -69,7 +69,7 @@ async function hint(client = new Client, message = new Message, args = Array, sd
             .setDescription(`${outt.replace(/ /g,'  ')}`);
         return message.channel.send(em);
     }
-    sdb.musicquiz.user.hint = hint;
+    sdb.quiz.user.hint = hint;
     await sdb.save().catch((err) => console.log(err));
     em.setTitle(`**힌트 (${hint.length} / ${usercount})**`)
         .setDescription(`
@@ -81,7 +81,7 @@ async function hint(client = new Client, message = new Message, args = Array, sd
 }
 
 async function skip(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, user = new User) {
-    if (!sdb.musicquiz.start.user) return;
+    if (!sdb.quiz.start.user) return;
 
     var usercount;
     try {
@@ -89,7 +89,7 @@ async function skip(client = new Client, message = new Message, args = Array, sd
     } catch(err) {
         return await quiz.end(client, message, sdb);
     }
-    var skip = sdb.musicquiz.user.skip;
+    var skip = sdb.quiz.user.skip;
     const userid = user.id;
     var text = '';
     if (skip.includes(userid)) {
@@ -99,11 +99,11 @@ async function skip(client = new Client, message = new Message, args = Array, sd
         text = `**${user.username}** 님이 스킵을 요청했습니다.`;
     }
     if (skip.length >= usercount) {
-        sdb.musicquiz.user.skip = [];
+        sdb.quiz.user.skip = [];
         await sdb.save().catch((err) => console.log(err));
         return await quiz.anser(client, message, ['스킵'], sdb);
     }
-    sdb.musicquiz.user.skip = skip;
+    sdb.quiz.user.skip = skip;
     await sdb.save().catch((err) => console.log(err));
     em.setTitle(`**스킵 (${skip.length} / ${usercount})**`)
         .setDescription(`

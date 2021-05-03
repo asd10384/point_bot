@@ -62,9 +62,9 @@ client.on('message', async (message) => {
             if (ttsid == null || ttsid == undefined) {
                 ttsid = '0';
             }
-            var musicquizid = sdb.musicquiz.mqchannelid;
-            if (musicquizid == null || musicquizid == undefined) {
-                musicquizid = '0';
+            var quizid = sdb.quiz.qzchannelid;
+            if (quizid == null || quizid == undefined) {
+                quizid = '0';
             }
 
             // prefix 입력시
@@ -96,11 +96,11 @@ client.on('message', async (message) => {
                 if (ttsid == message.channel.id) {
                     command = client.commands.get('tts');
                 }
-                if (musicquizid == message.channel.id) {
-                    if (sdb.musicquiz.start.start == true) {
+                if (quizid == message.channel.id) {
+                    if (sdb.quiz.start.start == true) {
                         return await ansermsg(client, message, args, sdb);
                     } else {
-                        command = client.commands.get('quiz');
+                        command = client.commands.get('qz');
                         msgdelete(message, 100);
                     }
                 }
