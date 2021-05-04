@@ -62,6 +62,7 @@ async function go(client = new Client, reaction = new ReactionCollector, user = 
                     if (sdb.quiz.page.now-1 == 5) sdb.quiz.page.p5 = num;
                 }
                 if (name === '↩️') {
+                    sdb.quiz.page.slide = 0;
                     reaction.users.remove(user);
                     if (sdb.quiz.page.now <= 1) return;
                     sdb.quiz.page.now = sdb.quiz.page.now-1;

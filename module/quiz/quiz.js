@@ -28,6 +28,9 @@ module.exports = {
 };
 
 async function end(client = new Client, message = new Message, sdb = MDB.object.server) {
+    db.set(`db.${message.guild.id}.mq.timer`, false);
+    db.set(`db.${message.guild.id}.img.timer`, false);
+    db.set(`db.${message.guild.id}.img.time`, 45);
     sdb.quiz.quiz.name = [];
     sdb.quiz.quiz.vocal = [];
     sdb.quiz.quiz.link = [];
@@ -171,7 +174,7 @@ async function start_em(client = new Client, message = new Message, args = Array
                             ][
                                 keys2[data.page.p2-1]
                             ][
-                                keys3[data.page.p3-1]
+                                keys3[(data.page.slide*5)+data.page.p3-1]
                             ];
                             if (data.page.now >=5) {
                                 if (data.page.click == 1) {
@@ -181,13 +184,11 @@ async function start_em(client = new Client, message = new Message, args = Array
                                     data.page.p2 = 0;
                                     data.page.p3 = 0;
                                     data.page.p4 = 0;
-                                    data.page.slide = 0;
                                     await db.set(`db.${message.guild.id}.mq.timer`, false);
                                     return await ready(client, message, args, sdb, vchannel, ulist);
                                 }
                                 data.page.now = 3;
                                 data.page.p4 = 0;
-                                data.page.slide = 0;
                                 ulist = dflist[
                                     keys1[data.page.p1-1]
                                 ][
@@ -204,8 +205,9 @@ async function start_em(client = new Client, message = new Message, args = Array
                 return sdb.save().catch((err) => console.log(err));
             }
             sdb.save().catch((err) => console.log(err));
+            var slide = data.page.slide;
             if (data.page.now == 4) {
-                data.page.slide = 0;
+                slide = 0;
                 var urllist = ulist.url.split('/');
                 text[0] = `**이름** : ${urllist[urllist.length-1].replace('.html','')}\n**형식** : ${(ulist.quiz.music) ? `음악퀴즈` : (ulist.quiz || !ulist.quiz == '') ? ulist.quiz : `지정되지 않음`}\n**설명** : ${(ulist.desc || !ulist.desc == '') ? ulist.desc : `설명이 없습니다.`}\n\n1️⃣ 시작하기\n2️⃣ 뒤로가기\n`;
             } else {
@@ -218,15 +220,15 @@ async function start_em(client = new Client, message = new Message, args = Array
                     i++;
                     if (i % 5 == 0) p++;
                 }
-                if (data.page.slide < 0) data.page.slide = 0;
-                if (data.page.slide > text.length-1) data.page.slide = text.length-1;
+                if (slide < 0) slide = 0;
+                if (slide > text.length-1) slide = text.length-1;
             }
             const np = new MessageEmbed()
                 .setTitle(`** [퀴즈 선택화면 ]**`)
                 .setDescription(`
                     **\` 아래 숫자를 눌러 선택해주세요. \`**
 
-                    ${text[data.page.slide]}
+                    ${text[slide]}
                         
                     (아래 이모지가 전부 로딩된 뒤 선택해주세요.)
                 `)
@@ -246,6 +248,8 @@ async function start_em(client = new Client, message = new Message, args = Array
 }
 async function anser(client = new Client, message = new Message, args = Array, sdb = MDB.object.server) {
     db.set(`db.${message.guild.id}.mq.timer`, true);
+    db.set(`db.${message.guild.id}.img.timer`, false);
+    db.set(`db.${message.guild.id}.img.time`, 45);
     sdb.quiz.start.user = false;
     sdb.quiz.start.hint = false;
     sdb.quiz.user.hint = [];
@@ -324,6 +328,37 @@ async function timer(client = new Client, message = new Message, sdb = MDB.objec
         }
     }, 1000);
 }
+async function imgtimer(client = new Client, message = new Message, sdb = MDB.object.server, count = Number, all_count = Number, img = String) {
+    const ontimer = setInterval(async () => {
+        var ts = db.get(`db.${message.guild.id}.img.timer`) || false;
+        var time = db.get(`db.${message.guild.id}.img.time`) || 45;
+        if (!ts) {
+            return clearInterval(ontimer);
+        }
+        if (time <= 0) {
+            clearInterval(ontimer);
+            db.set(`db.${message.guild.id}.img.timer`, false);
+            db.set(`db.${message.guild.id}.img.time`, 45);
+            return await anser(client, message, ['스킵'], sdb);
+        }
+        if (time % 5 == 0 || time < 5) {
+            var np = new MessageEmbed()
+                .setTitle(`**정답 : ???**`)
+                .setDescription(`**남은시간 : ${time}**\n**문제 : ${count+1}/${all_count}**`)
+                .setImage(img)
+                .setFooter(`기본 명령어 : ${process.env.prefix}퀴즈 도움말`)
+                .setColor('ORANGE');
+        
+            try {
+                var c = client.channels.cache.get(sdb.quiz.qzchannelid);
+                c.messages.fetch(sdb.quiz.msg.npid).then(m => {
+                    m.edit(np);
+                });
+            } catch(err) {}
+        }
+        db.set(`db.${message.guild.id}.img.time`, time-1);
+    }, 1000);
+}
 
 function bignum(num=1) {
     return num == 1 ? '1️⃣' : num == 2 ? '2️⃣' : num == 3 ? '3️⃣' : num == 4 ? '4️⃣' : '5️⃣';
@@ -350,58 +385,6 @@ async function allmsgdelete(client = new Client, sdb = MDB.object.server, time =
         }
     }
     return;
-}
-
-async function musicplay(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel) {
-    sdb.tts.tts = false;
-    sdb.quiz.start.start = true;
-    await sdb.save().catch((err) => console.log(err));
-
-    var count = sdb.quiz.quiz.count;
-    var link = sdb.quiz.quiz.link[count];
-    if (link == undefined || link == null || link == '') {
-        vchannel.leave();
-        await allmsgdelete(client, sdb, 50);
-        return await end(client, message, sdb);
-    }
-    var url = ytdl(link, { bitrate: 512000, quality: 'highestaudio' });
-    var options = {
-        volume: 0.07
-    };
-    const manser = sdb.quiz.anser.list[sdb.quiz.anser.anser];
-    const all_count = sdb.quiz.quiz.name.length;
-    
-    var list = `퀴즈를 종료하시려면 \` ${process.env.prefix}퀴즈 종료 \`를 입력해주세요.
-힌트를 받으시려면 \`힌트 \`를 입력하거나 💡를 눌러주세요.
-문제를 스킵하시려면 \` 스킵 \`을 입력하거나 ⏭️을 눌러주세요.`;
-    var np = new MessageEmbed()
-        .setTitle(`**정답 : ???**`)
-        .setDescription(`**채팅창에 ${manser} 형식으로 적어주세요.**\n**문제 : ${count+1}/${all_count}**`)
-        .setImage(`http://ytms.netlify.app/question_mark.png`)
-        .setFooter(`기본 명령어 : ${process.env.prefix}퀴즈 도움말`)
-        .setColor('ORANGE');
-
-    try {
-        var c = client.channels.cache.get(sdb.quiz.qzchannelid);
-        c.messages.fetch(sdb.quiz.msg.listid).then(m => {
-            m.edit(list);
-        });
-        c.messages.fetch(sdb.quiz.msg.npid).then(m => {
-            m.edit(np);
-        });
-    } catch(err) {}
-
-    vchannel.join().then(async (connection) => {
-        db.set(`db.${message.guild.id}.mq.timer`, true);
-        await timer(client, message, sdb);
-        const dispatcher = connection.play(url, options);
-        sdb.quiz.start.user = true;
-        sdb.quiz.start.hint = true;
-        await sdb.save().catch((err) => console.log(err));
-        dispatcher.on('finish', async () => {
-            return await anser(client, message, args, sdb);
-        });
-    })
 }
 
 async function ready(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, ulist = {
@@ -468,13 +451,13 @@ async function getimg(client = new Client, message = new Message, args = Array, 
         $('body div.music div').each(async function () {
             dfname.push($(this).children('a.name').text().trim());
             dfvocal.push($(this).children('a.vocal').text().trim());
-            dflink.push($(this).children('a.link').text().trim());
+            dflink.push(process.env.mqsite + $(this).children('a.link').attr('href').trim().replace('..',''));
         });
         var rndlist = [],
             name = [],
             vocal = [],
             link = [],
-            logtext = '';
+            logtext = `URL : ${ulist.url}\nQUIZ : ${ulist.quiz}\n\n`;
         var count = dfname.length;
         if (count > 50) count = 50;
         for (i=0; i<count; i++) {
@@ -490,20 +473,74 @@ async function getimg(client = new Client, message = new Message, args = Array, 
             logtext += `${i+1}. ${dfvocal[r]}-${dfname[r]} [${r+1}]\n`;
         }
         console.log(logtext);
-        var music = sdb.quiz;
-        music.quiz.name = name;
-        music.quiz.vocal = vocal;
-        music.quiz.link = link;
-        music.quiz.count = 0;
-        music.start.start = true;
-        music.start.user = false;
-        sdb.quiz = music;
+        var img = sdb.quiz;
+        img.quiz.name = name;
+        img.quiz.vocal = vocal;
+        img.quiz.link = link;
+        img.quiz.count = 0;
+        img.start.start = true;
+        img.start.user = false;
+        sdb.quiz = img;
         await sdb.save().catch((err) => console.log(err));
         return await imgplay(client, message, args, sdb, vchannel);
-        // 12 여기 제작 해야됨
     });
     return;
 }
+async function imgplay(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel) {
+    sdb.tts.tts = false;
+    sdb.quiz.start.start = true;
+    await sdb.save().catch((err) => console.log(err));
+
+    var count = sdb.quiz.quiz.count;
+    var img = sdb.quiz.quiz.link[count];
+    if (img == undefined || img == null || img == '') {
+        vchannel.leave();
+        await allmsgdelete(client, sdb, 50);
+        return await end(client, message, sdb);
+    }
+    var url = ytdl(link, { bitrate: 512000, quality: 'highestaudio' });
+    var options = {
+        volume: 0.07
+    };
+    const manser = sdb.quiz.anser.list[sdb.quiz.anser.anser];
+    const all_count = sdb.quiz.quiz.name.length;
+    
+    var list = `퀴즈를 종료하시려면 \` ${process.env.prefix}퀴즈 종료 \`를 입력해주세요.
+힌트를 받으시려면 \`힌트 \`를 입력하거나 💡를 눌러주세요.
+문제를 스킵하시려면 \` 스킵 \`을 입력하거나 ⏭️을 눌러주세요.`;
+    var np = new MessageEmbed()
+        .setTitle(`**정답 : ???**`)
+        .setDescription(`**채팅창에 ${manser} 형식으로 적어주세요.**\n**문제 : ${count+1}/${all_count}**`)
+        .setImage(img)
+        .setFooter(`기본 명령어 : ${process.env.prefix}퀴즈 도움말`)
+        .setColor('ORANGE');
+
+    try {
+        var c = client.channels.cache.get(sdb.quiz.qzchannelid);
+        c.messages.fetch(sdb.quiz.msg.listid).then(m => {
+            m.edit(list);
+        });
+        c.messages.fetch(sdb.quiz.msg.npid).then(m => {
+            m.edit(np);
+        });
+    } catch(err) {}
+
+    vchannel.join().then(async (connection) => {
+        db.set(`db.${message.guild.id}.img.time`, 45);
+        db.set(`db.${message.guild.id}.img.timer`, true);
+        db.set(`db.${message.guild.id}.mq.timer`, true);
+        await imgtimer(client, message, sdb);
+        await timer(client, message, sdb);
+        const dispatcher = connection.play(url, options);
+        sdb.quiz.start.user = true;
+        sdb.quiz.start.hint = true;
+        await sdb.save().catch((err) => console.log(err));
+        dispatcher.on('finish', async () => {
+            return await anser(client, message, args, sdb);
+        });
+    })
+}
+
 async function getmusic(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, ulist = {
     url: String,
     desc: String,
@@ -552,6 +589,57 @@ async function getmusic(client = new Client, message = new Message, args = Array
         return await musicplay(client, message, args, sdb, vchannel);
     });
     return;
+}
+async function musicplay(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel) {
+    sdb.tts.tts = false;
+    sdb.quiz.start.start = true;
+    await sdb.save().catch((err) => console.log(err));
+
+    var count = sdb.quiz.quiz.count;
+    var link = sdb.quiz.quiz.link[count];
+    if (link == undefined || link == null || link == '') {
+        vchannel.leave();
+        await allmsgdelete(client, sdb, 50);
+        return await end(client, message, sdb);
+    }
+    var url = ytdl(link, { bitrate: 512000, quality: 'highestaudio' });
+    var options = {
+        volume: 0.07
+    };
+    const manser = sdb.quiz.anser.list[sdb.quiz.anser.anser];
+    const all_count = sdb.quiz.quiz.name.length;
+    
+    var list = `퀴즈를 종료하시려면 \` ${process.env.prefix}퀴즈 종료 \`를 입력해주세요.
+힌트를 받으시려면 \`힌트 \`를 입력하거나 💡를 눌러주세요.
+문제를 스킵하시려면 \` 스킵 \`을 입력하거나 ⏭️을 눌러주세요.`;
+    var np = new MessageEmbed()
+        .setTitle(`**정답 : ???**`)
+        .setDescription(`**채팅창에 ${manser} 형식으로 적어주세요.**\n**문제 : ${count+1}/${all_count}**`)
+        .setImage(`http://ytms.netlify.app/question_mark.png`)
+        .setFooter(`기본 명령어 : ${process.env.prefix}퀴즈 도움말`)
+        .setColor('ORANGE');
+
+    try {
+        var c = client.channels.cache.get(sdb.quiz.qzchannelid);
+        c.messages.fetch(sdb.quiz.msg.listid).then(m => {
+            m.edit(list);
+        });
+        c.messages.fetch(sdb.quiz.msg.npid).then(m => {
+            m.edit(np);
+        });
+    } catch(err) {}
+
+    vchannel.join().then(async (connection) => {
+        db.set(`db.${message.guild.id}.mq.timer`, true);
+        await timer(client, message, sdb);
+        const dispatcher = connection.play(url, options);
+        sdb.quiz.start.user = true;
+        sdb.quiz.start.hint = true;
+        await sdb.save().catch((err) => console.log(err));
+        dispatcher.on('finish', async () => {
+            return await anser(client, message, args, sdb);
+        });
+    })
 }
 
 function msgdelete(m = new Message, t = Number) {
