@@ -95,6 +95,7 @@ async function start_em(client = new Client, message = new Message, args = Array
             var text = [`\n`];
 
             if (opt.first) {
+                data.page.slide = 0;
                 data.page.now = 1;
                 data.page.p1 = 0;
                 try {
@@ -111,8 +112,6 @@ async function start_em(client = new Client, message = new Message, args = Array
                         m.react('➡️');
                     });
                 } catch(err) {}
-            } else {
-                data.page.slide = 0;
             }
             var ulist;
             var keys1, keys2, keys3, keys4;
@@ -214,8 +213,10 @@ async function start_em(client = new Client, message = new Message, args = Array
                 var i = 0, it = '', p = 0;
                 while (i < uname.length) {
                     it = bignum((i+1)-(p*5));
+                    if (!text[p]) text[p] = '\n';
                     text[p] += `${it}  ${uname[i]}\n`;
                     i++;
+                    if (i % 5 == 0) p++;
                 }
                 if (data.page.slide < 0) data.page.slide = 0;
                 if (data.page.slide > text.length-1) data.page.slide = text.length-1;
