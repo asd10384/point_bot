@@ -15,7 +15,7 @@ function set(message = new Message, sdb = MDB.object.server, start = Boolean) {
 }
 function play(message = new Message, sdb = MDB.object.server) {
     setInterval(async () => {
-        if (sdb.musicquiz.start.start) return;
+        if (sdb.quiz.start.start) return;
         var time = await db.get(`db.${message.guild.id}.tts.timertime`);
         if (time == undefined || time == null) time = Number(process.env.ttsout)*60;
         var on = await db.get(`db.${message.guild.id}.tts.timeron`) || false;

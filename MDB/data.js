@@ -44,6 +44,7 @@ const out = {
                     list: Array,
                     anser: Number,
                     time: Number,
+                    imgtime: Number,
                 },
                 msg: {
                     listid: String,
@@ -51,6 +52,7 @@ const out = {
                     scoreid: String,
                 },
                 quiz: {
+                    format: String,
                     name: Array,
                     vocal: Array,
                     link: Array,
@@ -125,6 +127,7 @@ async function set_server(message = new Message) {
                 list: ['제목', '가수', '제목-가수', '가수-제목'],
                 anser: 0,
                 time: 10,
+                imgtime: 60,
             },
             msg: {
                 listid: '',
@@ -132,6 +135,7 @@ async function set_server(message = new Message) {
                 scoreid: '',
             },
             quiz: {
+                format: '음악퀴즈',
                 name: [],
                 vocal: [],
                 link: [],
