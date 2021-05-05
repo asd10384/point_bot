@@ -9,7 +9,7 @@ const MDB = require('../../MDB/data');
 
 const mqscore = require('./score');
 const msg = require('./msg');
-const { play } = require('../tts/play');
+const { play, broadcast } = require('../tts/play');
 
 const chack = /(?:http:\/\/|https:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?/gi;
 
@@ -292,7 +292,7 @@ async function anser(client = new Client, message = new Message, args = Array, s
         if (format == '음악퀴즈') np.setImage(`http://img.youtube.com/vi/${yturl}/sddefault.jpg`);
         if (format == '그림퀴즈') {
             np.setImage(link);
-            await play(message, sdb, message.guild.me.voice.channel, `정답은 ${name} 이었습니다.`, {volume:0.07});
+            await broadcast(message, sdb, message.guild.me.voice.channel, `sound/dingdong.mp3`, {volume:0.5});
         }
         
         try {
@@ -498,7 +498,7 @@ async function getimg(client = new Client, message = new Message, args = Array, 
     quiz: String,
     complite: Boolean,
 }) {
-    request(ulist.url.toString().toLocaleLowerCase().replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/g, encodeURIComponent), async (err, res, html) => {
+    request(ulist.url.toString().toLocaleLowerCase().replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|\s]/g, encodeURIComponent), async (err, res, html) => {
         if (!html) {
             await end(client, message, sdb);
             emerr.setDescription(`HTML을 찾을수 없습니다.`);
@@ -513,7 +513,7 @@ async function getimg(client = new Client, message = new Message, args = Array, 
         $('body div.music div').each(async function () {
             dfname.push($(this).children('a.name').text().trim());
             dfvocal.push($(this).children('a.vocal').text().trim());
-            dflink.push(process.env.mqsite + $(this).children('a.link').attr('href').trim().replace('../..','').replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/g, encodeURIComponent));
+            dflink.push(process.env.mqsite + $(this).children('a.link').attr('href').trim().replace('../..','').replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|\s]/g, encodeURIComponent));
         });
         var rndlist = [],
             name = [],
@@ -609,7 +609,7 @@ async function getmusic(client = new Client, message = new Message, args = Array
     quiz: String,
     complite: Boolean,
 }) {
-    request(ulist.url.toString().toLocaleLowerCase().replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/g, encodeURIComponent), async (err, res, html) => {
+    request(ulist.url.toString().toLocaleLowerCase().replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|\s]/g, encodeURIComponent), async (err, res, html) => {
         const $ = load(html);
         var dfname = [],
             dfvocal = [],
