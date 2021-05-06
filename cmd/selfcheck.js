@@ -17,7 +17,7 @@ const embed = new MessageEmbed()
 module.exports = {
     name: 'selfcheck',
     aliases: ['자가진단'],
-    description: '자동 자가진단',
+    description: `간편 자가진단 ${process.env.prefix}자가진단 도움말`,
     async run (client = new Client, message = new Message, args = Array, sdb = MDB.object.server, user = new User) {
         var pp = db.get(`dp.prefix.${message.member.id}`);
         if (pp == (null || undefined)) {
@@ -120,7 +120,10 @@ module.exports = {
                 embed.setTitle(`**자동 자가진단**`)
                     .setDescription(`
                         **${message.member.user.username}** 님의 자동 자가진단이
-                        **${t}** 되었습니다.
+                        **  ${t}** 되었습니다.
+
+                        자동 자가진단은 매일 **오전 ${autotime[0]}시 ${autotime[1]}분** 마다
+                        실행됩니다.  ([토, 일] 요일 제외)
 
                         자동 자가진단 성공 또는 실패 메세지도
                         이 메시지와 같이 DM 으로 날아옵니다.
@@ -353,12 +356,12 @@ async function autocheckinterval(client = new Client, message = new Message, sdb
                         title = emobj.title;
                         desc = emobj.desc;
                         color = emobj.color;
-                        embed.setTitle(`**\` ${user.username} \`**님 자가진단 **${title}**`)
+                        embed.setTitle(`**\` ${user.username} \`**님 자동 자가진단 **${title}**`)
                             .setDescription(desc)
                             .setColor((color) ? color : 'ORANGE');
                         return user.send(embed).catch(() => {return;});
                     } else {
-                        embed.setTitle(`**\` ${user.username} \`**님 자가진단 **실패**`)
+                        embed.setTitle(`**\` ${user.username} \`**님 자동 자가진단 **실패**`)
                             .setDescription(`
                                 ${user.username}님의 정보가 등록되어있지 않습니다.
                                 ${user.username}님이 먼저 **${pp}자가진단 설정**을 해주셔야 합니다.
