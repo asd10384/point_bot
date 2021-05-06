@@ -21,7 +21,6 @@ async function reac (client = new Client, reaction = new ReactionCollector, user
 async function go(client = new Client, reaction = new ReactionCollector, user = new User) {
     if (reaction.message.partial) await reaction.message.fetch();
     if (reaction.partial) await reaction.fetch();
-
     const name = reaction.emoji.name;
     const message = reaction.message;
     const serverid = reaction.message.guild.id;
@@ -36,6 +35,12 @@ async function go(client = new Client, reaction = new ReactionCollector, user = 
             await MDB.set.server(message);
             return await reac(client, reaction, user);
         } else {
+            if (name === '⏭️') {
+                if (sdb.selfcheck.channelid == message.channel.id) {
+                    reaction.users.remove(user);
+                    return await client.commands.get(`selfcheck`).run(client, message, [], sdb, user);
+                }
+            }
             if (reaction.message.channel.id === sdb.quiz.qzchannelid) {
                 if (name === '💡') {
                     if (sdb.quiz.start.user) {
@@ -48,7 +53,10 @@ async function go(client = new Client, reaction = new ReactionCollector, user = 
                         reaction.users.remove(user);
                         return await skip(client, message, ['스킵'], sdb, user);
                     }
-                    
+                    if (sdb.selfcheck.channelid == message.channel.id) {
+                        reaction.users.remove(user);
+                        return await client.commands.get(`selfcheck`).run(client, message, ['자가진단'], sdb);
+                    }
                 }
                 if (name === '1️⃣' || name === '2️⃣' || name === '3️⃣' || name === '4️⃣' || name === '5️⃣') {
                     reaction.users.remove(user);

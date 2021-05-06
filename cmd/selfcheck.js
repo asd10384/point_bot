@@ -1,8 +1,9 @@
 
 require('dotenv').config();
 const db = require('quick.db');
-const { MessageEmbed, Client, Message } = require('discord.js');
+const { MessageEmbed, Client, Message, User } = require('discord.js');
 const { hcs } = require('selfcheck');
+const { format } = require('../module/mds');
 
 const MDB = require('../MDB/data');
 const udata = MDB.module.user();
@@ -17,7 +18,7 @@ module.exports = {
     name: 'selfcheck',
     aliases: ['자가진단'],
     description: '자동 자가진단',
-    async run (client = new Client, message = new Message, args = Array, sdb = MDB.object.server) {
+    async run (client = new Client, message = new Message, args = Array, sdb = MDB.object.server, user = new User) {
         var pp = db.get(`dp.prefix.${message.member.id}`);
         if (pp == (null || undefined)) {
             await db.set(`db.prefix.${message.member.id}`, process.env.prefix);
@@ -26,7 +27,7 @@ module.exports = {
         // if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, Number(process.env.deletetime)));
 
         udata.findOne({
-            userID: message.member.user.id
+            userID: user.id
         }, async (err, db) => {
             var udb = MDB.object.user;
             udb = db;
@@ -35,7 +36,8 @@ module.exports = {
                 await MDB.set.user(message.member.user);
                 return client.commands.get(`${this.name}`).run(client, message, args, sdb);
             }
-            var username = message.author.username;;
+            var autotime = eval(process.env.autoselfcheck);
+            var username = message.author.username;
             var sc = udb.selfcheck;
             var title = '';
             var desc = '';
@@ -54,7 +56,7 @@ module.exports = {
                             desc: `**\` 시간 \`** : ${result.inveYmd}`,
                             color: `ORANGE`,
                         }
-                    }).catch((err) => {
+                    }).catch(() => {
                         return {
                             title: `실패`,
                             desc: `\` ${pp}자가진단 확인 \`으로\n입력사항에 오류가있는지 확인해주세요.`,
@@ -64,11 +66,69 @@ module.exports = {
                     title = emobj.title;
                     desc = emobj.desc;
                     color = emobj.color;
-                    embed.setTitle(`**\` ${message.author.username} \`**님 자가진단 **${title}**`)
+                    embed.setTitle(`**\` ${user.username} \`**님 자가진단 **${title}**`)
                         .setDescription(desc)
                         .setColor((color) ? color : 'ORANGE');
                     return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)+2000));
                 }
+            }
+            if (args[0] == '채널생성') {
+                if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, Number(process.env.deletetime)));
+                return message.guild.channels.create(`💬원터치자가진단`, { // ${client.user.username}-음악퀴즈채널
+                    type: 'text',
+                    topic: `${process.env.prefix}자가진단 도움말`
+                }).then(channel => {
+                    sdb.selfcheck.channelid = channel.id;
+                    sdb.save().catch(err => console.log(err));
+                    embed.setTitle(`**자가진단을 원터치로 간편하게**`)
+                        .setDescription(`
+                            이 메세지의 ⏭️ 이모지를 누르면
+                            등록된 정보로 자가진단을 합니다.
+                        `)
+                        .setFooter(`도움말 : ${process.env.prefix}자가진단 도움말`);
+                    channel.send(embed).then(m => {
+                        m.react('⏭️');
+                    });
+                });
+            }
+            if (args[0] == '자동') {
+                if (!(sc.name || sc.password)) {
+                    const emerr = new MessageEmbed()
+                        .setTitle(`**자동 자가진단 오류**`)
+                        .setDescription(`
+                            먼저 **${process.env.prefix}자가진단 설정** 으로
+                            정보를 등록한뒤 사용해주세요.
+                        `)
+                        .setFooter(`도움말 : ${process.env.prefix}자가진단 도움말`)
+                        .setColor('RED');
+                    return message.channel.send(emerr).then(m => msgdelete(m, Number(process.env.deletetime)));
+                }
+                var atchitch = await db.get(`db.${message.guild.id}.autocheck`);
+                if (atchitch == null || atchitch == undefined || atchitch == false) {
+                    await db.set(`db.${message.guild.id}.autocheck`, true);
+                    await autocheckinterval(client, message, sdb);
+                }
+                var id = undefined;
+                var t = `활성화`;
+                if (sdb.selfcheck.autocheck.includes(message.member.user.id)) {
+                    id = sdb.selfcheck.autocheck.pop(sdb.selfcheck.autocheck.indexOf(message.member.user.id));
+                    t = `비` + t;
+                } else {
+                    sdb.selfcheck.autocheck.push(message.member.user.id);
+                }
+                sdb.save().catch((err) => console.log(err));
+                embed.setTitle(`**자동 자가진단**`)
+                    .setDescription(`
+                        **${message.member.user.username}** 님의 자동 자가진단이
+                        **${t}** 되었습니다.
+
+                        자동 자가진단 성공 또는 실패 메세지도
+                        이 메시지와 같이 DM 으로 날아옵니다.
+                    `)
+                    .setFooter(`도움말 : ${process.env.prefix}자가진단 도움말`);
+                return user.send(embed).catch(() => {
+                    message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*3));
+                }).then(m => msgdelete(m, Number(process.env.deletetime)*3));
             }
             if (args[0] == '설정') {
                 if (args[1]) {
@@ -123,7 +183,9 @@ module.exports = {
                     }
                     udata.findOne({
                         userID: tuser.id
-                    }, async (err, udb2) => {
+                    }, async (err, db2) => {
+                        var udb2 = MDB.object.user;
+                        udb2 = db2;
                         if (err) console.log(err);
                         if (!udb2) {
                             await MDB.set.user(tuser.user);
@@ -165,7 +227,7 @@ module.exports = {
                                     desc: `**\` 시간 \`** : ${result.inveYmd}`,
                                     color: `ORANGE`,
                                 }
-                            }).catch((err) => {
+                            }).catch(() => {
                                 return {
                                     title: `실패`,
                                     desc: `\` ${pp}자가진단 확인 \`으로\n입력사항에 오류가있는지 확인해주세요.`,
@@ -198,10 +260,13 @@ module.exports = {
                     ${pp}자가진단 : 입력된 정보로 자가진단을 합니다.
                     ${pp}자가진단 설정 : 정보를 입력합니다.
                     ${pp}자가진단 확인 : 입력된 정보를 확인합니다.
+                    ${pp}자가진단 자동 : 매일 오전 ${autotime[0]}시${autotime[1]}분에 자동으로 자가진단을 합니다.
+                    (주말은 제외)
 
                     \` 관리자 명령어 \`
                     ${pp}자가진단 @USER : 유저가 입력한 정보로 자가진단을 합니다.
                     ${pp}자가진단 확인 @USER : 유저가 입력한 정보를 확인합니다.
+                    ${pp}자가진단 채널생성 : 자가진단을 원클릭으로 할수있는 채널을 생성합니다.
                 `)
                 .setColor('ORANGE');
             return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*3));
@@ -238,4 +303,71 @@ async function check(message = new Message, embed = new MessageEmbed, username =
         `)
         .setColor('ORANGE');
     return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*2));
+}
+
+async function autocheckinterval(client = new Client, message = new Message, sdb = MDB.object.server) {
+    const timer = setInterval(async () => {
+        var userlist = [];
+        var user, emobj;
+        var autotime = eval(process.env.autoselfcheck);
+        var date = format.nowdate(new Date());
+        if (['토','일'].includes(date.week)) return ;
+        if (date.hour == Number(autotime[0]) && date.min == Number(autotime[1]) && date.sec == 0) {
+            userlist = sdb.selfcheck.autocheck;
+            for (i of userlist) {
+                user = message.guild.members.cache.get(i).user;
+                udata.findOne({
+                    userID: user.id
+                }, async (err, db) => {
+                    var udb = MDB.object.user;
+                    udb = db;
+                    if (err) console.log(err);
+                    if (!udb) {
+                        await MDB.set.user(user);
+                        await autocheckinterval(client, message, sdb);
+                        return clearInterval(timer)
+                    }
+                    sc = udb.selfcheck;
+                    if (sc.name || sc.password) {
+                        emobj = await hcs({
+                            area: sc.area,
+                            school: sc.school,
+                            name: sc.name,
+                            birthday: sc.birthday,
+                            password: sc.password
+                        }).then((result) => {
+                            return {
+                                title: `성공`,
+                                desc: `**\` 시간 \`** : ${result.inveYmd}`,
+                                time: result.inveYmd,
+                                color: `ORANGE`,
+                            }
+                        }).catch(() => {
+                            return {
+                                title: `실패`,
+                                desc: `\` ${pp}자가진단 확인 \`으로\n입력사항에 오류가있는지 확인해주세요.`,
+                                time: undefined,
+                                color: `RED`,
+                            }
+                        });
+                        title = emobj.title;
+                        desc = emobj.desc;
+                        color = emobj.color;
+                        embed.setTitle(`**\` ${user.username} \`**님 자가진단 **${title}**`)
+                            .setDescription(desc)
+                            .setColor((color) ? color : 'ORANGE');
+                        return user.send(embed).catch(() => {return;});
+                    } else {
+                        embed.setTitle(`**\` ${user.username} \`**님 자가진단 **실패**`)
+                            .setDescription(`
+                                ${user.username}님의 정보가 등록되어있지 않습니다.
+                                ${user.username}님이 먼저 **${pp}자가진단 설정**을 해주셔야 합니다.
+                            `)
+                            .setColor('RED');
+                            return user.send(embed).catch(() => {return;});
+                    }
+                });
+            }
+        }
+    }, 1000);
 }

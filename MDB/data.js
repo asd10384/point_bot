@@ -79,6 +79,10 @@ const out = {
                 ttschannelid: String,
                 tts: Boolean,
             },
+            selfcheck: {
+                channelid: String,
+                autocheck: Array,
+            },
             role: Array,
         },
     },
@@ -157,6 +161,10 @@ async function set_server(message = new Message) {
                 p4: 0,
                 slide: 0,
             },
+        },
+        selfcheck: {
+            channelid: '',
+            autocheck: [],
         },
         tts: {
             ttschannelid: '',

@@ -1,7 +1,7 @@
 
 require('dotenv').config();
 const db = require('quick.db');
-const { MessageEmbed, Client, Message } = require('discord.js');
+const { MessageEmbed, Client, Message, User } = require('discord.js');
 const MDB = require('../MDB/data');
 
 const per = new MessageEmbed()
@@ -12,7 +12,7 @@ module.exports = {
     name: 'leave',
     aliases: ['떠나기'],
     description: '음성대화방에서 나가기',
-    async run (client = new Client, message = new Message, args = Array, sdb = MDB.object.server) {
+    async run (client = new Client, message = new Message, args = Array, sdb = MDB.object.server, user = new User) {
         var pp = db.get(`dp.prefix.${message.member.id}`);
         if (pp == (null || undefined)) {
             await db.set(`db.prefix.${message.member.id}`, process.env.prefix);

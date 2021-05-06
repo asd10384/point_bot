@@ -1,7 +1,7 @@
 
 require('dotenv').config();
 const db = require('quick.db');
-const { MessageEmbed, Client, Message } = require('discord.js');
+const { MessageEmbed, Client, Message, User } = require('discord.js');
 const MDB = require('../MDB/data');
 
 const msg = require('../module/quiz/msg');
@@ -15,7 +15,7 @@ module.exports = {
     name: 'qzset',
     aliases: ['퀴즈설정','quizset'],
     description: '퀴즈채널을 만들고 봇과 연결함',
-    async run (client = new Client, message = new Message, args = Array, sdb = MDB.object.server) {
+    async run (client = new Client, message = new Message, args = Array, sdb = MDB.object.server, user = new User) {
         var pp = db.get(`dp.prefix.${message.member.id}`);
         if (pp == (null || undefined)) {
             await db.set(`db.prefix.${message.member.id}`, process.env.prefix);

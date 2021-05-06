@@ -1,7 +1,7 @@
 
 require('dotenv').config();
 const db = require('quick.db');
-const { MessageEmbed, Client, Message } = require('discord.js');
+const { MessageEmbed, Client, Message, User } = require('discord.js');
 const MDB = require('../MDB/data');
 
 /*
@@ -16,7 +16,7 @@ udata.findOne({
     if (err) console.log(err);
     if (!udb) {
         await MDB.set.user(message.member.user);
-        return client.commands.get(`${this.name}`).run(client, message, args, sdb);
+        return client.commands.get(`${this.name}`).run(client, message, args, sdb, user);
     }
     command
 });
@@ -35,7 +35,7 @@ module.exports = {
     name: 'random',
     aliases: ['랜덤'],
     description: '랜덤 [도움말]',
-    async run (client = new Client, message = new Message, args = Array, sdb = MDB.object.server) {
+    async run (client = new Client, message = new Message, args = Array, sdb = MDB.object.server, user = new User) {
         var pp = db.get(`dp.prefix.${message.member.id}`);
         if (pp == (null || undefined)) {
             await db.set(`db.prefix.${message.member.id}`, process.env.prefix);

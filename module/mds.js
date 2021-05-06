@@ -3,6 +3,7 @@ require('dotenv').config();
 const db = require('quick.db');
 const { MessageEmbed, Client, Message } = require('discord.js');
 const MDB = require('../MDB/data');
+const weeklist = ['일','월','화','수','목','금','토'];
 
 module.exports = {
     format: {
@@ -11,6 +12,7 @@ module.exports = {
     },
     az,
 };
+
 function now_date(time = new Date) {
     var year = time.getFullYear();
     var month = time.getMonth()+1;
@@ -18,6 +20,7 @@ function now_date(time = new Date) {
     var hour = time.getHours()+Number(process.env.addhour);
     var min = time.getMinutes();
     var sec = time.getSeconds();
+    var week = weeklist[time.getDay()];
     if (hour >= 24) {
         day++;
         hour = hour - 24;
@@ -29,6 +32,7 @@ function now_date(time = new Date) {
         'hour': hour,
         'min': min,
         'sec': sec,
+        'week': week,
         'time': {
             '1': `${year}년 ${month}월 ${day}일 ${hour}시 ${min}분 ${sec}초`,
             '2': `${year}년 ${az(month, 2)}월 ${az(day, 2)}일 ${az(hour, 2)}시 ${az(min, 2)}분 ${az(sec, 2)}초`,

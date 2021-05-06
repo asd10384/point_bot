@@ -66,6 +66,10 @@ client.on('message', async (message) => {
             if (quizid == null || quizid == undefined) {
                 quizid = '0';
             }
+            var selfcheck = sdb.selfcheck.channelid;
+            if (selfcheck == null || selfcheck == undefined) {
+                selfcheck = '0';
+            }
 
             // prefix 입력시
             if (message.content.startsWith(prefix)) {
@@ -77,7 +81,7 @@ client.on('message', async (message) => {
     
                 try {
                     // 명령어 실행
-                    await command.run(client, message, args, sdb);
+                    await command.run(client, message, args, sdb, message.member.user);
                 } catch(error) {
                     if (commandName == '' || commandName == ';' || commandName == undefined || commandName == null) return ;
                     // 코드 확인
@@ -104,7 +108,10 @@ client.on('message', async (message) => {
                         msgdelete(message, 100);
                     }
                 }
-                if (command) return command.run(client, message, args, sdb, true);
+                if (selfcheck == message.channel.id) {
+                    return msgdelete(message, 100);
+                }
+                if (command) return command.run(client, message, args, sdb, message.member.user, true);
             }
         }
     });
