@@ -34,7 +34,7 @@ module.exports = {
             if (err) console.log(err);
             if (!udb) {
                 await MDB.set.user(message.member.user);
-                return client.commands.get(`${this.name}`).run(client, message, args, sdb);
+                return client.commands.get(`${this.name}`).run(client, message, args, sdb, user);
             }
             var autotime = eval(process.env.autoselfcheck);
             var username = message.author.username;
@@ -189,7 +189,7 @@ module.exports = {
                         if (err) console.log(err);
                         if (!udb2) {
                             await MDB.set.user(tuser.user);
-                            return client.commands.get(`${this.name}`).run(client, message, args, sdb);
+                            return client.commands.get(`${this.name}`).run(client, message, args, sdb, user);
                         }
                         username = tuser.user.username;
                         sc = udb2.selfcheck;
@@ -211,7 +211,7 @@ module.exports = {
                         if (err) console.log(err);
                         if (!udb2) {
                             await MDB.set.user(user);
-                            return client.commands.get(`${this.name}`).run(client, message, args, sdb);
+                            return client.commands.get(`${this.name}`).run(client, message, args, sdb, user);
                         }
                         sc = udb2.selfcheck;
                         if (sc.name || sc.password) {
