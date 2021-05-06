@@ -37,11 +37,6 @@ require('./client/ready')(client);
 client.login(process.env.token);
 
 client.on('message', async (message) => {
-    var atchitch = await db.get(`db.${message.guild.id}.autocheck`);
-    if (atchitch == null || atchitch == undefined || atchitch == false) {
-        await db.set(`db.${message.guild.id}.autocheck`, true);
-        await client.commands.get(`selfcheck`).autocheckinterval(client, message, sdb);
-    }
     // 봇이나 디엠 메시지 무시
     if (message.author.bot) return;
     if (message.channel.type === 'dm') return;
@@ -62,6 +57,12 @@ client.on('message', async (message) => {
         if (!sdb) {
             await MDB.set.server(message);
         } else {
+            var atchitch = await db.get(`db.${message.guild.id}.autocheck`);
+            if (atchitch == null || atchitch == undefined || atchitch == false) {
+                await db.set(`db.${message.guild.id}.autocheck`, true);
+                await client.commands.get(`selfcheck`).autocheckinterval(client, message, sdb);
+            }
+            
             // 채팅 채널 연결
             var ttsid = sdb.tts.ttschannelid;
             if (ttsid == null || ttsid == undefined) {
