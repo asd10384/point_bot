@@ -103,11 +103,6 @@ module.exports = {
                         .setColor('RED');
                     return message.channel.send(emerr).then(m => msgdelete(m, Number(process.env.deletetime)));
                 }
-                var atchitch = await db.get(`db.${message.guild.id}.autocheck`);
-                if (atchitch == null || atchitch == undefined || atchitch == false) {
-                    await db.set(`db.${message.guild.id}.autocheck`, true);
-                    await autocheckinterval(client, message, sdb);
-                }
                 var id = undefined;
                 var t = `활성화`;
                 if (sdb.selfcheck.autocheck.includes(message.member.user.id)) {
@@ -275,6 +270,73 @@ module.exports = {
             return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*3));
         });
     },
+    autocheckinterval: async function (client = new Client, message = new Message, sdb = MDB.object.server) {
+        const timer = setInterval(async () => {
+            var userlist = [];
+            var user, emobj;
+            var autotime = eval(process.env.autoselfcheck);
+            var date = format.nowdate(new Date());
+            if (['토','일'].includes(date.week)) return ;
+            if (date.hour == Number(autotime[0]) && date.min == Number(autotime[1]) && date.sec == 0) {
+                userlist = sdb.selfcheck.autocheck;
+                for (i of userlist) {
+                    user = message.guild.members.cache.get(i).user;
+                    udata.findOne({
+                        userID: user.id
+                    }, async (err, db) => {
+                        var udb = MDB.object.user;
+                        udb = db;
+                        if (err) console.log(err);
+                        if (!udb) {
+                            await MDB.set.user(user);
+                            await autocheckinterval(client, message, sdb);
+                            return clearInterval(timer)
+                        }
+                        sc = udb.selfcheck;
+                        if (sc.name || sc.password) {
+                            emobj = await hcs({
+                                area: sc.area,
+                                school: sc.school,
+                                name: sc.name,
+                                birthday: sc.birthday,
+                                password: sc.password
+                            }).then((result) => {
+                                return {
+                                    title: `성공`,
+                                    desc: `**\` 시간 \`** : ${result.inveYmd}`,
+                                    time: result.inveYmd,
+                                    color: `ORANGE`,
+                                }
+                            }).catch(() => {
+                                return {
+                                    title: `실패`,
+                                    desc: `\` ${pp}자가진단 확인 \`으로\n입력사항에 오류가있는지 확인해주세요.`,
+                                    time: undefined,
+                                    color: `RED`,
+                                }
+                            });
+                            title = emobj.title;
+                            desc = emobj.desc;
+                            color = emobj.color;
+                            embed.setTitle(`**\` ${user.username} \`**님 자동 자가진단 **${title}**`)
+                                .setDescription(desc)
+                                .setColor((color) ? color : 'ORANGE');
+                            return user.send(embed).catch(() => {return;});
+                        } else {
+                            embed.setTitle(`**\` ${user.username} \`**님 자동 자가진단 **실패**`)
+                                .setDescription(`
+                                    ${user.username}님의 정보가 등록되어있지 않습니다.
+                                    ${user.username}님이 먼저 **${pp}자가진단 설정**을 해주셔야 합니다.
+                                `)
+                                .setColor('RED');
+                            return user.send(embed).catch(() => {return;});
+                        }
+                    });
+                }
+            }
+        }, 1000);
+        return;
+    },
 };
 
 function msgdelete(m = new Message, t = Number) {
@@ -306,71 +368,4 @@ async function check(message = new Message, embed = new MessageEmbed, username =
         `)
         .setColor('ORANGE');
     return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*2));
-}
-
-async function autocheckinterval(client = new Client, message = new Message, sdb = MDB.object.server) {
-    const timer = setInterval(async () => {
-        var userlist = [];
-        var user, emobj;
-        var autotime = eval(process.env.autoselfcheck);
-        var date = format.nowdate(new Date());
-        if (['토','일'].includes(date.week)) return ;
-        if (date.hour == Number(autotime[0]) && date.min == Number(autotime[1]) && date.sec == 0) {
-            userlist = sdb.selfcheck.autocheck;
-            for (i of userlist) {
-                user = message.guild.members.cache.get(i).user;
-                udata.findOne({
-                    userID: user.id
-                }, async (err, db) => {
-                    var udb = MDB.object.user;
-                    udb = db;
-                    if (err) console.log(err);
-                    if (!udb) {
-                        await MDB.set.user(user);
-                        await autocheckinterval(client, message, sdb);
-                        return clearInterval(timer)
-                    }
-                    sc = udb.selfcheck;
-                    if (sc.name || sc.password) {
-                        emobj = await hcs({
-                            area: sc.area,
-                            school: sc.school,
-                            name: sc.name,
-                            birthday: sc.birthday,
-                            password: sc.password
-                        }).then((result) => {
-                            return {
-                                title: `성공`,
-                                desc: `**\` 시간 \`** : ${result.inveYmd}`,
-                                time: result.inveYmd,
-                                color: `ORANGE`,
-                            }
-                        }).catch(() => {
-                            return {
-                                title: `실패`,
-                                desc: `\` ${pp}자가진단 확인 \`으로\n입력사항에 오류가있는지 확인해주세요.`,
-                                time: undefined,
-                                color: `RED`,
-                            }
-                        });
-                        title = emobj.title;
-                        desc = emobj.desc;
-                        color = emobj.color;
-                        embed.setTitle(`**\` ${user.username} \`**님 자동 자가진단 **${title}**`)
-                            .setDescription(desc)
-                            .setColor((color) ? color : 'ORANGE');
-                        return user.send(embed).catch(() => {return;});
-                    } else {
-                        embed.setTitle(`**\` ${user.username} \`**님 자동 자가진단 **실패**`)
-                            .setDescription(`
-                                ${user.username}님의 정보가 등록되어있지 않습니다.
-                                ${user.username}님이 먼저 **${pp}자가진단 설정**을 해주셔야 합니다.
-                            `)
-                            .setColor('RED');
-                            return user.send(embed).catch(() => {return;});
-                    }
-                });
-            }
-        }
-    }, 1000);
 }

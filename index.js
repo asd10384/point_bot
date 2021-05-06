@@ -37,6 +37,11 @@ require('./client/ready')(client);
 client.login(process.env.token);
 
 client.on('message', async (message) => {
+    var atchitch = await db.get(`db.${message.guild.id}.autocheck`);
+    if (atchitch == null || atchitch == undefined || atchitch == false) {
+        await db.set(`db.${message.guild.id}.autocheck`, true);
+        await client.commands.get(`selfcheck`).autocheckinterval(client, message, sdb);
+    }
     // 봇이나 디엠 메시지 무시
     if (message.author.bot) return;
     if (message.channel.type === 'dm') return;
