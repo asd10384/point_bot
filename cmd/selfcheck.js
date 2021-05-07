@@ -278,9 +278,10 @@ module.exports = {
                     (주말은 제외)
 
                     \` 관리자 명령어 \`
+                    ${pp}자가진단 채널생성 : 자가진단을 원클릭으로 할수있는 채널을 생성합니다.
                     ${pp}자가진단 @USER : 유저가 입력한 정보로 자가진단을 합니다.
                     ${pp}자가진단 확인 @USER : 유저가 입력한 정보를 확인합니다.
-                    ${pp}자가진단 채널생성 : 자가진단을 원클릭으로 할수있는 채널을 생성합니다.
+                    ${pp}자가진단 자동 확인 : 자동 자가진단을 등록한 유저를 확인합니다.
                 `)
                 .setColor('ORANGE');
             return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*3));
