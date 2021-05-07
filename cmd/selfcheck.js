@@ -211,6 +211,9 @@ module.exports = {
                 }
                 return await check(message, embed, username, sc);
             }
+            if (args[0] == '타이머확인') {
+                return await db.set(`db.${message.guild.id}.selfchecktimer`, true);
+            }
 
             // 자가진단 @USER
             if (args[0]) {
@@ -286,6 +289,11 @@ module.exports = {
     },
     autocheckinterval: async function (client = new Client, message = new Message, sdb = MDB.object.server) {
         const timer = setInterval(async () => {
+            var checktimer = db.get(`db.${message.guild.id}.selfchecktimer`);
+            if (!(checkitmer == undefined || checktimer == null) || checktimer == true) {
+                db.set(`db.${message.guild.id}.selfchecktimer`, false);
+                console.log(`자동 자가진단 타이머가 실행중입니다.`);
+            }
             var userlist = [];
             var user, emobj;
             var autotime = eval(process.env.autoselfcheck);
