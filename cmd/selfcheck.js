@@ -91,7 +91,21 @@ module.exports = {
                     });
                 });
             }
-            if (args[0] == '자동') {
+            if (args[0] == '자동' || args[0] == 'auto') {
+                if (args[1] == '확인' || args[1] == 'check') {
+                    if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, Number(process.env.deletetime)));
+                    var text = '';
+                    for (i of sdb.selfcheck.autocheck) {
+                        text += `<@${i}>\n`;
+                    }
+                    embed.setTitle(`**자동 자가진단**`)
+                        .setDescription(`
+                            **유저 확인**
+                            ${(text == '') ? `없음` : text}
+                        `)
+                        .setFooter(`도움말 : ${process.env.prefix}자가진단 도움말`);
+                    return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*2+2000));
+                }
                 if (!(sc.name || sc.password)) {
                     const emerr = new MessageEmbed()
                         .setTitle(`**자동 자가진단 오류**`)
