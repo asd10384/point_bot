@@ -290,7 +290,7 @@ module.exports = {
     autocheckinterval: async function (client = new Client, message = new Message, sdb = MDB.object.server) {
         const timer = setInterval(async () => {
             var checktimer = db.get(`db.${message.guild.id}.selfchecktimer`);
-            if (!(checkitmer == undefined || checktimer == null) || checktimer == true) {
+            if ((!checktimer) ? false : checktimer == true) {
                 db.set(`db.${message.guild.id}.selfchecktimer`, false);
                 console.log(`자동 자가진단 타이머가 실행중입니다.`);
             }
