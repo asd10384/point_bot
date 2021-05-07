@@ -27,9 +27,9 @@ async function go(client = new Client, reaction = new ReactionCollector, user = 
 
     await sdata.findOne({
         serverid: serverid
-    }, async (err, db) => {
+    }, async (err, db1) => {
         var sdb = MDB.object.server;
-        sdb = db;
+        sdb = db1;
         if (err) console.log(err);
         if (!sdb) {
             await MDB.set.server(message);

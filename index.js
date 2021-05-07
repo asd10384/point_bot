@@ -50,9 +50,9 @@ client.on('message', async (message) => {
 
     await sdata.findOne({
         serverid: message.guild.id
-    }, async (err, db) => {
+    }, async (err, db1) => {
         var sdb = MDB.object.server;
-        sdb = db;
+        sdb = db1;
         if (err) console.log(err);
         if (!sdb) {
             await MDB.set.server(message);

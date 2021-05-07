@@ -28,9 +28,9 @@ module.exports = {
 async function tts(client = new Client, message = new Message, args = Array, sdb = MDB.object.server) {    
     udata.findOne({
         userID: message.member.user.id
-    }, async (err, db) => {
+    }, async (err, db1) => {
         var udb = MDB.object.user;
-        udb = db;
+        udb = db1;
         if (err) console.log(err);
         if (!udb) {
             await MDB.set.user(message.member.user);

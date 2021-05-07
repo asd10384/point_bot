@@ -28,9 +28,9 @@ module.exports = {
 
         udata.findOne({
             userID: user.id
-        }, async (err, db) => {
+        }, async (err, db1) => {
             var udb = MDB.object.user;
-            udb = db;
+            udb = db1;
             if (err) console.log(err);
             if (!udb) {
                 await MDB.set.user(message.member.user);
@@ -117,10 +117,9 @@ module.exports = {
                         .setColor('RED');
                     return message.channel.send(emerr).then(m => msgdelete(m, Number(process.env.deletetime)));
                 }
-                var id = undefined;
                 var t = `활성화`;
                 if (sdb.selfcheck.autocheck.includes(message.member.user.id)) {
-                    id = sdb.selfcheck.autocheck.pop(sdb.selfcheck.autocheck.indexOf(message.member.user.id));
+                    sdb.selfcheck.autocheck.pop(sdb.selfcheck.autocheck.indexOf(message.member.user.id));
                     t = `비` + t;
                 } else {
                     sdb.selfcheck.autocheck.push(message.member.user.id);
@@ -291,8 +290,8 @@ module.exports = {
         const timer = setInterval(async () => {
             var checktimer = db.get(`db.${message.guild.id}.selfchecktimer`);
             if ((!checktimer) ? false : checktimer == true) {
-                db.set(`db.${message.guild.id}.selfchecktimer`, false);
                 console.log(`자동 자가진단 타이머가 실행중입니다.`);
+                db.set(`db.${message.guild.id}.selfchecktimer`, false);
             }
             var userlist = [];
             var user, emobj;
@@ -305,9 +304,9 @@ module.exports = {
                     user = message.guild.members.cache.get(i).user;
                     udata.findOne({
                         userID: user.id
-                    }, async (err, db) => {
+                    }, async (err, db1) => {
                         var udb = MDB.object.user;
-                        udb = db;
+                        udb = db1;
                         if (err) console.log(err);
                         if (!udb) {
                             await MDB.set.user(user);
