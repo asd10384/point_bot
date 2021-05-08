@@ -706,17 +706,21 @@ async function musicplay(client = new Client, message = new Message, args = Arra
         });
     } catch(err) {}
 
-    vchannel.join().then(async (connection) => {
-        db.set(`db.${message.guild.id}.mq.timer`, true);
-        await timer(client, message, sdb);
-        const dispatcher = connection.play(url, options);
-        sdb.quiz.start.user = true;
-        sdb.quiz.start.hint = true;
-        await sdb.save().catch((err) => console.log(err));
-        dispatcher.on('finish', async () => {
-            return await anser(client, message, ['스킵','시간초과'], sdb, user);
+    try {
+        vchannel.join().then(async (connection) => {
+            db.set(`db.${message.guild.id}.mq.timer`, true);
+            await timer(client, message, sdb);
+            const dispatcher = connection.play(url, options);
+            sdb.quiz.start.user = true;
+            sdb.quiz.start.hint = true;
+            await sdb.save().catch((err) => console.log(err));
+            dispatcher.on('finish', async () => {
+                return await anser(client, message, ['스킵','시간초과'], sdb, user);
+            });
         });
-    })
+    } catch(err) {
+        return await end(client, message, sdb);
+    }
 }
 
 function msgdelete(m = new Message, t = Number) {
