@@ -83,7 +83,7 @@ module.exports = {
         }
         if (args[0] == '기본설정') {
             if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, Number(process.env.deletetime)));
-            client.commands.get('qzset').run(client, message, args, sdb);
+            client.commands.get('qzset').run(client, message, args, sdb, user);
         }
         if (args[0] == '도움말' || args[0] == '명령어' || args[0] == 'help' || args[0] == 'info') {
             const help = new MessageEmbed()
