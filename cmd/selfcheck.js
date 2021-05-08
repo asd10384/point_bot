@@ -6,7 +6,6 @@ const { hcs } = require('selfcheck');
 const { format } = require('../module/mds');
 
 const MDB = require('../MDB/data');
-const sdata = MDB.module.server();
 const udata = MDB.module.user();
 
 const per = new MessageEmbed()
@@ -212,7 +211,7 @@ module.exports = {
                 return await check(message, embed, username, sc);
             }
             if (args[0] == '타이머확인') {
-                return await db.set(`db.${message.guild.id}.selfchecktimer`, true);
+                return await db.set(`db.${message.guild.id}.selfcheck.timerstatus`, true);
             }
 
             // 자가진단 @USER
@@ -291,9 +290,9 @@ module.exports = {
     autocheckinterval: async function (client = new Client, message = new Message, sdb = MDB.object.server) {
         const timer = setInterval(async () => {
             var autotime = eval(process.env.autoselfcheck);
-            var checktimer = db.get(`db.${message.guild.id}.selfchecktimer`);
+            var checktimer = db.get(`db.${message.guild.id}.selfcheck.timertimerstatus`);
             if (checktimer) {
-                db.set(`db.${message.guild.id}.selfchecktimer`, false);
+                db.set(`db.${message.guild.id}.selfcheck.timertimerstatus`, false);
                 console.log(`\n** ${message.guild.name} 서버 **\n자동 자가진단 타이머가 실행중입니다.\n시간 : ${autotime[0]}시 ${autotime[1]}분\n`);
             }
             var userlist = [];

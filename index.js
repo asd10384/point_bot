@@ -57,9 +57,9 @@ client.on('message', async (message) => {
         if (!sdb) {
             await MDB.set.server(message);
         } else {
-            var atchitch = await db.get(`db.${message.guild.id}.autocheck`);
+            var atchitch = await db.get(`db.${message.guild.id}.selfcheck.autocheck`);
             if (atchitch == null || atchitch == undefined || atchitch == false) {
-                await db.set(`db.${message.guild.id}.autocheck`, true);
+                await db.set(`db.${message.guild.id}.selfcheck.autocheck`, true);
                 await client.commands.get(`selfcheck`).autocheckinterval(client, message, sdb);
             }
             
