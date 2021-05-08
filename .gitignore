@@ -20,5 +20,3 @@ json.sqlite
 .env
 
 googlettsapi.json
-
-tts.wav
