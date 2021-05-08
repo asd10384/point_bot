@@ -387,24 +387,17 @@ function bignum(num=1) {
 }
 
 async function allmsgdelete(client = new Client, sdb = MDB.object.server, time = Number || 50) {
-    var c;
     try {
-        c = client.channels.cache.get(sdb.quiz.qzchannelid);
+        var c = client.channels.cache.get(sdb.quiz.qzchannelid);
+        setTimeout(async () => {
+            await c.messages.fetch({ after: sdb.quiz.msg.npid }).then(async (msg) => {
+                if (msg.size > 0) {
+                    await c.bulkDelete(msg.size);
+                }
+            });
+        }, time);
     } catch(err) {
         return;
-    }
-    if (c) {
-        try {
-            setTimeout(async () => {
-                await c.messages.fetch().then(async (msg) => {
-                    if (msg.size > 3) {
-                        await c.bulkDelete(msg.size-3);
-                    }
-                });
-            }, time);
-        } catch(err) {
-            return;
-        }
     }
     return;
 }
@@ -572,7 +565,6 @@ async function imgplay(client = new Client, message = new Message, args = Array,
     var img = sdb.quiz.quiz.link[count];
     if (img == undefined || img == null || img == '') {
         vchannel.leave();
-        await allmsgdelete(client, sdb, 50);
         return await end(client, message, sdb);
     }
     var url = ytdl(`https://youtu.be/PZCXXe3O-2Q`, { bitrate: 512000, quality: 'highestaudio' });
@@ -602,20 +594,24 @@ async function imgplay(client = new Client, message = new Message, args = Array,
         });
     } catch(err) {}
 
-    vchannel.join().then(async (connection) => {
-        db.set(`db.${message.guild.id}.img.time`, sdb.quiz.anser.imgtime);
-        db.set(`db.${message.guild.id}.img.timer`, true);
-        db.set(`db.${message.guild.id}.mq.timer`, true);
-        await imgtimer(client, message, sdb, count, all_count, img);
-        await timer(client, message, sdb);
-        const dispatcher = connection.play(url, options);
-        sdb.quiz.start.user = true;
-        sdb.quiz.start.hint = true;
-        await sdb.save().catch((err) => console.log(err));
-        dispatcher.on('finish', async () => {
-            return await anser(client, message, ['스킵','시간초과'], sdb, user);
+    try {
+        vchannel.join().then(async (connection) => {
+            db.set(`db.${message.guild.id}.img.time`, sdb.quiz.anser.imgtime);
+            db.set(`db.${message.guild.id}.img.timer`, true);
+            db.set(`db.${message.guild.id}.mq.timer`, true);
+            await imgtimer(client, message, sdb, count, all_count, img);
+            await timer(client, message, sdb);
+            const dispatcher = connection.play(url, options);
+            sdb.quiz.start.user = true;
+            sdb.quiz.start.hint = true;
+            await sdb.save().catch((err) => console.log(err));
+            dispatcher.on('finish', async () => {
+                return await anser(client, message, ['스킵','시간초과'], sdb, user);
+            });
         });
-    })
+    } catch(err) {
+        return await end(client, message, sdb);
+    }
 }
 
 async function getmusic(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, user = new User, ulist = {
@@ -676,7 +672,6 @@ async function musicplay(client = new Client, message = new Message, args = Arra
     var link = sdb.quiz.quiz.link[count];
     if (link == undefined || link == null || link == '') {
         vchannel.leave();
-        await allmsgdelete(client, sdb, 50);
         return await end(client, message, sdb);
     }
     var url = ytdl(link, { bitrate: 512000, quality: 'highestaudio' });
