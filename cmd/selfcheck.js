@@ -290,14 +290,14 @@ module.exports = {
     },
     autocheckinterval: async function (client = new Client, message = new Message, sdb = MDB.object.server) {
         const timer = setInterval(async () => {
+            var autotime = eval(process.env.autoselfcheck);
             var checktimer = db.get(`db.${message.guild.id}.selfchecktimer`);
-            if ((!checktimer) ? false : checktimer == true) {
-                console.log(`자동 자가진단 타이머가 실행중입니다.`);
+            if (checktimer) {
                 db.set(`db.${message.guild.id}.selfchecktimer`, false);
+                console.log(`\n** ${message.guild.name} 서버 **\n자동 자가진단 타이머가 실행중입니다.\n시간 : ${autotime[0]}시 ${autotime[1]}분\n`);
             }
             var userlist = [];
             var user, emobj;
-            var autotime = eval(process.env.autoselfcheck);
             var date = format.nowdate(new Date());
             if (['토','일'].includes(date.week)) return ;
             if (date.hour == Number(autotime[0]) && date.min == Number(autotime[1]) && date.sec == 0) {

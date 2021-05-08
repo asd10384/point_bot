@@ -15,10 +15,15 @@ function set(message = new Message, sdb = MDB.object.server, start = Boolean) {
 }
 function play(message = new Message, sdb = MDB.object.server) {
     setInterval(async () => {
-        if (sdb.quiz.start.start) return;
-        var time = await db.get(`db.${message.guild.id}.tts.timertime`);
+        var time = db.get(`db.${message.guild.id}.tts.timertime`);
         if (time == undefined || time == null) time = Number(process.env.ttsout)*60;
-        var on = await db.get(`db.${message.guild.id}.tts.timeron`) || false;
+        var status = db.get(`db.${message.guild.id}.tts.timerstatus`);
+        if (status) {
+            db.set(`db.${message.guild.id}.tts.timerstatus`, false);
+            console.log(`\n** ${message.guild.name} 서버 **\nTTS타이머가 실행중입니다.\n시간 : ${time}\n음악퀴즈 : ${sdb.quiz.start.start}`);
+        }
+        if (sdb.quiz.start.start) return;
+        var on = db.get(`db.${message.guild.id}.tts.timeron`);
         if (on) {
             if (time <= 0) {
                 set(message, sdb, false);
@@ -26,7 +31,7 @@ function play(message = new Message, sdb = MDB.object.server) {
                     message.guild.me.voice.channel.leave();
                 } catch(err) {}
             } else {
-                await db.set(`db.${message.guild.id}.tts.timertime`, time-5);
+                db.set(`db.${message.guild.id}.tts.timertime`, time-5);
             }
         } else {
             set(message, sdb, false);
