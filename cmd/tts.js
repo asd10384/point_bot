@@ -53,7 +53,8 @@ module.exports = {
             if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, msg_time));
             return await ban.unban(client, message, args, sdb, pp);
         }
-        if (args[0] == '타이머확인') {
+        if (args[0] == '타이머확인' || args[0] == 'timercheck') {
+            if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, Number(process.env.deletetime)));
             return await db.set(`db.${message.guild.id}.tts.timerstatus`, true);
         }
         return await tts.tts(client, message, args, sdb);
