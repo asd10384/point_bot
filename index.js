@@ -98,7 +98,7 @@ client.on('message', async (message) => {
                         .setFooter(` ${prefix}help 를 입력해 명령어를 확인해 주세요.`);
                     message.channel.send(embed).then(m => msgdelete(m, deletetime));
                 } finally {
-                    return msgdelete(message, 150);
+                    return msgdelete(message, 100);
                 }
             } else {
                 var args = message.content.trim().split(/ +/g);
