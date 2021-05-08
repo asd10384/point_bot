@@ -101,7 +101,7 @@ async function skip(client = new Client, message = new Message, args = Array, sd
     if (skip.length >= usercount) {
         sdb.quiz.user.skip = [];
         await sdb.save().catch((err) => console.log(err));
-        return await quiz.anser(client, message, ['스킵'], sdb);
+        return await quiz.anser(client, message, ['스킵'], sdb, user);
     }
     sdb.quiz.user.skip = skip;
     await sdb.save().catch((err) => console.log(err));

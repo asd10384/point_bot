@@ -53,10 +53,6 @@ async function go(client = new Client, reaction = new ReactionCollector, user = 
                         reaction.users.remove(user);
                         return await skip(client, message, ['스킵'], sdb, user);
                     }
-                    if (sdb.selfcheck.channelid == message.channel.id) {
-                        reaction.users.remove(user);
-                        return await client.commands.get(`selfcheck`).run(client, message, ['자가진단'], sdb);
-                    }
                 }
                 if (name === '1️⃣' || name === '2️⃣' || name === '3️⃣' || name === '4️⃣' || name === '5️⃣') {
                     reaction.users.remove(user);
@@ -91,7 +87,7 @@ async function go(client = new Client, reaction = new ReactionCollector, user = 
                 if (!vchannel) {
                     var vchannel = message.member.voice.channel;
                 }
-                return await quiz.start_em(client, message, [], sdb, vchannel, {first: false});
+                return await quiz.start_em(client, message, [], sdb, vchannel, user, {first: false});
             }
         }
     });

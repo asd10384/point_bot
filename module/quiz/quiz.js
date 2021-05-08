@@ -4,7 +4,7 @@ const db = require('quick.db');
 const request = require('request');
 const { load } = require('cheerio');
 const ytdl = require('ytdl-core');
-const { MessageEmbed, Client, Message, Channel } = require('discord.js');
+const { MessageEmbed, Client, Message, Channel, User } = require('discord.js');
 const MDB = require('../../MDB/data');
 
 const mqscore = require('./score');
@@ -82,13 +82,13 @@ async function end(client = new Client, message = new Message, sdb = MDB.object.
 
     await allmsgdelete(client, sdb, 1000);
 }
-async function start(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel) {
-    await start_em(client, message, args, sdb, vchannel, {
+async function start(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, user = new User) {
+    await start_em(client, message, args, sdb, vchannel, user, {
         first: true,
     });
     await db.set(`db.${message.guild.id}.mq.timer`, true);
 }
-async function start_em(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, opt = {
+async function start_em(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, user = new User, opt = {
     first: Boolean,
 }) {
     var data = sdb.quiz;
@@ -186,7 +186,7 @@ async function start_em(client = new Client, message = new Message, args = Array
                                     data.page.p3 = 0;
                                     data.page.p4 = 0;
                                     await db.set(`db.${message.guild.id}.mq.timer`, false);
-                                    return await ready(client, message, args, sdb, vchannel, ulist);
+                                    return await ready(client, message, args, sdb, vchannel, user, ulist);
                                 }
                                 data.page.now = 3;
                                 data.page.p4 = 0;
@@ -247,7 +247,7 @@ async function start_em(client = new Client, message = new Message, args = Array
     });
     return;
 }
-async function anser(client = new Client, message = new Message, args = Array, sdb = MDB.object.server) {
+async function anser(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, user = new User) {
     db.set(`db.${message.guild.id}.mq.timer`, true);
     db.set(`db.${message.guild.id}.img.timer`, false);
     db.set(`db.${message.guild.id}.img.time`, 45);
@@ -258,20 +258,19 @@ async function anser(client = new Client, message = new Message, args = Array, s
     await allmsgdelete(client, sdb, 1000);
 
     try {
-        var anser_user;
+        var anser_user = user.username;
         if (args[0] == '스킵' || args[0] == 'skip') {
             anser_user = (args[1] == '시간초과') ? '시간초과로 스킵되었습니다.' : (args[1] == '관리자') ? `${message.member.user.username} 님이 강제로 스킵했습니다.` : '스킵하셨습니다.';
             sdb.quiz.quiz.skipcount = sdb.quiz.quiz.skipcount+1;
         } else {
-            anser_user = message.member.user.username;
-            var userid = message.author.id;
-            var score = sdb.quiz.user.score;
-            if (score[userid]) {
-                score[userid] = score[userid] + 1;
+            var score = db.get(`db.${message.guild.id}.quiz.score`);
+            if (!score) score = {};
+            if (score[user.id]) {
+                score[user.id] = score[user.id] + 1;
             } else {
-                score[userid] = 1;
+                score[user.id] = 1;
             }
-            sdb.quiz.user.score = score;
+            db.set(`db.${message.guild.id}.quiz.score`, score);
         }
         var time = sdb.quiz.anser.time;
         var count = sdb.quiz.quiz.count;
@@ -289,7 +288,9 @@ async function anser(client = new Client, message = new Message, args = Array, s
             .setFooter(`${time}초 뒤에 다음문제로 넘어갑니다.`)
             .setColor('ORANGE');
         
-        if (format == '음악퀴즈') np.setImage(`http://img.youtube.com/vi/${yturl}/sddefault.jpg`);
+        if (format == '음악퀴즈') {
+            np.setImage(`http://img.youtube.com/vi/${yturl}/sddefault.jpg`);
+        }
         if (format == '그림퀴즈') {
             np.setImage(link);
             await broadcast(message, sdb, message.guild.me.voice.channel, `sound/dingdong.mp3`, {volume:0.5});
@@ -318,11 +319,14 @@ async function anser(client = new Client, message = new Message, args = Array, s
             } catch(err) {
                 vchannel = client.channels.cache.get(sdb.quiz.vcid);
             }
-            if (format == '음악퀴즈') await musicplay(client, message, args, sdb, vchannel);
-            if (format == '그림퀴즈') await imgplay(client, message, args, sdb, vchannel);
+            if (format == '음악퀴즈') await musicplay(client, message, args, sdb, vchannel, user);
+            if (format == '그림퀴즈') await imgplay(client, message, args, sdb, vchannel, user);
             return;
         }, time * 1000);
-    } catch(err) {}
+    } catch(err) {
+        console.log(err);
+        return await end(client, message, sdb);
+    }
 }
 
 async function timer(client = new Client, message = new Message, sdb = MDB.object.server) {
@@ -346,7 +350,7 @@ async function imgtimer(client = new Client, message = new Message, sdb = MDB.ob
             if (time <= 0) {
                 db.set(`db.${message.guild.id}.img.timer`, false);
                 db.set(`db.${message.guild.id}.img.time`, sdb.quiz.anser.imgtime);
-                await anser(client, message, ['스킵'], sdb);
+                await anser(client, message, ['스킵'], sdb, user);
                 return clearInterval(ontimer);
             }
             if (time % 5 == 0 || (time < 10 && time % 2 == 1 && time > 3) || time < 3) {
@@ -398,7 +402,7 @@ async function allmsgdelete(client = new Client, sdb = MDB.object.server, time =
     return;
 }
 
-async function ready(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, ulist = {
+async function ready(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, user = new User, ulist = {
     url: String,
     desc: String,
     quiz: String,
@@ -415,7 +419,7 @@ async function ready(client = new Client, message = new Message, args = Array, s
     sdb.quiz.start.user = false;
     sdb.quiz.user.hint = [];
     sdb.quiz.user.skip = [];
-    sdb.quiz.user.score = [];
+    db.set(`db.${message.guild.id}.quiz.score`, {});
     sdb.quiz.quiz.skipcount = 0;
     sdb.save().catch((err) => console.log(err));
     var list = `**잠시뒤 퀴즈가 시작됩니다.**`;
@@ -431,9 +435,9 @@ async function ready(client = new Client, message = new Message, args = Array, s
         });
     } catch(err) {}
     await mqscore.score(client, message, args, sdb);
-    return await getquiz(client, message, args, sdb, vchannel, ulist);
+    return await getquiz(client, message, args, sdb, vchannel, user, ulist);
 }
-async function getquiz(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, ulist = {
+async function getquiz(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, user = new User, ulist = {
     url: String,
     desc: String,
     quiz: String,
@@ -458,10 +462,12 @@ async function getquiz(client = new Client, message = new Message, args = Array,
             return c.messages.fetch(sdb.quiz.msg.npid).then(m => {
                 m.edit(np);
                 setTimeout(async () => {
-                    return await getmusic(client, message, args, sdb, vchannel, ulist);
+                    return await getmusic(client, message, args, sdb, vchannel, user, ulist);
                 }, 10000);
             });
-        } catch(err) {return;}
+        } catch(err) {
+            return await end(client, message, sdb);
+        }
     }
     if (format == '그림퀴즈') {
         await play(message, sdb, vchannel, `잠시뒤, ${format} 가 시작됩니다.`, {volume:0.07});
@@ -481,10 +487,12 @@ async function getquiz(client = new Client, message = new Message, args = Array,
             return c.messages.fetch(sdb.quiz.msg.npid).then(m => {
                 m.edit(np);
                 setTimeout(async () => {
-                    return await getimg(client, message, args, sdb, vchannel, ulist);
+                    return await getimg(client, message, args, sdb, vchannel, user, ulist);
                 }, 10000);
             });
-        } catch(err) {return;}
+        } catch(err) {
+            return await end(client, message, sdb);
+        }
     }
     await end(client, message, sdb);
     emerr.setDescription(`퀴즈 형식을 찾을수 없습니다.`);
@@ -492,7 +500,7 @@ async function getquiz(client = new Client, message = new Message, args = Array,
         return message.channel.send(emerr).then(m => msgdelete(m, Number(process.env.deletetime)));
     }, 1250);
 }
-async function getimg(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, ulist = {
+async function getimg(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, user = new User, ulist = {
     url: String,
     desc: String,
     quiz: String,
@@ -502,7 +510,7 @@ async function getimg(client = new Client, message = new Message, args = Array, 
         if (!html) {
             await end(client, message, sdb);
             emerr.setDescription(`HTML을 찾을수 없습니다.`);
-            return setTimeout(() => {
+            return setTimeout(async () => {
                 return message.channel.send(emerr).then(m => msgdelete(m, Number(process.env.deletetime)));
             }, 1250);
         }
@@ -544,11 +552,11 @@ async function getimg(client = new Client, message = new Message, args = Array, 
         img.start.user = false;
         sdb.quiz = img;
         await sdb.save().catch((err) => console.log(err));
-        return await imgplay(client, message, args, sdb, vchannel);
+        return await imgplay(client, message, args, sdb, vchannel, user);
     });
     return;
 }
-async function imgplay(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel) {
+async function imgplay(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, user = new User) {
     sdb.tts.tts = false;
     sdb.quiz.start.start = true;
     await sdb.save().catch((err) => console.log(err));
@@ -598,12 +606,12 @@ async function imgplay(client = new Client, message = new Message, args = Array,
         sdb.quiz.start.hint = true;
         await sdb.save().catch((err) => console.log(err));
         dispatcher.on('finish', async () => {
-            return await anser(client, message, args, sdb);
+            return await anser(client, message, ['스킵','시간초과'], sdb, user);
         });
     })
 }
 
-async function getmusic(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, ulist = {
+async function getmusic(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, user = new User, ulist = {
     url: String,
     desc: String,
     quiz: String,
@@ -648,11 +656,11 @@ async function getmusic(client = new Client, message = new Message, args = Array
         music.start.user = false;
         sdb.quiz = music;
         await sdb.save().catch((err) => console.log(err));
-        return await musicplay(client, message, args, sdb, vchannel);
+        return await musicplay(client, message, args, sdb, vchannel, user);
     });
     return;
 }
-async function musicplay(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel) {
+async function musicplay(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, user = new User) {
     sdb.tts.tts = false;
     sdb.quiz.start.start = true;
     await sdb.save().catch((err) => console.log(err));
@@ -699,7 +707,7 @@ async function musicplay(client = new Client, message = new Message, args = Arra
         sdb.quiz.start.hint = true;
         await sdb.save().catch((err) => console.log(err));
         dispatcher.on('finish', async () => {
-            return await anser(client, message, args, sdb);
+            return await anser(client, message, ['스킵','시간초과'], sdb, user);
         });
     })
 }

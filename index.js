@@ -108,7 +108,7 @@ client.on('message', async (message) => {
                 }
                 if (quizid == message.channel.id) {
                     if (sdb.quiz.start.start == true) {
-                        return await ansermsg(client, message, args, sdb);
+                        return await ansermsg(client, message, args, sdb, message.member.user);
                     } else {
                         command = client.commands.get('qz');
                         msgdelete(message, 100);

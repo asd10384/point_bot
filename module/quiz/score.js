@@ -9,7 +9,7 @@ module.exports = {
 };
 
 async function score(client = new Client, message = new Message, args = [], sdb = MDB.object.server) {
-    var score = sdb.quiz.user.score;
+    var score = db.get(`db.${message.guild.id}.quiz.score`);
     var skip = sdb.quiz.quiz.skipcount;
     var text = '';
     var i = 1;

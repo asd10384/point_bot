@@ -46,12 +46,12 @@ module.exports = {
         if (args[0] == 'ban' || args[0] == '밴' || args[0] == '뮤트') {
             if (chat) msgdelete(message, 50);
             if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, msg_time));
-            return await ban.ban(client, message, args, sdb);
+            return await ban.ban(client, message, args, sdb, pp);
         }
         if (args[0] == 'unban' || args[0] == '언밴' || args[0] == '언벤' || args[0] == '해제') {
             if (chat) msgdelete(message, 50);
             if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, msg_time));
-            return await ban.unban(client, message, args, sdb);
+            return await ban.unban(client, message, args, sdb, pp);
         }
         return await tts.tts(client, message, args, sdb);
     },

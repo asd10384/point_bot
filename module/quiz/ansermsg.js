@@ -1,7 +1,7 @@
 
 require('dotenv').config();
 const db = require('quick.db');
-const { MessageEmbed, Client, Message, Channel } = require('discord.js');
+const { MessageEmbed, Client, Message, Channel, User } = require('discord.js');
 const MDB = require('../../MDB/data');
 
 const quiz = require('./quiz');
@@ -11,7 +11,7 @@ module.exports = {
     ansermsg,
 };
 
-async function ansermsg(client = new Client, message = new Message, args = Array, sdb = MDB.object.server) {
+async function ansermsg(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, user = new User) {
     const text = args.join(' ').trim().toLowerCase();
 
     var count = sdb.quiz.quiz.count;
@@ -28,12 +28,12 @@ async function ansermsg(client = new Client, message = new Message, args = Array
     if (text == anser_text) {
         sdb.quiz.start.user = false;
         await sdb.save().catch((err) => console.log(err));
-        return await quiz.anser(client, message, args, sdb);
+        return await quiz.anser(client, message, args, sdb, user);
     }
     if (text == '힌트' || text == 'hint') {
-        return await hint(client, message, args, sdb, message.member.user);
+        return await hint(client, message, args, sdb, user);
     }
     if (text == '스킵' || text == 'skip') {
-        return await skip(client, message, args, sdb, message.member.user);
+        return await skip(client, message, args, sdb, user);
     }
 }

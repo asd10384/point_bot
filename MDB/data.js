@@ -38,7 +38,6 @@ const out = {
                 user: {
                     hint: Array,
                     skip: Array,
-                    score: Object,
                 },
                 anser: {
                     list: Array,
@@ -125,7 +124,6 @@ async function set_server(message = new Message) {
             user: {
                 hint: [],
                 skip: [],
-                score: {},
             },
             anser: {
                 list: ['제목', '가수', '제목-가수', '가수-제목'],

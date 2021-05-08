@@ -16,7 +16,7 @@ const ttscheck = new MessageEmbed()
     .setColor('RED');
 
 // 밴
-async function ban(client = new Client, message = new Message, args = Array, sdb = MDB.object.server) {    
+async function ban(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, pp = String) {    
     udata.findOne({
         userID: message.member.user.id
     }, async (err, db1) => {
@@ -71,7 +71,7 @@ async function ban(client = new Client, message = new Message, args = Array, sdb
 // 밴 끝
 
 // 언밴
-async function unban(client = new Client, message = new Message, args = Array, sdb = MDB.object.server) {    
+async function unban(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, pp = String) {    
     udata.findOne({
         userID: message.member.user.id
     }, async (err, db1) => {

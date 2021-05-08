@@ -56,7 +56,7 @@ module.exports = {
             
             if (!sdb.quiz.start.embed) {
                 sdb.quiz.start.embed = true;
-                return await quiz.start(client, message, args, sdb, vchannel);
+                return await quiz.start(client, message, args, sdb, vchannel, user);
             } else {
                 emerr.setDescription(`
                     이미 음악퀴즈 시작을 입력하셨습니다.
@@ -73,10 +73,10 @@ module.exports = {
             return await sdb.save().catch((err) => console.log(err));
         }
         if (args[0] == '힌트' || args[0] == 'hint') {
-            return await hint(client, message, ['관리자'], sdb, message.member.user);
+            return await hint(client, message, ['관리자'], sdb, user);
         }
         if (args[0] == '스킵' || args[0] == 'skip') {
-            return await quiz.anser(client, message, ['스킵','관리자'], sdb);
+            return await quiz.anser(client, message, ['스킵','관리자'], sdb, user);
         }
         if (args[0] == '설정' || args[0] == 'setting') {
             return message.channel.send(`현재 제작중`).then(m => msgdelete(m, Number(process.env.deletetime)));
