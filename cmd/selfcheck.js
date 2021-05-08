@@ -290,9 +290,9 @@ module.exports = {
     autocheckinterval: async function (client = new Client, message = new Message, sdb = MDB.object.server) {
         const timer = setInterval(async () => {
             var autotime = eval(process.env.autoselfcheck);
-            var checktimer = db.get(`db.${message.guild.id}.selfcheck.timertimerstatus`);
+            var checktimer = db.get(`db.${message.guild.id}.selfcheck.timerstatus`);
             if (checktimer) {
-                db.set(`db.${message.guild.id}.selfcheck.timertimerstatus`, false);
+                db.set(`db.${message.guild.id}.selfcheck.timerstatus`, false);
                 console.log(`\n** ${message.guild.name} 서버 **\n자동 자가진단 타이머가 실행중입니다.\n시간 : ${autotime[0]}시 ${autotime[1]}분\n`);
             }
             var userlist = [];
