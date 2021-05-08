@@ -251,11 +251,13 @@ async function anser(client = new Client, message = new Message, args = Array, s
     db.set(`db.${message.guild.id}.mq.timer`, true);
     db.set(`db.${message.guild.id}.img.timer`, false);
     db.set(`db.${message.guild.id}.img.time`, 45);
+
+    allmsgdelete(client, sdb, 1000);
+    
     sdb.quiz.start.user = false;
     sdb.quiz.start.hint = false;
     sdb.quiz.user.hint = [];
     sdb.quiz.user.skip = [];
-    await allmsgdelete(client, sdb, 1000);
 
     try {
         var anser_user = user.username;
