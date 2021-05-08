@@ -281,20 +281,25 @@ async function anser(client = new Client, message = new Message, args = Array, s
         var format = sdb.quiz.quiz.format;
         var yturl = link.replace(chack, '').replace(/(?:&(.+))/gi, '');
         var list = `퀴즈를 종료하시려면 \` ${process.env.prefix}퀴즈 종료 \`를 입력해주세요.`;
-        var np = new MessageEmbed()
-            .setTitle(`**정답 : ${name}**`)
-            .setURL(link)
-            .setDescription(`**${vocal}**\n**정답자 : ${anser_user}**\n**문제 : ${count+1} / ${all_count}**`)
-            .setFooter(`${time}초 뒤에 다음문제로 넘어갑니다.`)
-            .setColor('ORANGE');
+        var np = new MessageEmbed();
         
         if (format == '음악퀴즈') {
+            vocal = `**가수 : ${vocal}**`;
             np.setImage(`http://img.youtube.com/vi/${yturl}/sddefault.jpg`);
         }
         if (format == '그림퀴즈') {
             np.setImage(link);
             await broadcast(message, sdb, message.guild.me.voice.channel, `sound/dingdong.mp3`, {volume:0.5});
         }
+        np.setTitle(`**정답 : ${name}**`)
+            .setURL(link)
+            .setDescription(`
+                **${vocal}**
+                **정답자 : ${anser_user}**
+                **문제 : ${count+1} / ${all_count}**
+            `)
+            .setFooter(`${time}초 뒤에 다음문제로 넘어갑니다.`)
+            .setColor('ORANGE');
         
         try {
             var c = client.channels.cache.get(sdb.quiz.qzchannelid);
