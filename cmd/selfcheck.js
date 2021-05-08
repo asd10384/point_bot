@@ -6,6 +6,7 @@ const { hcs } = require('selfcheck');
 const { format } = require('../module/mds');
 
 const MDB = require('../MDB/data');
+const sdata = MDB.module.server();
 const udata = MDB.module.user();
 
 const per = new MessageEmbed()
@@ -342,6 +343,7 @@ module.exports = {
                             color = emobj.color;
                             embed.setTitle(`**\` ${user.username} \`**님 자동 자가진단 **${title}**`)
                                 .setDescription(desc)
+                                .setFooter(`서버 : ${message.guild.name}`)
                                 .setColor((color) ? color : 'ORANGE');
                             return user.send(embed).catch(() => {return;});
                         } else {
@@ -350,6 +352,7 @@ module.exports = {
                                     ${user.username}님의 정보가 등록되어있지 않습니다.
                                     ${user.username}님이 먼저 **${pp}자가진단 설정**을 해주셔야 합니다.
                                 `)
+                                .setFooter(`서버 : ${message.guild.name}`)
                                 .setColor('RED');
                             return user.send(embed).catch(() => {return;});
                         }
