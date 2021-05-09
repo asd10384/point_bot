@@ -23,6 +23,7 @@ function now_date(time = new Date) {
     var week = weeklist[day];
     if (hour >= 24) {
         week = weeklist[day+1];
+        if (week == undefined) week = weeklist[day-5];
         hour = hour - 24;
     }
     var nowtime = {
