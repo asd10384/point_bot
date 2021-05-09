@@ -28,11 +28,10 @@ module.exports = {
             topic: `정답은 채팅으로 치시면 됩니다.`
         }).then(async c => {
             sdb.quiz.qzchannelid = c.id;
-            var anser = sdb.quiz.anser.list[sdb.quiz.anser.anser];
             var time = sdb.quiz.anser.time;
             var score = await msg.score();
             var list = await msg.list();
-            var np = await msg.np(anser, time);
+            var np = await msg.np(time);
             c.send(score).then(async (m) => {
                 sdb.quiz.msg.scoreid = m.id;
                 await sdb.save().catch(err => console.log(err));
