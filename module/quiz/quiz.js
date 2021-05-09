@@ -412,7 +412,7 @@ async function ready(client = new Client, message = new Message, args = Array, s
     quiz: String,
     complite: Number,
 }) {
-    if (!ulist.complite === 100) {
+    if (!ulist.start) {
         await end(client, message, sdb);
         emerr.setDescription(`아직 이 퀴즈가 완성되지 않았습니다.`);
         return setTimeout(async () => {
