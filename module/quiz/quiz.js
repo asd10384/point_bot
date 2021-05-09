@@ -33,6 +33,7 @@ async function end(client = new Client, message = new Message, sdb = MDB.object.
     db.set(`db.${message.guild.id}.mq.timer`, false);
     db.set(`db.${message.guild.id}.img.timer`, false);
     db.set(`db.${message.guild.id}.img.time`, sdb.quiz.anser.imgtime);
+    sdb.quiz.start.userid = '';
     sdb.quiz.quiz.name = [];
     sdb.quiz.quiz.vocal = [];
     sdb.quiz.quiz.link = [];
@@ -57,10 +58,9 @@ async function end(client = new Client, message = new Message, sdb = MDB.object.
     sdb.tts.tts = true;
 
     await sdb.save();
-    var anser = sdb.quiz.anser.list[sdb.quiz.anser.anser];
     var time = sdb.quiz.anser.time;
     var list = await msg.list();
-    var np = await msg.np(anser, time);
+    var np = await msg.np(time);
     try {
         message.guild.me.voice.channel.leave();
     } catch(err) {}
@@ -84,6 +84,7 @@ async function end(client = new Client, message = new Message, sdb = MDB.object.
     await allmsgdelete(client, sdb, 1000);
 }
 async function start(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, user = new User) {
+    sdb.quiz.start.userid = user.id;
     await start_em(client, message, args, sdb, vchannel, user, {
         first: true,
     });
@@ -421,6 +422,7 @@ async function ready(client = new Client, message = new Message, args = Array, s
     }
     db.set(`db.${message.guild.id}.quiz.startcheck`, true);
     db.set(`db.${message.guild.id}.quiz.score`, {});
+    sdb.quiz.start.userid = '';
     sdb.quiz.quiz.format = ulist.quiz;
     sdb.quiz.start.user = false;
     sdb.quiz.user.hint = [];
@@ -448,62 +450,53 @@ async function getquiz(client = new Client, message = new Message, args = Array,
     quiz: String,
     complite: Boolean,
 }) {
-    const format = ulist.quiz;
-    if (format == '음악퀴즈') {
-        await play(message, sdb, vchannel, `잠시뒤, ${format} 가 시작됩니다.`, {volume:0.07});
-        const np = new MessageEmbed()
-            .setTitle(`**${format} 설명**`)
-            .setImage(`https://ytms.netlify.app/question_mark.png`)
-            .setDescription(`
-                나오는 노래를 듣고 정답을 채팅창에 적어주세요.
-                정답이면 자동으로 넘어갑니다.
-
-                퀴즈는 10초뒤 자동 시작됩니다.
-            `)
-            .setFooter(`자세한 설정은 __${process.env.prefix}퀴즈 설정__ 으로 하실수 있습니다.`)
-            .setColor('ORANGE');
-        try {
-            var c = client.channels.cache.get(sdb.quiz.qzchannelid);
-            return c.messages.fetch(sdb.quiz.msg.npid).then(m => {
-                m.edit(np);
-                setTimeout(async () => {
-                    return await getmusic(client, message, args, sdb, vchannel, user, ulist);
-                }, 10000);
-            });
-        } catch(err) {
-            return await end(client, message, sdb);
-        }
+    if (ulist.quiz == '음악퀴즈') {
+        return await tensec(client, message, args, sdb, vchannel, user, ulist, {
+            desc: `나오는 노래를 듣고 정답을 채팅창에 적어주세요.\n정답이면 자동으로 넘어갑니다.`
+        });
     }
-    if (format == '그림퀴즈') {
-        await play(message, sdb, vchannel, `잠시뒤, ${format} 가 시작됩니다.`, {volume:0.07});
-        const np = new MessageEmbed()
-            .setTitle(`**${format} 설명**`)
-            .setImage(`https://ytms.netlify.app/question_mark.png`)
-            .setDescription(`
-                나오는 이미지를 보고 정답을 채팅창에 적어주세요.
-                정답이면 자동으로 넘어갑니다.
-
-                퀴즈는 10초뒤 자동 시작됩니다.
-            `)
-            .setFooter(`자세한 설정은 __${process.env.prefix}퀴즈 설정__ 으로 하실수 있습니다.`)
-            .setColor('ORANGE');
-        try {
-            var c = client.channels.cache.get(sdb.quiz.qzchannelid);
-            return c.messages.fetch(sdb.quiz.msg.npid).then(m => {
-                m.edit(np);
-                setTimeout(async () => {
-                    return await getimg(client, message, args, sdb, vchannel, user, ulist);
-                }, 10000);
-            });
-        } catch(err) {
-            return await end(client, message, sdb);
-        }
+    if (ulist.quiz == '그림퀴즈') {
+        return await tensec(client, message, args, sdb, vchannel, user, ulist, {
+            desc: `나오는 이미지를 보고 정답을 채팅창에 적어주세요.\n정답이면 자동으로 넘어갑니다.`
+        });
     }
     await end(client, message, sdb);
     emerr.setDescription(`퀴즈 형식을 찾을수 없습니다.`);
     return setTimeout(async () => {
         return message.channel.send(emerr).then(m => msgdelete(m, Number(process.env.deletetime)));
     }, 1250);
+}
+async function tensec(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, user = User, ulist = {
+    url: String,
+    desc: String,
+    quiz: String,
+    complite: Boolean,
+}, text = {
+    desc: String,
+}) {
+    await broadcast(message, sdb, vchannel, `sound/dingdong.mp3`, {volume:0.5});
+    const np = new MessageEmbed()
+        .setTitle(`**${ulist.quiz} 설명**`)
+        .setImage(`https://ytms.netlify.app/question_mark.png`)
+        .setDescription(`
+            ${text.desc}
+
+            퀴즈는 10초뒤 자동 시작됩니다.
+        `)
+        .setFooter(`자세한 설정은 ${process.env.prefix}퀴즈 설정 으로 하실수 있습니다.`)
+        .setColor('ORANGE');
+    try {
+        var c = client.channels.cache.get(sdb.quiz.qzchannelid);
+        return c.messages.fetch(sdb.quiz.msg.npid).then(m => {
+            m.edit(np);
+            setTimeout(async function() {
+                if (ulist.quiz == '음악퀴즈') return await getmusic(client, message, args, sdb, vchannel, user, ulist);
+                if (ulist.quiz == '그림퀴즈') return await getimg(client, message, args, sdb, vchannel, user, ulist);
+            }, 10000);
+        });
+    } catch(err) {
+        return await end(client, message, sdb);
+    }
 }
 async function getimg(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, user = new User, ulist = {
     url: String,
@@ -576,7 +569,6 @@ async function imgplay(client = new Client, message = new Message, args = Array,
     var options = {
         volume: 0.21
     };
-    const manser = sdb.quiz.anser.list[sdb.quiz.anser.anser];
     const all_count = sdb.quiz.quiz.name.length;
     
     var list = `퀴즈를 종료하시려면 \` ${process.env.prefix}퀴즈 종료 \`를 입력해주세요.
@@ -584,7 +576,7 @@ async function imgplay(client = new Client, message = new Message, args = Array,
 문제를 스킵하시려면 \` 스킵 \`을 입력하거나 ⏭️을 눌러주세요.`;
     var np = new MessageEmbed()
         .setTitle(`**정답 : ???**`)
-        .setDescription(`**채팅창에 ${manser} 형식으로 적어주세요.**\n**문제 : ${count+1}/${all_count}**`)
+        .setDescription(`**채팅창에 정답을 적어주세요.**\n**문제 : ${count+1}/${all_count}**`)
         .setImage(img)
         .setFooter(`기본 명령어 : ${process.env.prefix}퀴즈 도움말`)
         .setColor('ORANGE');
@@ -641,13 +633,17 @@ async function getmusic(client = new Client, message = new Message, args = Array
             link = [],
             logtext = '';
         var count = dfname.length;
+        var maxcount = 100;
         if (count > 50) count = 50;
         for (i=0; i<count; i++) {
+            if (maxcount < 0) break;
             var r = Math.floor(Math.random()*(dfname.length+1));
             if (r >= 50 || rndlist.includes(r) || dfname[r] == '' || dfname[r] == undefined) {
                 i--;
+                maxcount--;
                 continue;
             }
+            maxcount = 100;
             rndlist.push(r);
             name.push(dfname[r]);
             vocal.push(dfvocal[r]);
@@ -683,7 +679,6 @@ async function musicplay(client = new Client, message = new Message, args = Arra
     var options = {
         volume: 0.07
     };
-    const manser = sdb.quiz.anser.list[sdb.quiz.anser.anser];
     const all_count = sdb.quiz.quiz.name.length;
     
     var list = `퀴즈를 종료하시려면 \` ${process.env.prefix}퀴즈 종료 \`를 입력해주세요.
@@ -691,7 +686,7 @@ async function musicplay(client = new Client, message = new Message, args = Arra
 문제를 스킵하시려면 \` 스킵 \`을 입력하거나 ⏭️을 눌러주세요.`;
     var np = new MessageEmbed()
         .setTitle(`**정답 : ???**`)
-        .setDescription(`**채팅창에 ${manser} 형식으로 적어주세요.**\n**문제 : ${count+1}/${all_count}**`)
+        .setDescription(`**채팅창에 정답을 적어주세요.**\n**문제 : ${count+1}/${all_count}**`)
         .setImage(`https://ytms.netlify.app/question_mark.png`)
         .setFooter(`기본 명령어 : ${process.env.prefix}퀴즈 도움말`)
         .setColor('ORANGE');

@@ -40,8 +40,6 @@ const out = {
                     skip: Array,
                 },
                 anser: {
-                    list: Array,
-                    anser: Number,
                     time: Number,
                     imgtime: Number,
                 },
@@ -59,6 +57,7 @@ const out = {
                     skipcount: Number,
                 },
                 start: {
+                    userid: String,
                     start: Boolean,
                     embed: Boolean,
                     user: Boolean,
@@ -126,8 +125,6 @@ async function set_server(message = new Message) {
                 skip: [],
             },
             anser: {
-                list: ['제목', '가수', '제목-가수', '가수-제목'],
-                anser: 0,
                 time: 10,
                 imgtime: 60,
             },
@@ -145,6 +142,7 @@ async function set_server(message = new Message) {
                 skipcount: 0,
             },
             start: {
+                userid: '',
                 start: false,
                 embed: false,
                 user: false,

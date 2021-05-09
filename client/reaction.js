@@ -1,6 +1,6 @@
 
 require('dotenv').config();
-const { Client, User, ReactionCollector, MessageEmbed } = require('discord.js');
+const { Client, User, ReactionCollector, MessageEmbed, Message } = require('discord.js');
 const db = require('quick.db');
 const MDB = require('../MDB/data');
 const sdata = MDB.module.server();
@@ -45,17 +45,20 @@ async function go(client = new Client, reaction = new ReactionCollector, user = 
             if (reaction.message.channel.id === sdb.quiz.qzchannelid) {
                 if (name === '💡') {
                     if (sdb.quiz.start.user) {
-                        reaction.users.remove(user);
+                        reaction.users.remove(user).catch((err) => {return;});
                         if (member.voice.channel.id !== sdb.quiz.vcid) return errmsg(message, user, `힌트`);
                         return await hint(client, message, [], sdb, user);
                     }
                 }
                 if (name === '⏭️') {
                     if (sdb.quiz.start.user) {
-                        reaction.users.remove(user);
+                        reaction.users.remove(user).catch((err) => {return;});
                         if (member.voice.channel.id !== sdb.quiz.vcid) return errmsg(message, user, `스킵`);
                         return await skip(client, message, ['스킵'], sdb, user);
                     }
+                }
+                if (sdb.quiz.start.userid !== user.id) {
+                    return await errstart(message, user, `버튼 입력`);
                 }
                 if (name === '1️⃣' || name === '2️⃣' || name === '3️⃣' || name === '4️⃣' || name === '5️⃣') {
                     reaction.users.remove(user);
@@ -66,7 +69,6 @@ async function go(client = new Client, reaction = new ReactionCollector, user = 
                     if (sdb.quiz.page.now-1 == 2) sdb.quiz.page.p2 = num;
                     if (sdb.quiz.page.now-1 == 3) sdb.quiz.page.p3 = num;
                     if (sdb.quiz.page.now-1 == 4) sdb.quiz.page.p4 = num;
-                    if (sdb.quiz.page.now-1 == 5) sdb.quiz.page.p5 = num;
                 }
                 if (name === '↩️') {
                     sdb.quiz.page.slide = 0;
@@ -88,7 +90,7 @@ async function go(client = new Client, reaction = new ReactionCollector, user = 
                     var vchannel = client.channels.cache.get(sdb.quiz.vcid);
                 } catch(err) {}
                 if (!vchannel) {
-                    var vchannel = message.member.voice.channel;
+                    var vchannel = member.voice.channel;
                 }
                 return await quiz.start_em(client, message, [], sdb, vchannel, user, {first: false});
             }
@@ -102,4 +104,19 @@ async function errmsg(message = new Message, user = new User, why = String) {
         .setDescription(`**같은 음성채널에서**\n**사용해주세요.**`)
         .setColor('RED');
     return message.channel.send(em);
+}
+async function errstart(message = new Message, user = new User, why = String) {
+    const em = new MessageEmbed()
+        .setTitle(`**${user.username} 님 ${why} 오류**`)
+        .setDescription(`**퀴즈 시작을 입력한 사람만\n버튼을 누를수 있습니다.**`)
+        .setColor('RED');
+    return message.channel.send(em).then(m => msgdelete(m, Number(process.env.deletetime)));
+}
+
+function msgdelete(m = new Message, t = Number) {
+    setTimeout(() => {
+        try {
+            m.delete();
+        } catch(err) {}
+    }, t);
 }

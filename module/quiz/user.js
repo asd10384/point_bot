@@ -14,19 +14,9 @@ module.exports = {
     skip,
 };
 
-async function hint(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, user = new User) {
+async function hint(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, user = new User, anser = String) {
     if (!sdb.quiz.start.user) return;
     if (!sdb.quiz.start.hint) return;
-    var count = sdb.quiz.quiz.count;
-    var name = sdb.quiz.quiz.name[count];
-    var vocal = sdb.quiz.quiz.vocal[count];
-
-    const ansernum = sdb.quiz.anser.anser;
-    anser = '';
-    if (ansernum == 0) anser = `${name}`.trim().toLowerCase();
-    if (ansernum == 1) anser = `${vocal}`.trim().toLowerCase();
-    if (ansernum == 2) anser = `${name}-${vocal}`.trim().toLowerCase();
-    if (ansernum == 3) anser = `${vocal}-${name}`.trim().toLowerCase();
 
     var usercount;
     try {

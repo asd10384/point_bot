@@ -23,17 +23,11 @@ async function ansermsg(client = new Client, message = new Message, args = Array
 
     var count = sdb.quiz.quiz.count;
     var name = sdb.quiz.quiz.name[count];
-    var vocal = sdb.quiz.quiz.vocal[count];
 
-    const anser = sdb.quiz.anser.anser;
-    var anser_text = '';
-    if (anser == 0) anser_text = `${name}`.trim().toLowerCase();
-    if (anser == 1) anser_text = `${vocal}`.trim().toLowerCase();
-    if (anser == 2) anser_text = `${name}-${vocal}`.trim().toLowerCase();
-    if (anser == 3) anser_text = `${vocal}-${name}`.trim().toLowerCase();
+    var anser_text = `${name}`.trim().toLowerCase();
 
     if (text == '힌트' || text == 'hint') {
-        return await hint(client, message, args, sdb, user);
+        return await hint(client, message, args, sdb, user, anser_text);
     }
     if (text == '스킵' || text == 'skip') {
         return await skip(client, message, args, sdb, user);
