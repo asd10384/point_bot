@@ -20,9 +20,9 @@ function now_date(time = new Date) {
     var hour = time.getHours()+Number(process.env.addhour);
     var min = time.getMinutes();
     var sec = time.getSeconds();
-    var week = weeklist[time.getDay()];
+    var week = weeklist[day];
     if (hour >= 24) {
-        day++;
+        week = weeklist[day+1];
         hour = hour - 24;
     }
     var nowtime = {
