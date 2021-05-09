@@ -1,6 +1,6 @@
 
 require('dotenv').config();
-const { Client, User, ReactionCollector } = require('discord.js');
+const { Client, User, ReactionCollector, MessageEmbed } = require('discord.js');
 const db = require('quick.db');
 const MDB = require('../MDB/data');
 const sdata = MDB.module.server();
@@ -23,6 +23,7 @@ async function go(client = new Client, reaction = new ReactionCollector, user = 
     if (reaction.partial) await reaction.fetch();
     const name = reaction.emoji.name;
     const message = reaction.message;
+    const member = message.guild.members.cache.get(user.id);
     const serverid = reaction.message.guild.id;
 
     await sdata.findOne({
@@ -45,12 +46,14 @@ async function go(client = new Client, reaction = new ReactionCollector, user = 
                 if (name === '💡') {
                     if (sdb.quiz.start.user) {
                         reaction.users.remove(user);
+                        if (member.voice.channel.id !== sdb.quiz.vcid) return errmsg(message, user, `힌트`);
                         return await hint(client, message, [], sdb, user);
                     }
                 }
                 if (name === '⏭️') {
                     if (sdb.quiz.start.user) {
                         reaction.users.remove(user);
+                        if (member.voice.channel.id !== sdb.quiz.vcid) return errmsg(message, user, `스킵`);
                         return await skip(client, message, ['스킵'], sdb, user);
                     }
                 }
@@ -91,4 +94,12 @@ async function go(client = new Client, reaction = new ReactionCollector, user = 
             }
         }
     });
+}
+
+async function errmsg(message = new Message, user = new User, why = String) {
+    const em = new MessageEmbed()
+        .setTitle(`**${user.username} 님 ${why} 오류**`)
+        .setDescription(`**같은 음성채널에서**\n**사용해주세요.**`)
+        .setColor('RED');
+    return message.channel.send(em);
 }

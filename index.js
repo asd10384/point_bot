@@ -107,7 +107,7 @@ client.on('message', async (message) => {
                     command = client.commands.get('tts');
                 }
                 if (quizid == message.channel.id) {
-                    if (sdb.quiz.start.start == true) {
+                    if (sdb.quiz.start.start) {
                         return await ansermsg(client, message, args, sdb, message.member.user);
                     } else {
                         command = client.commands.get('qz');
