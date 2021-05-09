@@ -292,10 +292,11 @@ module.exports = {
             var checktimer = db.get(`db.${message.guild.id}.selfcheck.timerstatus`);
             if (checktimer) {
                 db.set(`db.${message.guild.id}.selfcheck.timerstatus`, false);
+                var userid = db.get(`db.${message.guild.id}.selfcheck.timeruserid`);
                 db.set(`db.${message.guild.id}.selfcheck.timeruserid`, '');
                 var text = `\n** ${message.guild.name} 서버 **\n자동 자가진단 타이머가 실행중입니다.\n시간 : ${autotime[0]}시 ${autotime[1]}분\n`;
                 console.log(text);
-                const user = (message.guild.members.cache.get(db.get(`db.${message.guild.id}.selfcheck.timeruserid`))) ? message.guild.members.cache.get(db.get(`db.${message.guild.id}.selfcheck.timeruserid`)).user : undefined;
+                const user = (message.guild.members.cache.get(userid)) ? message.guild.members.cache.get(userid).user : undefined;
                 if (user) {
                     user.send(new MessageEmbed().setDescription(text).setColor('ORANGE'))
                         .catch(() => {return;})
