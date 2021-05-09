@@ -36,6 +36,7 @@ module.exports = {
                 await MDB.set.user(user);
                 return client.commands.get(`${this.name}`).run(client, message, args, sdb, user);
             }
+            udb.name = user.username;
             var autotime = eval(process.env.autoselfcheck);
             var username = message.author.username;
             var sc = udb.selfcheck;
@@ -202,6 +203,7 @@ module.exports = {
                             await MDB.set.user(tuser);
                             return client.commands.get(`${this.name}`).run(client, message, args, sdb, user);
                         }
+                        udb2.name = user.username;
                         username = tuser.username;
                         sc = udb2.selfcheck;
                         await check(message, embed, username, sc);
@@ -227,6 +229,7 @@ module.exports = {
                             await MDB.set.user(tuser);
                             return client.commands.get(`${this.name}`).run(client, message, args, sdb, user);
                         }
+                        udb2.name = user.username;
                         sc = udb2.selfcheck;
                         if (sc.name || sc.password) {
                             const emobj = await hcs({
@@ -314,6 +317,7 @@ module.exports = {
                             clearInterval(timer);
                             return await autocheckinterval(client, message, sdb);
                         }
+                        udb.name = user.username;
                         sc = udb.selfcheck;
                         if (sc.name || sc.password) {
                             emobj = await hcs({

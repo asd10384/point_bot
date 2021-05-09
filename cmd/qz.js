@@ -22,6 +22,7 @@ udata.findOne({
         await MDB.set.user(user);
         return client.commands.get(`${this.name}`).run(client, message, args, sdb, user);
     }
+    udb.name = user.username;
     command
 });
 */

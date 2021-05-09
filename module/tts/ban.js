@@ -27,6 +27,7 @@ async function ban(client = new Client, message = new Message, args = Array, sdb
             await MDB.set.user(user);
             return await ban(client, message, args, sdb, user, pp);
         }
+        udb.name = user.username;
         if (args[1]) {
             var muser = message.guild.members.cache.get(args[1].replace(/[^0-9]/g, ''));
             if (muser) {
@@ -37,10 +38,11 @@ async function ban(client = new Client, message = new Message, args = Array, sdb
                     if (err) console.log(err);
                     if (!udb2) {
                         await MDB.set.user(user2);
-                        var ttsboolen = true;
+                        return await ban(client, message, args, sdb, user, pp);
                     } else {
                         var ttsboolen = udb2.tts;
                         udb2.tts = false;
+                        udb2.name = user.username;
                         udb2.save();
                     }
                     if (ttsboolen == false) {
@@ -80,31 +82,32 @@ async function unban(client = new Client, message = new Message, args = Array, s
         if (err) console.log(err);
         if (!udb) {
             await MDB.set.user(user);
-            return await unban(client, message, args, sdb);
+            return await unban(client, message, args, sdb, pp);
         }
+        udb.name = user.username;
         if (args[1]) {
-            var muser = message.guild.members.cache.get(args[1].replace(/[^0-9]/g, ''));
+            var muser = message.guild.members.cache.get(args[1].replace(/[^0-9]/g, '')).user || undefined;
             if (muser) {
-                var user2 = muser.user;
                 udata.findOne({
-                    userID: user2.id
+                    userID: muser.id
                 }, async (err, udb2) => {
                     if (err) console.log(err);
                     if (!udb2) {
-                        await MDB.set.user(user2);
-                        var ttsboolen = false;
+                        await MDB.set.user(muser);
+                        return await unban(client, message, args, sdb, user, pp);
                     } else {
+                        udb2.name = user.username;
                         var ttsboolen = udb2.tts;
                         udb2.tts = true;
                         udb2.save();
                     }
                     if (ttsboolen == true) {
-                        ttscheck.setTitle(`\` ${user2.username} \`님의 TTS 설정`)
+                        ttscheck.setTitle(`\` ${muser.username} \`님의 TTS 설정`)
                             .setDescription(`이미 해재된 상태입니다.`);
                         return message.channel.send(ttscheck).then(m => msgdelete(m, Number(process.env.deletetime)+3000));
                     }
                     const date = format.nowdate(new Date());
-                    ttscheck.setTitle(`\` ${user2.username} \`님의 TTS 설정`)
+                    ttscheck.setTitle(`\` ${muser.username} \`님의 TTS 설정`)
                         .setDescription(`${date['time']['2']}\n이후로 \` 해제 \` 되셨습니다.`);
                     return message.channel.send(ttscheck).then(m => {
                         if (!sdb.tts.ttschannelid === message.channel.id) {

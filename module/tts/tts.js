@@ -35,6 +35,7 @@ async function tts(client = new Client, message = new Message, args = Array, sdb
             await MDB.set.user(user);
             return await tts(client, message, args, sdb, user);
         }
+        udb.name = user.username;
         var ttsboolen = (udb.tts) ? true : false;
         if (!ttsboolen) return msgdelete(message, 20);
 
