@@ -9,7 +9,7 @@ module.exports = {
     play,
 };
 
-async function set(message = new Message, sdb = MDB.object.server, start = Boolean) {
+function set(message = new Message, sdb = MDB.object.server, start = Boolean) {
     db.set(`db.${message.guild.id}.tts.timeron`, start);
     db.set(`db.${message.guild.id}.tts.timertime`, Number(process.env.ttsout)*60);
 }

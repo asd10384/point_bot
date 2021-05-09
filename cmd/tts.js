@@ -5,6 +5,7 @@ const { MessageEmbed, Client, Message, User } = require('discord.js');
 const MDB = require('../MDB/data');
 
 const tts = require('../module/tts/tts');
+const ttstimer = require('../module/tts/timer');
 const ban = require('../module/tts/ban');
 
 const per = new MessageEmbed()
@@ -24,6 +25,13 @@ module.exports = {
         // if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, Number(process.env.deletetime)));
 
         if (!args[0]) return;
+
+        var timerstart = db.get(`db.${message.guild.id}.tts.timerstart`);
+        if (!timerstart) {
+            db.set(`db.${message.guild.id}.tts.timerstart`, true);
+            await ttstimer.play(message, sdb);
+        }
+
         if (args[0] == 'help' || args[0] == '도움말' || args[0] == '명령어') {
             const help = new MessageEmbed()
                 .setTitle(`\` 명령어 \``)

@@ -43,13 +43,9 @@ async function play(message = new Message, sdb = MDB.object.server, channel = ne
 // 출력
 async function broadcast(message = new Message, sdb = Object, channel = new Channel, url = String, options = Object) {
     return channel.join().then(connection => {
+        // const dispatcher = 
+        connection.play(url, options);
         timer.set(message, sdb, true);
-        const dispatcher = connection.play(url, options);
-        var timerstart = db.get(`db.${message.guild.id}.tts.timerstart`);
-        if (!timerstart) {
-            db.set(`db.${message.guild.id}.tts.timerstart`, true);
-            timer.play(message, sdb);
-        }
     });
 }
 // 출력 끝
