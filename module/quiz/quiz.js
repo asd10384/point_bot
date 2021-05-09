@@ -253,7 +253,7 @@ async function anser(client = new Client, message = new Message, args = Array, s
     db.set(`db.${message.guild.id}.img.timer`, false);
     db.set(`db.${message.guild.id}.img.time`, 45);
 
-    allmsgdelete(client, sdb, 450);
+    allmsgdelete(client, sdb, 500);
     
     sdb.quiz.start.user = false;
     sdb.quiz.start.hint = false;
