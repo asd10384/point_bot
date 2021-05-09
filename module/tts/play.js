@@ -1,7 +1,7 @@
 
 require('dotenv').config();
 const MDB = require('../../MDB/data');
-const { writeFile } = require('fs');
+const { writeFile, createWriteStream } = require('fs');
 const timer = require('./timer');
 var checktimer = false;
 
@@ -35,9 +35,16 @@ async function play(message = new Message, sdb = MDB.object.server, channel = ne
     options['volume'] = 0.7;
 
     var fileurl = `ttssound/${message.guild.id}.wav`;
-    writeFile(fileurl, response[0].audioContent, async (err) => {
-        await broadcast(message, sdb, channel, fileurl, options);
+    var ws = createWriteStream(fileurl);
+    ws.write(response[0].audioContent);
+    ws.end();
+    ws.on('finish', async function() {
+        return await broadcast(message, sdb, channel, fileurl, options);
     });
+    // writeFile(fileurl, response[0].audioContent, async (err) => {
+    //     await broadcast(message, sdb, channel, fileurl, options);
+    // });
+    return;
 }
 // TEXT -> tts.WAV로 변경 끝
 
