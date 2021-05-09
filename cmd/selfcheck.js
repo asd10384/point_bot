@@ -295,10 +295,12 @@ module.exports = {
                 db.set(`db.${message.guild.id}.selfcheck.timeruserid`, '');
                 var text = `\n** ${message.guild.name} 서버 **\n자동 자가진단 타이머가 실행중입니다.\n시간 : ${autotime[0]}시 ${autotime[1]}분\n`;
                 console.log(text);
-                message.guild.members.cache.get(db.get(`db.${message.guild.id}.selfcheck.timeruserid`)).user
-                    .send(new MessageEmbed().setDescription(text).setColor('ORNAGE'))
-                    .catch(() => {return;})
-                    .then(m => msgdelete(m, Number(process.env.deletetime)*3));
+                const user = (message.guild.members.cache.get(db.get(`db.${message.guild.id}.selfcheck.timeruserid`))) ? message.guild.members.cache.get(db.get(`db.${message.guild.id}.selfcheck.timeruserid`)).user : undefined;
+                if (user) {
+                    user.send(new MessageEmbed().setDescription(text).setColor('ORANGE'))
+                        .catch(() => {return;})
+                        .then(m => msgdelete(m, Number(process.env.deletetime)*3));
+                }
             }
             var userlist = [];
             var user, emobj;

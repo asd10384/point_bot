@@ -48,7 +48,7 @@ module.exports = {
             return await db.set(`db.${message.guild.id}.tts.timerstatus`, true);
         }
         var text = `**타이머확인**\n${process.env.prefix}타이머확인 자가진단\n${process.env.prefix}타이머확인 tts`;
-        user.send(new MessageEmbed().setDescription(text).setColor('ORNAGE'))
+        user.send(new MessageEmbed().setDescription(text).setColor('ORANGE'))
             .catch(() => {return;})
             .then(m => msgdelete(m, Number(process.env.deletetime)*2));
     },
