@@ -35,17 +35,11 @@ async function play(message = new Message, sdb = MDB.object.server, channel = ne
     options['volume'] = 0.7;
 
     var fileurl = `ttssound/${message.guild.id}.wav`;
-    writeFileSync(fileurl, response[0].audioContent);
-    var ws = createWriteStream(fileurl);
-    ws.write(response[0].audioContent);
-    ws.end();
-    ws.on('finish', async function() {
-        return await broadcast(message, sdb, channel, fileurl, options);
-    });
+    writeFileSync(fileurl, response[0].audioContent, {encoding: 'utf8'});
+    return await broadcast(message, sdb, channel, fileurl, options);
     // writeFile(fileurl, response[0].audioContent, async (err) => {
     //     await broadcast(message, sdb, channel, fileurl, options);
     // });
-    return;
 }
 // TEXT -> tts.WAV로 변경 끝
 
