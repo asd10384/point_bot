@@ -29,6 +29,7 @@ module.exports = {
 };
 
 async function end(client = new Client, message = new Message, sdb = MDB.object.server) {
+    db.set(`db.${message.guild.id}.quiz.startcheck`, false);
     db.set(`db.${message.guild.id}.mq.timer`, false);
     db.set(`db.${message.guild.id}.img.timer`, false);
     db.set(`db.${message.guild.id}.img.time`, sdb.quiz.anser.imgtime);
@@ -55,7 +56,7 @@ async function end(client = new Client, message = new Message, sdb = MDB.object.
 
     sdb.tts.tts = true;
 
-    await sdb.save().catch((err) => console.log(err));
+    await sdb.save();
     var anser = sdb.quiz.anser.list[sdb.quiz.anser.anser];
     var time = sdb.quiz.anser.time;
     var list = await msg.list();
@@ -203,14 +204,14 @@ async function start_em(client = new Client, message = new Message, args = Array
             if (!ulist) {
                 data.page.now = data.page.now-1;
                 data.page.slide = 0;
-                return sdb.save().catch((err) => console.log(err));
+                return sdb.save();
             }
-            sdb.save().catch((err) => console.log(err));
+            sdb.save();
             var slide = data.page.slide;
             if (data.page.now == 4) {
                 slide = 0;
                 var urllist = ulist.url.split('/');
-                text[0] = `**이름** : ${urllist[urllist.length-1].replace('.html','')}\n**형식** : ${(ulist.quiz.music) ? `음악퀴즈` : (ulist.quiz || !ulist.quiz == '') ? ulist.quiz : `지정되지 않음`}\n**설명** : ${(ulist.desc || !ulist.desc == '') ? ulist.desc : `설명이 없습니다.`}\n\n1️⃣ 시작하기\n2️⃣ 뒤로가기\n`;
+                text[0] = `**이름** : ${urllist[urllist.length-1].replace('.html','')}\n**형식** : ${(ulist.quiz.music) ? `음악퀴즈` : (ulist.quiz || !ulist.quiz == '') ? ulist.quiz : `지정되지 않음`}\n**설명** : ${(ulist.desc || !ulist.desc == '') ? ulist.desc : `설명이 없습니다.`}\n**완성도** : ${(ulist.complite === 100) ? `완성` : (ulist.complite === 0) ? `미완성` : `${ulist.complite}%`}\n\n1️⃣ 시작하기\n2️⃣ 뒤로가기\n`;
             } else {
                 var uname = Object.keys(ulist);
                 var i = 0, it = '', p = 0;
@@ -252,7 +253,7 @@ async function anser(client = new Client, message = new Message, args = Array, s
     db.set(`db.${message.guild.id}.img.timer`, false);
     db.set(`db.${message.guild.id}.img.time`, 45);
 
-    allmsgdelete(client, sdb, 1000);
+    allmsgdelete(client, sdb, 450);
     
     sdb.quiz.start.user = false;
     sdb.quiz.start.hint = false;
@@ -287,7 +288,7 @@ async function anser(client = new Client, message = new Message, args = Array, s
         
         if (format == '음악퀴즈') {
             vocal = `**가수 : ${vocal}**`;
-            np.setImage(`http://img.youtube.com/vi/${yturl}/sddefault.jpg`);
+            np.setImage(`https://img.youtube.com/vi/${yturl}/sddefault.jpg`);
         }
         if (format == '그림퀴즈') {
             np.setImage(link);
@@ -313,11 +314,13 @@ async function anser(client = new Client, message = new Message, args = Array, s
             });
         } catch(err) {}
         sdb.quiz.quiz.count = sdb.quiz.quiz.count+1;
-        await sdb.save().catch((err) => console.log(err));
+        await sdb.save();
 
         await mqscore.score(client, message, args, sdb);
 
         setTimeout(async function () {
+            var startcheck = db.get(`db.${message.guild.id}.quiz.startcheck`);
+            if (!startcheck) return ;
             await allmsgdelete(client, sdb, 50);
             db.set(`db.${message.guild.id}.mq.timer`, false);
             var vchannel;
@@ -389,13 +392,14 @@ function bignum(num=1) {
 async function allmsgdelete(client = new Client, sdb = MDB.object.server, time = Number || 50) {
     try {
         var c = client.channels.cache.get(sdb.quiz.qzchannelid);
-        setTimeout(async () => {
-            await c.messages.fetch({ after: sdb.quiz.msg.npid }).then(async (msg) => {
-                if (msg.size > 0) {
-                    await c.bulkDelete(msg.size);
-                }
+        setTimeout(() => {
+            c.messages.fetch({ after: sdb.quiz.msg.npid }).then(function(msg) {
+                setTimeout(() => {
+                    if (msg.size <= 1) return;
+                    c.bulkDelete(msg.size);
+                }, Math.floor(time/3));
             });
-        }, time);
+        }, Math.floor(time/3*2));
     } catch(err) {
         return;
     }
@@ -406,22 +410,23 @@ async function ready(client = new Client, message = new Message, args = Array, s
     url: String,
     desc: String,
     quiz: String,
-    complite: Boolean,
+    complite: Number,
 }) {
-    if (!ulist.complite) {
+    if (!ulist.complite === 100) {
         await end(client, message, sdb);
         emerr.setDescription(`아직 이 퀴즈가 완성되지 않았습니다.`);
         return setTimeout(async () => {
             return message.channel.send(emerr).then(m => msgdelete(m, Number(process.env.deletetime)));
         }, 1250);
     }
+    db.set(`db.${message.guild.id}.quiz.startcheck`, true);
+    db.set(`db.${message.guild.id}.quiz.score`, {});
     sdb.quiz.quiz.format = ulist.quiz;
     sdb.quiz.start.user = false;
     sdb.quiz.user.hint = [];
     sdb.quiz.user.skip = [];
-    db.set(`db.${message.guild.id}.quiz.score`, {});
     sdb.quiz.quiz.skipcount = 0;
-    sdb.save().catch((err) => console.log(err));
+    sdb.save();
     var list = `**잠시뒤 퀴즈가 시작됩니다.**`;
     try {
         var c = client.channels.cache.get(sdb.quiz.qzchannelid);
@@ -448,7 +453,7 @@ async function getquiz(client = new Client, message = new Message, args = Array,
         await play(message, sdb, vchannel, `잠시뒤, ${format} 가 시작됩니다.`, {volume:0.07});
         const np = new MessageEmbed()
             .setTitle(`**${format} 설명**`)
-            .setImage(`http://ytms.netlify.app/question_mark.png`)
+            .setImage(`https://ytms.netlify.app/question_mark.png`)
             .setDescription(`
                 나오는 노래를 듣고 정답을 채팅창에 적어주세요.
                 정답이면 자동으로 넘어갑니다.
@@ -551,7 +556,7 @@ async function getimg(client = new Client, message = new Message, args = Array, 
         img.start.start = true;
         img.start.user = false;
         sdb.quiz = img;
-        await sdb.save().catch((err) => console.log(err));
+        await sdb.save();
         return await imgplay(client, message, args, sdb, vchannel, user);
     });
     return;
@@ -559,7 +564,7 @@ async function getimg(client = new Client, message = new Message, args = Array, 
 async function imgplay(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, user = new User) {
     sdb.tts.tts = false;
     sdb.quiz.start.start = true;
-    await sdb.save().catch((err) => console.log(err));
+    await sdb.save();
 
     var count = sdb.quiz.quiz.count;
     var img = sdb.quiz.quiz.link[count];
@@ -604,7 +609,7 @@ async function imgplay(client = new Client, message = new Message, args = Array,
             const dispatcher = connection.play(url, options);
             sdb.quiz.start.user = true;
             sdb.quiz.start.hint = true;
-            await sdb.save().catch((err) => console.log(err));
+            await sdb.save();
             dispatcher.on('finish', async () => {
                 return await anser(client, message, ['스킵','시간초과'], sdb, user);
             });
@@ -658,7 +663,7 @@ async function getmusic(client = new Client, message = new Message, args = Array
         music.start.start = true;
         music.start.user = false;
         sdb.quiz = music;
-        await sdb.save().catch((err) => console.log(err));
+        await sdb.save();
         return await musicplay(client, message, args, sdb, vchannel, user);
     });
     return;
@@ -666,7 +671,7 @@ async function getmusic(client = new Client, message = new Message, args = Array
 async function musicplay(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, vchannel = new Channel, user = new User) {
     sdb.tts.tts = false;
     sdb.quiz.start.start = true;
-    await sdb.save().catch((err) => console.log(err));
+    await sdb.save();
 
     var count = sdb.quiz.quiz.count;
     var link = sdb.quiz.quiz.link[count];
@@ -687,7 +692,7 @@ async function musicplay(client = new Client, message = new Message, args = Arra
     var np = new MessageEmbed()
         .setTitle(`**정답 : ???**`)
         .setDescription(`**채팅창에 ${manser} 형식으로 적어주세요.**\n**문제 : ${count+1}/${all_count}**`)
-        .setImage(`http://ytms.netlify.app/question_mark.png`)
+        .setImage(`https://ytms.netlify.app/question_mark.png`)
         .setFooter(`기본 명령어 : ${process.env.prefix}퀴즈 도움말`)
         .setColor('ORANGE');
 
@@ -708,7 +713,7 @@ async function musicplay(client = new Client, message = new Message, args = Arra
             const dispatcher = connection.play(url, options);
             sdb.quiz.start.user = true;
             sdb.quiz.start.hint = true;
-            await sdb.save().catch((err) => console.log(err));
+            await sdb.save();
             dispatcher.on('finish', async () => {
                 return await anser(client, message, ['스킵','시간초과'], sdb, user);
             });

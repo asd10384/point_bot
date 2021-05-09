@@ -25,15 +25,15 @@ async function ansermsg(client = new Client, message = new Message, args = Array
     if (anser == 2) anser_text = `${name}-${vocal}`.trim().toLowerCase();
     if (anser == 3) anser_text = `${vocal}-${name}`.trim().toLowerCase();
 
-    if (text == anser_text) {
-        sdb.quiz.start.user = false;
-        await sdb.save().catch((err) => console.log(err));
-        return await quiz.anser(client, message, args, sdb, user);
-    }
     if (text == '힌트' || text == 'hint') {
         return await hint(client, message, args, sdb, user);
     }
     if (text == '스킵' || text == 'skip') {
         return await skip(client, message, args, sdb, user);
+    }
+    if (text == anser_text) {
+        sdb.quiz.start.user = false;
+        await sdb.save();
+        return await quiz.anser(client, message, args, sdb, user);
     }
 }

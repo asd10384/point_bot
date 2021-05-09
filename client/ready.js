@@ -38,7 +38,7 @@ module.exports = async function (client = new Client) {
 
         `);
         console.log('===============================');
-        console.log(db_text);
+        console.log((db_text === '') ? '\n없음\n' : db_text);
         console.log('===============================\n');
 
         client.user.setPresence({

@@ -69,8 +69,7 @@ module.exports = {
         }
         if (args[0] == '종료' || args[0] == 'stop') {
             sdb.quiz.start.embed = false;
-            await quiz.end(client, message, sdb);
-            return await sdb.save().catch((err) => console.log(err));
+            return await quiz.end(client, message, sdb);
         }
         if (args[0] == '힌트' || args[0] == 'hint') {
             return await hint(client, message, ['관리자'], sdb, user);

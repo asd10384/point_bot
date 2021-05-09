@@ -43,10 +43,9 @@ async function hint(client = new Client, message = new Message, args = Array, sd
         hint.push(userid);
         text = `**${user.username}** 님이 힌트를 요청했습니다.`;
     }
-    if (hint.length >= usercount || (args[0] && args[0] == '관리자')) {
+    if (hint.length >= usercount || (args[0] == '관리자')) {
         sdb.quiz.start.hint = false;
         sdb.quiz.user.hint = [];
-        await sdb.save().catch((err) => console.log(err));
         const tcount = anser.replace(/-/g,'').replace(/ /g,'').length;
         var rndlist = [];
         for (i=0; i<Math.floor(tcount/2); i++) {
@@ -65,12 +64,13 @@ async function hint(client = new Client, message = new Message, args = Array, sd
                 outt += `${anser[i].toUpperCase()}`;
             }
         }
+        await sdb.save();
         em.setTitle(`**힌트**`)
             .setDescription(`${outt.replace(/ /g,'  ')}`);
         return message.channel.send(em);
     }
     sdb.quiz.user.hint = hint;
-    await sdb.save().catch((err) => console.log(err));
+    await sdb.save();
     em.setTitle(`**힌트 (${hint.length} / ${usercount})**`)
         .setDescription(`
             ${text}
@@ -100,11 +100,11 @@ async function skip(client = new Client, message = new Message, args = Array, sd
     }
     if (skip.length >= usercount) {
         sdb.quiz.user.skip = [];
-        await sdb.save().catch((err) => console.log(err));
+        await sdb.save();
         return await quiz.anser(client, message, ['스킵'], sdb, user);
     }
     sdb.quiz.user.skip = skip;
-    await sdb.save().catch((err) => console.log(err));
+    await sdb.save();
     em.setTitle(`**스킵 (${skip.length} / ${usercount})**`)
         .setDescription(`
             ${text}

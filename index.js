@@ -91,7 +91,7 @@ client.on('message', async (message) => {
                 } catch(error) {
                     if (commandName == '' || commandName == ';' || commandName == undefined || commandName == null) return ;
                     // 코드 확인
-                    // console.log(error);
+                    console.log(error);
                     const embed = new MessageEmbed()
                         .setColor('DARK_RED')
                         .setDescription(`\` ${commandName} \` 이라는 명령어를 찾을수 없습니다.`)
@@ -111,7 +111,7 @@ client.on('message', async (message) => {
                         return await ansermsg(client, message, args, sdb, message.member.user);
                     } else {
                         command = client.commands.get('qz');
-                        msgdelete(message, 100);
+                        msgdelete(message, 105);
                     }
                 }
                 if (selfcheck == message.channel.id) {
