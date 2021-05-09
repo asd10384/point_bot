@@ -47,3 +47,11 @@ async function play(message = new Message, sdb = MDB.object.server) {
         }
     }, 5000);
 }
+
+function msgdelete(m = new Message, t = Number) {
+    setTimeout(() => {
+        try {
+            m.delete();
+        } catch(err) {}
+    }, t);
+}
