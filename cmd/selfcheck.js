@@ -212,10 +212,6 @@ module.exports = {
                 }
                 return await check(message, embed, username, sc);
             }
-            if (args[0] == '타이머확인' || args[0] == 'timercheck') {
-                if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, Number(process.env.deletetime)));
-                return await db.set(`db.${message.guild.id}.selfcheck.timerstatus`, true);
-            }
 
             // 자가진단 @USER
             if (args[0]) {
@@ -296,7 +292,13 @@ module.exports = {
             var checktimer = db.get(`db.${message.guild.id}.selfcheck.timerstatus`);
             if (checktimer) {
                 db.set(`db.${message.guild.id}.selfcheck.timerstatus`, false);
-                console.log(`\n** ${message.guild.name} 서버 **\n자동 자가진단 타이머가 실행중입니다.\n시간 : ${autotime[0]}시 ${autotime[1]}분\n`);
+                db.set(`db.${message.guild.id}.selfcheck.timeruserid`, '');
+                var text = `\n** ${message.guild.name} 서버 **\n자동 자가진단 타이머가 실행중입니다.\n시간 : ${autotime[0]}시 ${autotime[1]}분\n`;
+                console.log(text);
+                message.guild.members.cache.get(db.get(`db.${message.guild.id}.selfcheck.timeruserid`)).user
+                    .send(new MessageEmbed().setDescription(text).setColor('ORNAGE'))
+                    .catch(() => {return;})
+                    .then(m => msgdelete(m, Number(process.env.deletetime)*3));
             }
             var userlist = [];
             var user, emobj;

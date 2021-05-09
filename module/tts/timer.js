@@ -20,7 +20,13 @@ async function play(message = new Message, sdb = MDB.object.server) {
         var status = db.get(`db.${message.guild.id}.tts.timerstatus`);
         if (status) {
             db.set(`db.${message.guild.id}.tts.timerstatus`, false);
-            console.log(`\n** ${message.guild.name} 서버 **\nTTS타이머가 실행중입니다.\n시간 : ${time}\n음악퀴즈 : ${sdb.quiz.start.start}`);
+            db.set(`db.${message.guild.id}.tts.timeruserid`, '');
+            var text = `\n** ${message.guild.name} 서버 **\nTTS타이머가 실행중입니다.\n시간 : ${time}\n음악퀴즈 : ${sdb.quiz.start.start}`;
+            console.log(text);
+            message.guild.members.cache.get(db.get(`db.${message.guild.id}.tts.timeruserid`)).user
+                .send(new MessageEmbed().setDescription(text).setColor('ORNAGE'))
+                .catch(() => {return;})
+                .then(m => msgdelete(m, Number(process.env.deletetime)*3));
         }
         if (sdb.quiz.start.start) return;
         var on = db.get(`db.${message.guild.id}.tts.timeron`);
