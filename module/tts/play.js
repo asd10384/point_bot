@@ -34,7 +34,7 @@ async function play(message = new Message, sdb = MDB.object.server, channel = ne
     });
     options['volume'] = 0.7;
 
-    var fileurl = `${message.guild.id}.wav`;
+    var fileurl = `ttssound/${message.guild.id}.wav`;
     writeFileSync(fileurl, response[0].audioContent, {encoding: 'utf8'});
     return await broadcast(message, sdb, channel, fileurl, options);
     // writeFile(fileurl, response[0].audioContent, async (err) => {
