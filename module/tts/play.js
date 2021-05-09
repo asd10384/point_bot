@@ -1,7 +1,7 @@
 
 require('dotenv').config();
 const MDB = require('../../MDB/data');
-const { writeFile, createWriteStream } = require('fs');
+const { writeFile, createWriteStream, writeFileSync } = require('fs');
 const timer = require('./timer');
 var checktimer = false;
 
@@ -35,6 +35,7 @@ async function play(message = new Message, sdb = MDB.object.server, channel = ne
     options['volume'] = 0.7;
 
     var fileurl = `ttssound/${message.guild.id}.wav`;
+    writeFileSync(fileurl, response[0].audioContent);
     var ws = createWriteStream(fileurl);
     ws.write(response[0].audioContent);
     ws.end();
