@@ -219,7 +219,7 @@ module.exports = {
 
             // 자가진단 @USER
             if (args[0]) {
-                const tuser = message.guild.members.cache.get(args[0].replace(/[^0-9]/g, '')).user || undefined;
+                const tuser = (message.guild.members.cache.get(args[0].replace(/[^0-9]/g, ''))) ? message.guild.members.cache.get(args[0].replace(/[^0-9]/g, '')).user : undefined;
                 if (tuser) {
                     udata.findOne({
                         userID: tuser.id
