@@ -1,9 +1,9 @@
 
 require('dotenv').config();
+const db = require('quick.db');
 const MDB = require('../../MDB/data');
-const { writeFile, createWriteStream, writeFileSync } = require('fs');
+const { writeFile } = require('fs');
 const timer = require('./timer');
-var checktimer = false;
 
 const { TextToSpeechClient } = require('@google-cloud/text-to-speech');
 const ttsclient = new TextToSpeechClient({
@@ -35,25 +35,22 @@ async function play(message = new Message, sdb = MDB.object.server, channel = ne
     options['volume'] = 0.7;
 
     var fileurl = `ttssound/${message.guild.id}.wav`;
-    writeFileSync(fileurl, response[0].audioContent, {encoding: 'utf8'});
-    return await broadcast(message, sdb, channel, fileurl, options);
-    // writeFile(fileurl, response[0].audioContent, async (err) => {
-    //     await broadcast(message, sdb, channel, fileurl, options);
-    // });
+    writeFile(fileurl, response[0].audioContent, async (err) => {
+        return await broadcast(message, sdb, channel, fileurl, options);
+    });
 }
 // TEXT -> tts.WAV로 변경 끝
 
 // 출력
 async function broadcast(message = new Message, sdb = Object, channel = new Channel, url = String, options = Object) {
-    channel.join().then(connection => {
+    return channel.join().then(connection => {
         timer.set(message, sdb, true);
         const dispatcher = connection.play(url, options);
-        dispatcher.on("finish", async () => {
-            if (!checktimer) {
-                checktimer = true;
-                timer.play(message, sdb);
-            }
-        });
+        var timerstart = db.get(`db.${message.guild.id}.tts.timerstart`);
+        if (!timerstart) {
+            db.set(`db.${message.guild.id}.tts.timerstart`, true);
+            timer.play(message, sdb);
+        }
     });
 }
 // 출력 끝

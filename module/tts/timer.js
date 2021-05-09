@@ -9,11 +9,11 @@ module.exports = {
     play,
 };
 
-function set(message = new Message, sdb = MDB.object.server, start = Boolean) {
+async function set(message = new Message, sdb = MDB.object.server, start = Boolean) {
     db.set(`db.${message.guild.id}.tts.timeron`, start);
     db.set(`db.${message.guild.id}.tts.timertime`, Number(process.env.ttsout)*60);
 }
-function play(message = new Message, sdb = MDB.object.server) {
+async function play(message = new Message, sdb = MDB.object.server) {
     setInterval(async () => {
         var time = db.get(`db.${message.guild.id}.tts.timertime`);
         if (time == undefined || time == null) time = Number(process.env.ttsout)*60;
