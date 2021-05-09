@@ -295,7 +295,7 @@ module.exports = {
                 db.set(`db.${message.guild.id}.selfcheck.timerstatus`, false);
                 var userid = db.get(`db.${message.guild.id}.selfcheck.timeruserid`);
                 db.set(`db.${message.guild.id}.selfcheck.timeruserid`, '');
-                var text = `\n** ${message.guild.name} 서버 **\n자동 자가진단 타이머가 실행중입니다.\n현재시간 : ${date.year}시 ${date.min}분 ${date.sec}초\n설정시간 : ${autotime[0]}시 ${autotime[1]}분\n`;
+                var text = `\n** ${message.guild.name} 서버 **\n자동 자가진단 타이머가 실행중입니다.\n현재시간 : ${date.week}요일 ${date.year}시 ${date.min}분 ${date.sec}초\n설정시간 : ${autotime[0]}시 ${autotime[1]}분\n`;
                 console.log(text);
                 const user = (message.guild.members.cache.get(userid)) ? message.guild.members.cache.get(userid).user : undefined;
                 if (user) {
