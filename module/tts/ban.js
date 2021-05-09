@@ -1,7 +1,7 @@
 
 require('dotenv').config();
 const db = require('quick.db');
-const { MessageEmbed, Client, Message } = require('discord.js');
+const { MessageEmbed, Client, Message, User } = require('discord.js');
 const { format } = require('../mds');
 
 const MDB = require('../../MDB/data');
@@ -16,40 +16,40 @@ const ttscheck = new MessageEmbed()
     .setColor('RED');
 
 // 밴
-async function ban(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, pp = String) {    
+async function ban(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, user = new User, pp = String) {    
     udata.findOne({
-        userID: message.member.user.id
+        userID: user.id
     }, async (err, db1) => {
         var udb = MDB.object.user;
         udb = db1;
         if (err) console.log(err);
         if (!udb) {
-            await MDB.set.user(message.member.user);
-            return await ban(client, message, args, sdb);
+            await MDB.set.user(user);
+            return await ban(client, message, args, sdb, user, pp);
         }
         if (args[1]) {
             var muser = message.guild.members.cache.get(args[1].replace(/[^0-9]/g, ''));
             if (muser) {
-                var user = muser.user;
+                var user2 = muser.user;
                 udata.findOne({
-                    userID: user.id
+                    userID: user2.id
                 }, async (err, udb2) => {
                     if (err) console.log(err);
                     if (!udb2) {
-                        await MDB.set.user(user);
+                        await MDB.set.user(user2);
                         var ttsboolen = true;
                     } else {
                         var ttsboolen = udb2.tts;
                         udb2.tts = false;
-                        udb2.save().catch(err => console.log(err));
+                        udb2.save();
                     }
                     if (ttsboolen == false) {
-                        ttscheck.setTitle(`\` ${user.username} \`님의 TTS 설정`)
+                        ttscheck.setTitle(`\` ${user2.username} \`님의 TTS 설정`)
                             .setDescription(`이미 밴 상태입니다.`);
                         return message.channel.send(ttscheck).then(m => msgdelete(m, Number(process.env.deletetime)+3000));
                     }
                     const date = format.nowdate(new Date());
-                    ttscheck.setTitle(`\` ${user.username} \`님의 TTS 설정`)
+                    ttscheck.setTitle(`\` ${user2.username} \`님의 TTS 설정`)
                         .setDescription(`${date['time']['2']}\n이후로 \` 밴 \` 되셨습니다.`);
                     return message.channel.send(ttscheck).then(m => {
                         if (!sdb.tts.ttschannelid === message.channel.id) {
@@ -71,40 +71,40 @@ async function ban(client = new Client, message = new Message, args = Array, sdb
 // 밴 끝
 
 // 언밴
-async function unban(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, pp = String) {    
+async function unban(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, user = new User, pp = String) {    
     udata.findOne({
-        userID: message.member.user.id
+        userID: user.id
     }, async (err, db1) => {
         var udb = MDB.object.user;
         udb = db1;
         if (err) console.log(err);
         if (!udb) {
-            await MDB.set.user(message.member.user);
+            await MDB.set.user(user);
             return await unban(client, message, args, sdb);
         }
         if (args[1]) {
             var muser = message.guild.members.cache.get(args[1].replace(/[^0-9]/g, ''));
             if (muser) {
-                var user = muser.user;
+                var user2 = muser.user;
                 udata.findOne({
-                    userID: user.id
+                    userID: user2.id
                 }, async (err, udb2) => {
                     if (err) console.log(err);
                     if (!udb2) {
-                        await MDB.set.user(user);
+                        await MDB.set.user(user2);
                         var ttsboolen = false;
                     } else {
                         var ttsboolen = udb2.tts;
                         udb2.tts = true;
-                        udb2.save().catch(err => console.log(err));
+                        udb2.save();
                     }
                     if (ttsboolen == true) {
-                        ttscheck.setTitle(`\` ${user.username} \`님의 TTS 설정`)
+                        ttscheck.setTitle(`\` ${user2.username} \`님의 TTS 설정`)
                             .setDescription(`이미 해재된 상태입니다.`);
                         return message.channel.send(ttscheck).then(m => msgdelete(m, Number(process.env.deletetime)+3000));
                     }
                     const date = format.nowdate(new Date());
-                    ttscheck.setTitle(`\` ${user.username} \`님의 TTS 설정`)
+                    ttscheck.setTitle(`\` ${user2.username} \`님의 TTS 설정`)
                         .setDescription(`${date['time']['2']}\n이후로 \` 해제 \` 되셨습니다.`);
                     return message.channel.send(ttscheck).then(m => {
                         if (!sdb.tts.ttschannelid === message.channel.id) {

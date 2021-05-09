@@ -1,8 +1,7 @@
 
 require('dotenv').config();
 const db = require('quick.db');
-const { writeFile } = require('fs');
-const { MessageEmbed, Client, Message, Channel } = require('discord.js');
+const { MessageEmbed, Client, Message, Channel, User } = require('discord.js');
 const { broadcast, play } = require('./play');
 const MDB = require('../../MDB/data');
 const udata = MDB.module.user();
@@ -25,18 +24,18 @@ module.exports = {
 };
 
 // 기본
-async function tts(client = new Client, message = new Message, args = Array, sdb = MDB.object.server) {    
+async function tts(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, user = new User) {    
     udata.findOne({
-        userID: message.member.user.id
+        userID: user.id
     }, async (err, db1) => {
         var udb = MDB.object.user;
         udb = db1;
         if (err) console.log(err);
         if (!udb) {
-            await MDB.set.user(message.member.user);
-            return await tts(client, message, args, sdb);
+            await MDB.set.user(user);
+            return await tts(client, message, args, sdb, user);
         }
-        var ttsboolen = await (udb.tts) ? true : false;
+        var ttsboolen = (udb.tts) ? true : false;
         if (!ttsboolen) return msgdelete(message, 20);
 
         var text = args.join(' ');

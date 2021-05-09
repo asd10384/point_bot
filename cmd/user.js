@@ -52,16 +52,16 @@ module.exports = {
         } else {
             var muser = message.guild.members.cache.get(args[0].replace(/[^0-9]/g, '')) || undefined;
             if (muser) {
-                const user = muser;
-                const member = message.guild.members.cache.get(user.user.id);
+                const user2 = muser;
+                const member = message.guild.members.cache.get(user2.user.id);
     
-                user.roles.cache.forEach((role) => {
+                user2.roles.cache.forEach((role) => {
                     roles += `${role.name}\n`;
                 });
-                datelist = format.date(user.joinedAt);
+                datelist = format.date(user2.joinedAt);
                 date = `${datelist[0]}년 ${az(datelist[1], 2)}월 ${az(datelist[2], 2)}일`;
 
-                username = user.user.username;
+                username = user2.user.username;
                 avatar = member.user.displayAvatarURL();
                 tag = member.user.tag;
                 id = member.user.id;

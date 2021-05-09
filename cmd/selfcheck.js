@@ -33,7 +33,7 @@ module.exports = {
             udb = db1;
             if (err) console.log(err);
             if (!udb) {
-                await MDB.set.user(message.member.user);
+                await MDB.set.user(user);
                 return client.commands.get(`${this.name}`).run(client, message, args, sdb, user);
             }
             var autotime = eval(process.env.autoselfcheck);
@@ -186,7 +186,7 @@ module.exports = {
             }
             if (args[0] == '확인') {
                 if (args[1]) {
-                    const tuser = message.guild.members.cache.get(args[1].replace(/[^0-9]/g, '')) || undefined;
+                    const tuser = message.guild.members.cache.get(args[1].replace(/[^0-9]/g, '')).user || undefined;
                     if (!tuser) {
                         embed.setTitle(`유저를 찾을수 없습니다.`)
                             .setColor('RED');
@@ -199,10 +199,10 @@ module.exports = {
                         udb2 = db2;
                         if (err) console.log(err);
                         if (!udb2) {
-                            await MDB.set.user(tuser.user);
+                            await MDB.set.user(tuser);
                             return client.commands.get(`${this.name}`).run(client, message, args, sdb, user);
                         }
-                        username = tuser.user.username;
+                        username = tuser.username;
                         sc = udb2.selfcheck;
                         await check(message, embed, username, sc);
                     });
@@ -217,15 +217,14 @@ module.exports = {
 
             // 자가진단 @USER
             if (args[0]) {
-                const tuser = message.guild.members.cache.get(args[0].replace(/[^0-9]/g, '')) || undefined;
+                const tuser = message.guild.members.cache.get(args[0].replace(/[^0-9]/g, '')).user || undefined;
                 if (tuser) {
-                    const user = tuser.user;
                     udata.findOne({
                         userID: tuser.id
                     }, async (err, udb2) => {
                         if (err) console.log(err);
                         if (!udb2) {
-                            await MDB.set.user(user);
+                            await MDB.set.user(tuser);
                             return client.commands.get(`${this.name}`).run(client, message, args, sdb, user);
                         }
                         sc = udb2.selfcheck;
@@ -252,15 +251,15 @@ module.exports = {
                             title = emobj.title;
                             desc = emobj.desc;
                             color = emobj.color;
-                            embed.setTitle(`**\` ${user.username} \`**님 자가진단 **${title}**`)
+                            embed.setTitle(`**\` ${tuser.username} \`**님 자가진단 **${title}**`)
                                 .setDescription(desc)
                                 .setColor((color) ? color : 'ORANGE');
                             return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)+2000));
                         } else {
-                            embed.setTitle(`**\` ${user.username} \`**님 자가진단 **실패**`)
+                            embed.setTitle(`**\` ${tuser.username} \`**님 자가진단 **실패**`)
                                 .setDescription(`
-                                    ${user.username}님의 정보가 등록되어있지 않습니다.
-                                    ${user.username}님이 먼저 **${pp}자가진단 설정**을 해주셔야 합니다.
+                                    ${tuser.username}님의 정보가 등록되어있지 않습니다.
+                                    ${tuser.username}님이 먼저 **${pp}자가진단 설정**을 해주셔야 합니다.
                                 `)
                                 .setColor('RED');
                             return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)+2000));
@@ -289,7 +288,7 @@ module.exports = {
         });
     },
     autocheckinterval: async function (client = new Client, message = new Message, sdb = MDB.object.server) {
-        const timer = setInterval(async () => {
+        const timer = setInterval(async function() {
             var autotime = eval(process.env.autoselfcheck);
             var checktimer = db.get(`db.${message.guild.id}.selfcheck.timerstatus`);
             if (checktimer) {
@@ -312,8 +311,8 @@ module.exports = {
                         if (err) console.log(err);
                         if (!udb) {
                             await MDB.set.user(user);
-                            await autocheckinterval(client, message, sdb);
-                            return clearInterval(timer)
+                            clearInterval(timer);
+                            return await autocheckinterval(client, message, sdb);
                         }
                         sc = udb.selfcheck;
                         if (sc.name || sc.password) {
@@ -348,10 +347,7 @@ module.exports = {
                             return user.send(embed).catch(() => {return;});
                         } else {
                             embed.setTitle(`**\` ${user.username} \`**님 자동 자가진단 **실패**`)
-                                .setDescription(`
-                                    ${user.username}님의 정보가 등록되어있지 않습니다.
-                                    ${user.username}님이 먼저 **${pp}자가진단 설정**을 해주셔야 합니다.
-                                `)
+                                .setDescription(`${user.username}님의 정보가 등록되어있지 않습니다.\n${user.username}님이 먼저 **${pp}자가진단 설정**을 해주셔야 합니다.`)
                                 .setFooter(`서버 : ${message.guild.name}`)
                                 .setColor('RED');
                             return user.send(embed).catch(() => {return;});
