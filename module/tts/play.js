@@ -2,7 +2,7 @@
 require('dotenv').config();
 const db = require('quick.db');
 const MDB = require('../../MDB/data');
-const { writeFileSync } = require('fs');
+const { writeFile, writeFileSync } = require('fs');
 const timer = require('./timer');
 
 const { TextToSpeechClient } = require('@google-cloud/text-to-speech');
@@ -35,17 +35,18 @@ async function play(message = new Message, sdb = MDB.object.server, channel = ne
     options['volume'] = 0.7;
 
     var fileurl = `${message.guild.id}.wav`;
-    writeFileSync(fileurl, response[0].audioContent, {encoding: 'utf8'});
-    return await broadcast(message, sdb, channel, fileurl, options);
+    writeFile(fileurl, response[0].audioContent, () => broadcast(message, sdb, channel, fileurl, options));
+    // writeFileSync(fileurl, response[0].audioContent, {encoding: 'utf8'});
+    //return await broadcast(message, sdb, channel, fileurl, options);
 }
 // TEXT -> tts.WAV로 변경 끝
 
 // 출력
 async function broadcast(message = new Message, sdb = Object, channel = new Channel, url = String, options = Object) {
-    return channel.join().then(connection => {
+    channel.join().then(connection => {
         // const dispatcher = 
         connection.play(url, options);
-        timer.set(message, sdb, true);
     });
+    timer.set(message, sdb, true);
 }
 // 출력 끝
