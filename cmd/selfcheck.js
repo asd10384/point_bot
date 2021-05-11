@@ -310,7 +310,7 @@ async function autocheckinterval(client = new Client, message = new Message, sdb
         if (date.hour == Number(autotime[0]) && date.min == Number(autotime[1]) && (date.sec == 0 || go)) {
             var userlist = sdb.selfcheck.autocheck;
             for (i = 0; i<userlist.length; i++) {
-                const user = client.users.cache.get(userlist[i]);
+                var user = client.users.cache.get(userlist[i]) || undefined;
                 udata.findOne({
                     userID: userlist[i]
                 }, async (err, db1) => {
@@ -318,9 +318,11 @@ async function autocheckinterval(client = new Client, message = new Message, sdb
                     udb = db1;
                     if (err) console.log(err);
                     if (!udb) {
-                        await MDB.set.user(user);
-                        clearInterval(timer);
-                        return await autocheckinterval(client, message, sdb, true);
+                        if (user) {
+                            await MDB.set.user(user);
+                            clearInterval(timer);
+                            return await autocheckinterval(client, message, sdb, true);
+                        }
                     }
                     var sc = udb.selfcheck;
                     var emobj;
@@ -355,7 +357,7 @@ async function autocheckinterval(client = new Client, message = new Message, sdb
                             user.send(embed);
                         } else {
                             var c = message.guild.channels.cache.get(sdb.selfcheck.channelid);
-                            if (c) c.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*3));
+                            if (c) c.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*4));
                         }
                     } else {
                         embed.setTitle(`**\` ${uname} \`**님 자동 자가진단 **실패**`)
