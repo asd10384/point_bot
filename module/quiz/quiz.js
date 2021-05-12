@@ -592,7 +592,7 @@ async function imgplay(client = new Client, message = new Message, args = Array,
     } catch(err) {}
 
     try {
-        vchannel.join().then(async (connection) => {
+        vchannel.join().then(async function(connection) {
             db.set(`db.${message.guild.id}.img.time`, sdb.quiz.anser.imgtime);
             db.set(`db.${message.guild.id}.img.timer`, true);
             db.set(`db.${message.guild.id}.mq.timer`, true);
