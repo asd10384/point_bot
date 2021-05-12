@@ -618,6 +618,7 @@ async function getmusic(client = new Client, message = new Message, args = Array
     complite: Boolean,
 }) {
     request(ulist.url.toString().toLocaleLowerCase().replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|\s]/g, encodeURIComponent), async (err, res, html) => {
+        if (err) console.log(err);
         const $ = load(html);
         var dfname = [],
             dfvocal = [],
@@ -675,10 +676,6 @@ async function musicplay(client = new Client, message = new Message, args = Arra
         vchannel.leave();
         return await end(client, message, sdb);
     }
-    var url = ytdl(link, { bitrate: 512000, quality: 'highestaudio' });
-    var options = {
-        volume: 0.07
-    };
     const all_count = sdb.quiz.quiz.name.length;
     
     var list = `퀴즈를 종료하시려면 \` ${process.env.prefix}퀴즈 종료 \`를 입력해주세요.
@@ -705,7 +702,10 @@ async function musicplay(client = new Client, message = new Message, args = Arra
         vchannel.join().then(async (connection) => {
             db.set(`db.${message.guild.id}.mq.timer`, true);
             await timer(client, message, sdb);
-            const dispatcher = connection.play(url, options);
+            const dispatcher = connection.play(ytdl(link, {
+                bitrate: 512000,
+                quality: 'highestaudio'
+            }), {volume: 0.07});
             sdb.quiz.start.user = true;
             sdb.quiz.start.hint = true;
             await sdb.save();
