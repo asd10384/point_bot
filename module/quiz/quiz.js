@@ -699,7 +699,7 @@ async function musicplay(client = new Client, message = new Message, args = Arra
     } catch(err) {}
 
     try {
-        vchannel.join().then(async (connection) => {
+        vchannel.join().then(async function(connection) {
             db.set(`db.${message.guild.id}.mq.timer`, true);
             await timer(client, message, sdb);
             const dispatcher = connection.play(ytdl(link, {
