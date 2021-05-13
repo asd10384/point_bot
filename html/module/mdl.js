@@ -39,7 +39,7 @@ async function patchnote(req, res) {
                     });
                 }
                 for (i of nl_d) {
-                    text += `<button class="btn" onclick="location.href='/patchnote?year=${p.year}&month=${p.month}&day=${i}'">${i}일</button>`;
+                    text += `<button class="btn" onclick="location.href='/patchnote?year=${p.year}&month=${p.month}&day=${i}'">${i}일</button><br/>`;
                 }
                 return render(req, res, `patchnote`, {
                     title: `패치노트 - ${p.year}.${p.month}`,
@@ -47,7 +47,7 @@ async function patchnote(req, res) {
                 });
             }
             for (i of nl_m) {
-                text += `<button class="btn" onclick="location.href='/patchnote?year=${p.year}&month=${i}'">${i}월</button>`;
+                text += `<button class="btn" onclick="location.href='/patchnote?year=${p.year}&month=${i}'">${i}월</button><br/>`;
             }
             return render(req, res, `patchnote`, {
                 title: `패치노트 - ${p.year}`,
@@ -55,7 +55,7 @@ async function patchnote(req, res) {
             });
         }
         for (i of nl_y) {
-            text += `<button class="btn" onclick="location.href='/patchnote?year=${i}'">${i}년</button>`;
+            text += `<button class="btn" onclick="location.href='/patchnote?year=${i}'">${i}년</button><br/>`;
         }
         return render(req, res, `patchnote`, {
             title: `패치노트`,
