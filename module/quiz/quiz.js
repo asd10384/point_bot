@@ -527,7 +527,7 @@ async function getimg(client = new Client, message = new Message, args = Array, 
             link = [];
         var count = dfname.length;
         if (count > 50) count = 50;
-        var logtext = `URL : ${ulist.url}\nQUIZ : ${ulist.quiz}\n\n`;
+        var logtext = '';
         for (i=0; i<count; i++) {
             var r = Math.floor(Math.random()*(dfname.length+1));
             if (r >= 50 || rndlist.includes(r) || dfname[r] == '' || dfname[r] == undefined) {
