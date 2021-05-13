@@ -3,14 +3,14 @@
 <html lang='ko'>
     <head>
         <base href="/"/>
-        <link rel="icon" href="http://localhost:3000//favicon.ico" type="image/x-icon"/>
+        <link rel="icon" href="<%= domain %>/favicon.ico" type="image/x-icon"/>
         <meta name="title" content="서버확인"/>
         <meta property="og:title" content="서버확인"/>
         <meta name="description" content="서버확인"/>
         <meta name="og:description" content="서버확인"/>
 
-        <meta property="url" content="http://mandl.kro.kr"/>
-        <meta property="og:url" content="http://mandl.kro.kr"/>
+        <meta property="url" content="<%= domain %>"/>
+        <meta property="og:url" content="<%= domain %>"/>
 
         <meta property="image:alt" content="서버확인"/>
         <meta property="og:image:alt" content="서버확인"/>
@@ -53,8 +53,8 @@
         </div>
         <div class="sdb">
             <a>
-                <% if (sdb.id) { %>
-                    <%= JSON.stringify(sdb) %>
+                <% if (data.sdb.id) { %>
+                    <%= JSON.stringify(data.sdb) %>
                 <% } else { %>
                     <style>.sdb{text-align: center;font-size: 25px;}</style>
                     없음

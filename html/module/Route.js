@@ -11,7 +11,7 @@ const router = express.Router();
 
 /* 페이지 이동 */
 async function render(req, res, ejs = '', data = {}) {
-    return res.status(200).render(ejs, data);
+    return res.status(200).render(ejs, {domain: process.env.DOMAIN, data: data});
 }
 router.get('/', async function(req, res) {
     return render(req, res, `index`, {user: {guildid: null}});
