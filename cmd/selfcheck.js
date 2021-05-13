@@ -100,10 +100,7 @@ module.exports = {
                         text += `<@${i}>\n`;
                     }
                     embed.setTitle(`**자동 자가진단**`)
-                        .setDescription(`
-                            **유저 확인**
-                            ${(text == '') ? `없음` : text}
-                        `)
+                        .setDescription(`**유저 확인**\n${(text == '') ? `없음` : text}`)
                         .setFooter(`도움말 : ${process.env.prefix}자가진단 도움말`);
                     return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*2+2000));
                 }
