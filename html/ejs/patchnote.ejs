@@ -1,0 +1,43 @@
+
+<!doctype html>
+<html lang='ko'>
+    <head>
+        <base href="/"/>
+        <link rel="icon" href="<%= domain %>/favicon.ico" type="image/x-icon"/>
+        <meta name="title" content="<%= data.title %>"/>
+        <meta property="og:title" content="<%= data.title %>"/>
+        <meta name="description" content="<%= data.title %>"/>
+        <meta name="og:description" content="<%= data.title %>"/>
+
+        <meta property="url" content="<%= domain %>"/>
+        <meta property="og:url" content="<%= domain %>"/>
+
+        <meta property="image:alt" content="<%= data.title %>"/>
+        <meta property="og:image:alt" content="<%= data.title %>"/>
+
+        <title id="main_title"><%= data.title %></title>
+    </head>
+
+    <body>
+        <style>
+            body {
+                margin-top: 50px;
+                text-align: center;
+                font-size: 18px;
+            }
+            p {
+                font-size: 30px;
+                margin-bottom: 15px;
+                font-weight: bold;
+            }
+            .btn {
+                margin-top: 10px;
+                padding: 1px 4px;
+                font-size: 25px;
+            }
+        </style>
+        <button class="btn" onclick="location.href='/patchnote'">처음으로</button>
+        <p><%= data.title %></p>
+        <%- data.text %>
+    </body>
+</html>

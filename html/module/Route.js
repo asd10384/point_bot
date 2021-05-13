@@ -3,6 +3,7 @@ require('dotenv').config();
 const db = require('quick.db');
 const { MessageEmbed, Client, Message, User } = require('discord.js');
 const { client } = require('../../index');
+const mdl = require('./mdl');
 const MDB = require('../../MDB/data');
 const sdata = MDB.module.server();
 const express = require('express');
@@ -10,11 +11,8 @@ const express = require('express');
 const router = express.Router();
 
 /* 페이지 이동 */
-async function render(req, res, ejs = '', data = {}) {
-    return res.status(200).render(ejs, {domain: process.env.DOMAIN, data: data});
-}
 router.get('/', async function(req, res) {
-    return render(req, res, `index`, {user: {guildid: null}});
+    return mdl.render(req, res, `index`, {user: {guildid: null}});
 });
 router.post('/', async function(req, res) {
     var guild = client.guilds.cache.get(req.body.serverid) || null;
@@ -36,14 +34,14 @@ router.post('/', async function(req, res) {
                 user: {id: null}
             }
         };
-        return render(req, res, `index`, data);
+        return mdl.render(req, res, `index`, data);
     } else {
-        return render(req, res, `index`, {user:{guildid: null}});
+        return mdl.render(req, res, `index`, {user:{guildid: null}});
     }
 });
 
 router.get('/name', async function(req, res) {
-    return render(req, res, `name`, {
+    return mdl.render(req, res, `name`, {
         q: (req.query.q) ? req.query.q : '',
         sdb: {id: null}
     });
@@ -102,6 +100,7 @@ router.get('/server/:serverId', async function(req, res) {
         return res.send({id: null});
     }
 });
+
 router.get('/user/:userId', async function(req, res) {
     var user = client.users.cache.get(req.params.userId) || null;
     if (user) {
@@ -114,6 +113,10 @@ router.get('/user/:userId', async function(req, res) {
     } else {
         return res.send({id: null});
     }
+});
+
+router.get('/patchnote', async function(req, res) {
+    return mdl.patchnote(req, res);
 });
 
 module.exports = router;

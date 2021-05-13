@@ -23,7 +23,7 @@ app.use(express.static(__dirname + '/'));
 app.use(Route);
 
 app.use(async function(req, res, next) {
-    res.status(404).render(`err`);
+    res.status(404).render(`err`, {domain: process.env.DOMAIN});
 });
 
 app.use(async function (err, req, res, next) {
