@@ -135,3 +135,7 @@ const { reac } = require('./client/reaction');
 client.on('messageReactionAdd', async (reaction, user) => {
     await reac(client, reaction, user);
 });
+
+module.exports = {
+    client,
+};

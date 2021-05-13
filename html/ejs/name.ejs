@@ -1,0 +1,65 @@
+
+<!doctype html>
+<html lang='ko'>
+    <head>
+        <base href="/"/>
+        <link rel="icon" href="http://localhost:3000//favicon.ico" type="image/x-icon"/>
+        <meta name="title" content="서버확인"/>
+        <meta property="og:title" content="서버확인"/>
+        <meta name="description" content="서버확인"/>
+        <meta name="og:description" content="서버확인"/>
+
+        <meta property="url" content="http://mandl.kro.kr"/>
+        <meta property="og:url" content="http://mandl.kro.kr"/>
+
+        <meta property="image:alt" content="서버확인"/>
+        <meta property="og:image:alt" content="서버확인"/>
+
+        <title id="main_title">서버확인</title>
+    </head>
+
+    <body>
+        <style>
+            .body {
+                margin-top: 50px;
+                text-align: center;
+                font-size: 18px;
+            }
+            p {
+                font-size: 30px;
+                margin-bottom: 15px;
+                font-weight: bold;
+            }
+            .id {
+                margin-top: 5px;
+                font-size: 15px;
+                padding: 5px 5px;
+            }
+            .btn {
+                margin-top: 10px;
+                padding: 1px 4px;
+                font-size: 25px;
+            }
+        </style>
+        <div class="body">
+            <p>서버확인</p>
+            <form action="/name" method="POST">
+                <a>서버 이름 : </a><input class="id" type="text" value="<%= q %>" name="servername"/><br/>
+                <input class="btn" type="submit" value="이동"/>
+            </form>
+            <p>유저확인</p>
+            <button class="btn" onclick="location.href='/'">이동</button>
+            <p>SDB</p>
+        </div>
+        <div class="sdb">
+            <a>
+                <% if (sdb.id) { %>
+                    <%= JSON.stringify(sdb) %>
+                <% } else { %>
+                    <style>.sdb{text-align: center;font-size: 25px;}</style>
+                    없음
+                <% } %>
+            </a>
+        </div>
+    </body>
+</html>

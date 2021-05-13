@@ -32,6 +32,7 @@ const out = {
         },
         server: {
             serverid: String,
+            name: String,
             quiz: {
                 qzchannelid: String,
                 vcid: String,
@@ -117,6 +118,7 @@ async function set_server(message = new Message) {
     var data = module_server(); //모듈
     const newdata = new data({
         serverid: message.guild.id,
+        name: message.guild.name,
         quiz: {
             qzchannelid: '',
             vcid: '',

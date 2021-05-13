@@ -48,7 +48,6 @@ module.exports = async function (client = new Client) {
             },
             status: 'online'
         });
-        
         activity(client);
     });
 }
