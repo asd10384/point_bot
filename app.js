@@ -31,7 +31,7 @@ app.use(async function (err, req, res, next) {
 });
 
 app.listen(process.env.PORT, function() {
-    console.log(`\nNODEJS PAGE IS ONLINE, PORT : ${process.env.PORT}\n`);
+    console.log(`\nNODEJS PAGE IS ONLINE, DOMAIN : ${process.env.DOMAIN}\n`);
     setInterval(function() {
         http.get(process.env.DOMAIN);
     }, (60*1000)*30);
