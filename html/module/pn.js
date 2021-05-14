@@ -22,12 +22,15 @@ async function patchnote(req, res, note = '', notetext = '', login = false) {
     if (note) {
         pdata.find(async function(err, pdblist) {
             var text = '';
+            var pnt = [];
             for (db1 of pdblist) {
                 pdb = db1;
                 if (pdb.type === note) {
-                    var date = `${pdb.year}-${pdb.month}-${pdb.day}`;
-                    text += `<button class="btn" onclick="location.href='/patchnote/${note}/${date}'">${date}</button><br/>`;
+                    pnt.push(`${pdb.year}-${pdb.month}-${pdb.day}`);
                 }
+            }
+            for (i of pnt.sort()) {
+                text += `<button class="btn" onclick="location.href='/patchnote/${note}/${i}'">${i}</button><br/>`;
             }
             return mdl.render(req, res, `patchnote`, {
                 title: `패치노트 - ${notetext}`,
