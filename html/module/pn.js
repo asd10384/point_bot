@@ -17,7 +17,7 @@ module.exports = {
     patchnote_check,
 };
 
-async function patchnote(req, res, note = '', notetext = '') {
+async function patchnote(req, res, note = '', notetext = '', login = false) {
     var pdb = MDB.object.patchnote;
     if (note) {
         pdata.find(async function(err, pdblist) {
@@ -34,7 +34,8 @@ async function patchnote(req, res, note = '', notetext = '') {
                 note: note,
                 notetext: notetext,
                 text: text,
-                file: null
+                file: null,
+                login: login
             });
         });
         return;
@@ -46,7 +47,7 @@ async function patchnote(req, res, note = '', notetext = '') {
         </script>
     `);
 }
-async function patchnote_get(req, res, note = '', notetext = '', date = '') {
+async function patchnote_get(req, res, note = '', notetext = '', date = '', login = false) {
     var pdb = MDB.object.patchnote;
     if (note) {
         pdata.find(async function(err, pdblist) {

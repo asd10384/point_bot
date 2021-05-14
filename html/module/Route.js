@@ -126,6 +126,10 @@ const notelist = {
     musicquiz: `음악퀴즈`
 };
 router.get('/patchnote/:note/remove/:date', async function(req, res) {
+    if (!req.session.login) return mdl.render(req, res, `login`, {
+        title: '로그인',
+        url: `/patchnote/${req.params.note}/remove/${req.params.date}`
+    });
     var note = req.params.note;
     var date = req.params.date.split('-');
 
@@ -148,6 +152,11 @@ router.get('/patchnote/:note/remove/:date', async function(req, res) {
     }
 });
 router.get('/patchnote/:note/write(/:date)?', async function(req, res) {
+    if (!req.session.login) return mdl.render(req, res, `login`, {
+        title: '로그인',
+        url: `/patchnote/${req.params.note}/write${(req.params.date) ? `/${req.params.date}` : ''}`,
+        back: `/patchnote/${req.params.note}`
+    });
     var note = req.params.note;
     var date = req.params.date || null;
     if (notelist[note]) {
@@ -190,16 +199,14 @@ router.post('/patchnote/:note/write(/:date)?', async function(req, res) {
     return mdl.render(req, res, `err`, {text: `패치노트를 찾을수 없습니다.`});
 });
 router.get(`/patchnote(/:note)?(/:date)?`, async function(req, res) {
-    if (!req.session.login) return mdl.render(req, res, `login`, {
-        title: '로그인'
-    });
+    var login = req.session.login || false;
     var note = req.params.note || null;
     var date = req.params.date || null;
     if (note) {
         if (date) {
-            return pn.patchnote_get(req, res, note, notelist[note], date);
+            return pn.patchnote_get(req, res, note, notelist[note], date, login);
         }
-        if (notelist[note]) return pn.patchnote(req, res, note, notelist[note]);
+        if (notelist[note]) return pn.patchnote(req, res, note, notelist[note], login);
         return mdl.render(req, res, `err`, {text: `패치노트를 찾을수 없습니다.`});
     }
     return mdl.render(req, res, `patchnote`, {
@@ -207,40 +214,45 @@ router.get(`/patchnote(/:note)?(/:date)?`, async function(req, res) {
         note: note,
         notetext: notelist[note],
         text: null,
-        file: null
+        file: null,
+        login: login
     });
 });
 
 router.get('/login', async function(req, res) {
     req.session.login = false;
     return mdl.render(req, res, `login`, {
-        title: '로그인'
+        title: '로그인',
+        url: '/',
+        back: '/'
     });
 });
 router.post('/login', async function(req, res) {
     var id = req.body.id;
     var pw = req.body.pw;
+    var url = req.body.url;
+    var back = req.body.back;
     if (id === account.patchnote.id) {
         if (pw === account.patchnote.pw) {
             req.session.login = true;
             return res.send(`
                 <script 'type=text/javascript'>
                     alert('관리자로그인 성공');
-                    window.location='/patchnote';
+                    window.location='${url}';
                 </script>
             `);
         }
         return res.send(`
             <script 'type=text/javascript'>
                 alert('로그인 에러 : 올바르지 않은 비밀번호');
-                window.location='/';
+                window.location='${back}';
             </script>
         `);
     }
     return res.send(`
         <script 'type=text/javascript'>
             alert('로그인 에러 : 올바르지 않은 아이디');
-            window.location='/';
+            window.location='${back}';
         </script>
     `);
 });

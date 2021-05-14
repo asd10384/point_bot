@@ -44,6 +44,7 @@
         <div class="body">
             <p>관리자 아이디 비밀번호를 입력해주세요.</p>
             <form action="/login" method="POST">
+                <input hidden name="url" value="<%- data.url %>"/>
                 <a>ID : </a><input class="id" type="text" name="id"/><br/>
                 <a>PW : </a><input class="id" type="password" name="pw"/><br/>
                 <input class="btn" type="submit" value="로그인"/>

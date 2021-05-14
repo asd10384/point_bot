@@ -30,18 +30,18 @@ app.use(express.static(__dirname + '/'));
 
 app.use(Route);
 
-app.use(async function(req, res, next) {
-    res.status(404).render(`err`, {
-        domain: process.env.DOMAIN,
-        data: {
-            text: `페이지를 찾을수 없습니다.`
-        }
-    });
-});
+// app.use(async function(req, res, next) {
+//     res.status(404).render(`err`, {
+//         domain: process.env.DOMAIN,
+//         data: {
+//             text: `페이지를 찾을수 없습니다.`
+//         }
+//     });
+// });
 
-app.use(async function (err, req, res, next) {
-    res.status(500).send(err);
-});
+// app.use(async function (err, req, res, next) {
+//     res.status(500).send(err);
+// });
 
 app.listen(process.env.PORT, function() {
     console.log(`\nNODEJS PAGE IS ONLINE, DOMAIN : ${process.env.DOMAIN}\n`);
