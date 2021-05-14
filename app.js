@@ -8,6 +8,8 @@ const http = require('http');
 const express = require('express');
 const flash = require('connect-flash');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const sessionParser = require('express-session');
 
 const app = express();
 const Route = require('./html/module/Route');
@@ -16,6 +18,12 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/html/ejs'));
 
 app.use(flash());
+app.use(sessionParser({
+    secret: process.env.SESSION,
+    resave: true,
+    saveUninitialized: true
+}));
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(__dirname + '/'));

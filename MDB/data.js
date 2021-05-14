@@ -91,7 +91,7 @@ const out = {
             month: String,
             day: String,
             text: String,
-        }
+        },
     },
 };
 

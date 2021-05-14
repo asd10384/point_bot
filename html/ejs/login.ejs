@@ -1,0 +1,54 @@
+
+<!doctype html>
+<html lang='ko'>
+    <head>
+        <base href="/"/>
+        <link rel="icon" href="<%= domain %>/favicon.ico" type="image/x-icon"/>
+        <meta name="title" content="<%= data.title %>"/>
+        <meta property="og:title" content="<%= data.title %>"/>
+        <meta name="description" content="<%= data.title %>"/>
+        <meta name="og:description" content="<%= data.title %>"/>
+
+        <meta property="url" content="<%= domain %>"/>
+        <meta property="og:url" content="<%= domain %>"/>
+
+        <meta property="image:alt" content="<%= data.title %>"/>
+        <meta property="og:image:alt" content="<%= data.title %>"/>
+
+        <title id="main_title"><%= data.title %></title>
+    </head>
+
+    <body>
+        <style>
+            .body {
+                margin-top: 50px;
+                text-align: center;
+                font-size: 18px;
+            }
+            p {
+                font-size: 30px;
+                margin-bottom: 15px;
+                font-weight: bold;
+            }
+            .id {
+                margin-top: 5px;
+                font-size: 15px;
+                padding: 5px 5px;
+            }
+            .btn {
+                margin-top: 10px;
+                padding: 1px 4px;
+                font-size: 25px;
+            }
+        </style>
+        <div class="body">
+            <p>관리자 아이디 비밀번호를 입력해주세요.</p>
+            <form action="/login" method="POST">
+                <a>ID : </a><input class="id" type="text" name="id"/><br/>
+                <a>PW : </a><input class="id" type="password" name="pw"/><br/>
+                <input class="btn" type="submit" value="로그인"/>
+            </form>
+            <button class="btn" onclick="location.href='/'">돌아가기</button>
+        </div>
+    </body>
+</html>

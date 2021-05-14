@@ -12,8 +12,11 @@ const router = express.Router();
 const mdl = require('./mdl');
 const pn = require('./pn');
 
+const account = eval(process.env.ACCOUNT)[0];
+
 /* 페이지 이동 */
 router.get('/', async function(req, res) {
+    req.session.login = false;
     return mdl.render(req, res, `index`, {user: {guildid: null}});
 });
 router.post('/', async function(req, res) {
@@ -187,6 +190,9 @@ router.post('/patchnote/:note/write(/:date)?', async function(req, res) {
     return mdl.render(req, res, `err`, {text: `패치노트를 찾을수 없습니다.`});
 });
 router.get(`/patchnote(/:note)?(/:date)?`, async function(req, res) {
+    if (!req.session.login) return mdl.render(req, res, `login`, {
+        title: '로그인'
+    });
     var note = req.params.note || null;
     var date = req.params.date || null;
     if (note) {
@@ -203,6 +209,49 @@ router.get(`/patchnote(/:note)?(/:date)?`, async function(req, res) {
         text: null,
         file: null
     });
+});
+
+router.get('/login', async function(req, res) {
+    req.session.login = false;
+    return mdl.render(req, res, `login`, {
+        title: '로그인'
+    });
+});
+router.post('/login', async function(req, res) {
+    var id = req.body.id;
+    var pw = req.body.pw;
+    if (id === account.patchnote.id) {
+        if (pw === account.patchnote.pw) {
+            req.session.login = true;
+            return res.send(`
+                <script 'type=text/javascript'>
+                    alert('관리자로그인 성공');
+                    window.location='/patchnote';
+                </script>
+            `);
+        }
+        return res.send(`
+            <script 'type=text/javascript'>
+                alert('로그인 에러 : 올바르지 않은 비밀번호');
+                window.location='/';
+            </script>
+        `);
+    }
+    return res.send(`
+        <script 'type=text/javascript'>
+            alert('로그인 에러 : 올바르지 않은 아이디');
+            window.location='/';
+        </script>
+    `);
+});
+router.get('/logout', async function(req, res) {
+    req.session.login = false;
+    return res.send(`
+        <script 'type=text/javascript'>
+            alert('로그아웃 되셨습니다.');
+            window.location='/';
+        </script>
+    `);
 });
 
 module.exports = router;
