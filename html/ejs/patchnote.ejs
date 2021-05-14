@@ -36,8 +36,27 @@
                 font-size: 25px;
             }
         </style>
-        <button class="btn" onclick="location.href='/patchnote'">처음으로</button>
-        <p><%= data.title %></p>
-        <%- data.text %>
+        <% if (data.note) { %>
+            <p>패치노트 - <%= data.notetext %></p>
+            <% if (data.file) { %>
+                <button class="btn" onclick="location.href='/patchnote/<%= data.note %>'">돌아가기</button><br/>
+                <button class="btn" onclick="location.href='/patchnote/<%= data.note %>/remove/<%= data.file %>'">노트삭제</button><br/>
+                <button class="btn" onclick="location.href='/patchnote/<%= data.note %>/write/<%= data.file %>'">수정하기</button><br/>
+            <% } else { %>
+                <button class="btn" onclick="location.href='/patchnote'">돌아가기</button><br/>
+                <button class="btn" onclick="location.href='/patchnote/<%= data.note %>/write'">글쓰기</button><br/>
+            <% } %>
+            <br/>
+            <% if (data.text) { %>
+                <%- data.text %>
+            <% } else { %>
+                글 없음
+            <% } %>
+        <% } else { %>
+            <p>패치노트</p>
+            <button class="btn" onclick="location.href='/patchnote/bot'">패치노트 - 디스코드 봇</button><br/>
+            <button class="btn" onclick="location.href='/patchnote/site'">패치노트 - 사이트</button><br/>
+            <button class="btn" onclick="location.href='/patchnote/musicquiz'">패치노트 - 음악퀴즈</button><br/>
+        <% } %>
     </body>
 </html>

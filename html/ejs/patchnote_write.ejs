@@ -1,0 +1,58 @@
+
+<!doctype html>
+<html lang='ko'>
+    <head>
+        <base href="/"/>
+        <link rel="icon" href="<%= domain %>/favicon.ico" type="image/x-icon"/>
+        <meta name="title" content="<%= data.title %>"/>
+        <meta property="og:title" content="<%= data.title %>"/>
+        <meta name="description" content="<%= data.title %>"/>
+        <meta name="og:description" content="<%= data.title %>"/>
+
+        <meta property="url" content="<%= domain %>"/>
+        <meta property="og:url" content="<%= domain %>"/>
+
+        <meta property="image:alt" content="<%= data.title %>"/>
+        <meta property="og:image:alt" content="<%= data.title %>"/>
+
+        <title id="main_title"><%= data.title %></title>
+    </head>
+
+    <body>
+        <style>
+            body {
+                margin-top: 50px;
+                text-align: center;
+                font-size: 18px;
+            }
+            p {
+                font-size: 30px;
+                margin-bottom: 15px;
+                font-weight: bold;
+            }
+            .btn {
+                margin-top: 10px;
+                padding: 1px 4px;
+                font-size: 25px;
+            }
+        </style>
+        <% if (data.date) { %>
+            <button class="btn" onclick="location.href='/patchnote/<%= data.note %>/remove/<%= data.date %>'">노트삭제</button><br/>
+            <button class="btn" onclick="location.href='/patchnote/<%= data.note %>/<%= data.date %>'">돌아가기</button>
+            <p>패치노트 - <%= data.notetext %><br/>수정 - <%= data.date %></p>
+            <form action="/patchnote/<%= data.note %>/write/<%= data.date %>" method="POST">
+                <a>날짜 : </a><input class="id" type="date" name="date" value="<%= data.date %>" readonly/><br/>
+                <a>내용 : </a><input class="id" type="text" name="text" value="<%= data.text %>"/><br/>
+                <input class="btn" type="submit" value="수정하기"/>
+            </form>
+        <% } else { %>
+            <button class="btn" onclick="location.href='/patchnote/<%= data.note %>'">돌아가기</button>
+            <p>패치노트 - <%= data.notetext %></p>
+            <form action="/patchnote/<%= data.note %>/write" method="POST">
+                <a>날짜 : </a><input class="id" type="date" name="date"/><br/>
+                <a>내용 : </a><input class="id" type="text" name="text"/><br/>
+                <input class="btn" type="submit" value="글쓰기"/>
+            </form>
+        <% } %>
+    </body>
+</html>

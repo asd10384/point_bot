@@ -3,12 +3,14 @@ require('dotenv').config();
 const db = require('quick.db');
 const { MessageEmbed, Client, Message, User } = require('discord.js');
 const { client } = require('../../index');
-const mdl = require('./mdl');
 const MDB = require('../../MDB/data');
 const sdata = MDB.module.server();
+const pdata = MDB.module.patchnote();
 const express = require('express');
-
 const router = express.Router();
+
+const mdl = require('./mdl');
+const pn = require('./pn');
 
 /* 페이지 이동 */
 router.get('/', async function(req, res) {
@@ -115,8 +117,92 @@ router.get('/user/:userId', async function(req, res) {
     }
 });
 
-router.get('/patchnote', async function(req, res) {
-    return mdl.patchnote(req, res);
+const notelist = {
+    bot: `디스코드 봇`,
+    site: `사이트`,
+    musicquiz: `음악퀴즈`
+};
+router.get('/patchnote/:note/remove/:date', async function(req, res) {
+    var note = req.params.note;
+    var date = req.params.date.split('-');
+
+    if (notelist[note]) {
+        pdata.deleteOne({
+            type: note,
+            year: date[0],
+            month: date[1],
+            day: date[2]
+        }, {limit: 1}, async function(err, res2) {
+            if (err) return mdl.render(req, res, `err`, {text: `노트 삭제중 오류가 발생했습니다.`});
+            return res.send(`
+                <script 'type=text/javascript'>
+                    alert('노트가 삭제되었습니다.');
+                    window.location='/patchnote/${note}';
+                </script>
+            `);
+        });
+        return;
+    }
+});
+router.get('/patchnote/:note/write(/:date)?', async function(req, res) {
+    var note = req.params.note;
+    var date = req.params.date || null;
+    if (notelist[note]) {
+        if (date) {
+            var pdb = MDB.object.patchnote;
+            pdata.find(async function(err, pdblist) {
+                for (db1 of pdblist) {
+                    pdb = db1;
+                    if (pdb.type === note && `${pdb.year}-${pdb.month}-${pdb.day}` === date) {
+                        return mdl.render(req, res, `patchnote_write`, {
+                            title: `글쓰기`,
+                            note: note,
+                            notetext: notelist[note],
+                            date: date,
+                            text: pdb.text
+                        });
+                    }
+                }
+                return mdl.render(req, res, `err`, {
+                    text: `페이지를 찾을수 없습니다.`
+                });
+            });
+            return;
+        }
+        return mdl.render(req, res, `patchnote_write`, {
+            title: `글쓰기`,
+            note: note,
+            notetext: notelist[note],
+            date: null,
+            text: null
+        });
+    }
+});
+router.post('/patchnote/:note/write(/:date)?', async function(req, res) {
+    var note = req.params.note;
+    var date = (req.params.date) ? true : false;
+    if (notelist[note]) {
+        return pn.patchnote_check(req, res, note, notelist, req.body.date, req.body.text, date);
+    }
+    return mdl.render(req, res, `err`, {text: `패치노트를 찾을수 없습니다.`});
+});
+router.get(`/patchnote(/:note)?(/:date)?`, async function(req, res) {
+    var note = req.params.note || null;
+    var date = req.params.date || null;
+    if (note) {
+        if (date) {
+            return pn.patchnote_get(req, res, note, notelist[note], date);
+        }
+        if (notelist[note]) return pn.patchnote(req, res, note, notelist[note]);
+        return mdl.render(req, res, `err`, {text: `패치노트를 찾을수 없습니다.`});
+    }
+    return mdl.render(req, res, `patchnote`, {
+        title: `패치노트`,
+        note: note,
+        notetext: notelist[note],
+        text: null,
+        file: null
+    });
 });
 
 module.exports = router;

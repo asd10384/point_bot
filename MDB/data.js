@@ -12,6 +12,7 @@ const out = {
     module: {
         user: module_user,
         server: module_server,
+        patchnote: module_patchnote,
     },
     set: {
         user: set_user,
@@ -84,6 +85,13 @@ const out = {
             },
             role: Array,
         },
+        patchnote: {
+            type: String,
+            year: String,
+            month: String,
+            day: String,
+            text: String,
+        }
     },
 };
 
@@ -96,6 +104,10 @@ function module_user() {
 function module_server() {
     var dataSchema = Schema(out.object.server);
     return models.Mandl_server || model('Mandl_server', dataSchema);
+}
+function module_patchnote() {
+    var dataSchema = Schema(out.object.patchnote);
+    return models.Mandl_patchnote || model('Mandl_patchnote', dataSchema);
 }
 
 async function set_user(user = new User) {
