@@ -23,11 +23,10 @@ async function ansermsg(client = new Client, message = new Message, args = Array
 
     var count = sdb.quiz.quiz.count;
     var name = sdb.quiz.quiz.name[count];
-
     var anser_text = `${name}`.trim().toLowerCase();
 
     if (text == '힌트' || text == 'hint') {
-        return await hint(client, message, args, sdb, user, anser_text);
+        return await hint(client, message, args, sdb, user);
     }
     if (text == '스킵' || text == 'skip') {
         return await skip(client, message, args, sdb, user);
