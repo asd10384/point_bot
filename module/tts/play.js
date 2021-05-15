@@ -1,6 +1,7 @@
 
 require('dotenv').config();
 const db = require('quick.db');
+const { Message, Channel } = require('discord.js');
 const MDB = require('../../MDB/data');
 const { writeFile } = require('fs');
 const timer = require('./timer');
@@ -34,7 +35,7 @@ async function play(message = new Message, sdb = MDB.object.server, channel = ne
     });
     options['volume'] = 0.7;
 
-    var fileurl = `${message.guild.id}.wav`;
+    var fileurl = `${message.guild.id}-${message.author.id}.wav`;
     writeFile(fileurl, response[0].audioContent, async function() {
         return broadcast(message, sdb, channel, fileurl, options);
     });
