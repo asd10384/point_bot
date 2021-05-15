@@ -102,30 +102,11 @@ async function geturl(message = new Message, text = String, options = Object) {
 }
 // 유튜브 URL 생성 끝
 
-function msg (text) {
-    text = text.replace(/\?/gi, '물음표') || text;
-    text = text.replace(/\!/gi, '느낌표') || text;
-    text = text.replace(/\~/gi, '물결표') || text;
-    text = text.replace(/\+/gi, '더하기') || text;
-    text = text.replace(/\-/gi, '빼기') || text;
-
-    text = text.replace(/\'/gi, '따옴표') || text;
-    text = text.replace(/\"/gi, '큰따옴표') || text;
-
-    text = text.replace(/\(/gi, '여는소괄호') || text;
-    text = text.replace(/\)/gi, '닫는소괄호') || text;
-    text = text.replace(/\{/gi, '여는중괄호') || text;
-    text = text.replace(/\}/gi, '닫는중괄호') || text;
-    text = text.replace(/\[/gi, '여는대괄호') || text;
-    text = text.replace(/\]/gi, '닫는대괄호') || text;
-
-    text = text.replace(/ㄹㅇ/gi, '리얼') || text;
-    text = text.replace(/ㅅㅂ/gi, '시바') || text;
-    text = text.replace(/ㄲㅂ/gi, '까비') || text;
-    text = text.replace(/ㅅㄱ/gi, '수고') || text;
-    text = text.replace(/ㅎㅇ/gi, '하이') || text;
-    text = text.replace(/ㄴㅇㅅ/gi, '나이스') || text;
-
+function msg (text = '') {
+    var repobj = eval(process.env.REPMSG)[0];
+    for (i in repobj) {
+        text = text.split(i).join(repobj[i]);
+    }
     return text;
 }
 function msgdelete(m = new Message, t = Number) {
