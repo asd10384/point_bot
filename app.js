@@ -44,8 +44,16 @@ app.use(async function (err, req, res, next) {
 });
 
 app.listen(process.env.PORT, function() {
-    console.log(`\nNODEJS PAGE IS ONLINE, DOMAIN : ${process.env.DOMAIN}\n`);
+    console.log(`\nNODEJS PAGE IS ONLINE\nDOMAIN : ${process.env.DOMAIN}\nPORT: ${process.env.PORT}\n`);
     setInterval(function() {
-        http.get(process.env.DOMAIN_SLEEP);
-    }, (60*1000)*Number(process.env.DOMAIN_TIME));
+        http.get(process.env.DOMAIN_SLEEP, function(res) {
+            res.on('data', function (chunk) {
+                console.log(`사이트가 정상작동 중입니다.\n주소 : ${process.env.DOMAIN_SLEEP}\nres: ${res.statusCode}`);
+             });
+    
+            res.on('error', function (err) {
+                console.log(`사이트에 오류가 발생했습니다.\n주소 : ${process.env.DOMAIN_SLEEP}\nres: ${res.statusCode}`);
+            });
+        });
+    }, (1000)*Number(process.env.DOMAIN_TIME));
 });
