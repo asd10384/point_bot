@@ -55,5 +55,5 @@ app.listen(process.env.PORT, function() {
                 console.log(`사이트에 오류가 발생했습니다.\n주소 : ${process.env.DOMAIN_SLEEP}\nres: ${res.statusCode}`);
             });
         });
-    }, (1000)*Number(process.env.DOMAIN_TIME));
+    }, (60*1000)*Number(process.env.DOMAIN_TIME));
 });
