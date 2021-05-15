@@ -395,12 +395,10 @@ async function allmsgdelete(client = new Client, sdb = MDB.object.server, time =
         var c = client.channels.cache.get(sdb.quiz.qzchannelid);
         setTimeout(() => {
             c.messages.fetch({ after: sdb.quiz.msg.npid }).then(function(msg) {
-                setTimeout(() => {
-                    if (msg.size <= 1) return;
-                    c.bulkDelete(msg.size);
-                }, Math.floor(time/3));
+                if (msg.size <= 1) return;
+                c.bulkDelete(msg.size);
             });
-        }, Math.floor(time/3*2));
+        }, Math.floor(time));
     } catch(err) {
         return;
     }
