@@ -14,9 +14,13 @@ module.exports = {
     skip,
 };
 
-async function hint(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, user = new User, anser = String) {
+async function hint(client = new Client, message = new Message, args = Array, sdb = MDB.object.server, user = new User) {
     if (!sdb.quiz.start.user) return;
     if (!sdb.quiz.start.hint) return;
+
+    var count = sdb.quiz.quiz.count;
+    var name = sdb.quiz.quiz.name[count];
+    var anser = `${name}`.trim().toLowerCase();
 
     var usercount;
     try {
