@@ -35,7 +35,7 @@
     "selfcheck": "^8.0.1",
     "simple-youtube-api": "^5.2.1",
     "sleep": "^6.3.0",
-    "ytdl-core": "^4.7.0"
+    "ytdl-core": "^4.8.0"
   },
   "scripts": {
     ".": "node index.js",
