@@ -5,6 +5,7 @@ const client = new Client({partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'USER']}
 const { readdirSync } = require('fs');
 const { join } = require('path');
 const db = require('quick.db');
+const log = require('./log/log');
 const { ansermsg } = require('./module/quiz/ansermsg');
 
 // env
@@ -53,7 +54,7 @@ client.on('message', async (message) => {
     }, async (err, db1) => {
         var sdb = MDB.object.server;
         sdb = db1;
-        if (err) console.log(err);
+        if (err) log.errlog(err);
         if (!sdb) {
             await MDB.set.server(message);
         } else {
@@ -91,7 +92,7 @@ client.on('message', async (message) => {
                 } catch(error) {
                     if (commandName == '' || commandName == ';' || commandName == undefined || commandName == null) return ;
                     // 코드 확인
-                    // console.log(error);
+                    // log.errlog(error);
                     const embed = new MessageEmbed()
                         .setColor('DARK_RED')
                         .setDescription(`\` ${commandName} \` 이라는 명령어를 찾을수 없습니다.`)

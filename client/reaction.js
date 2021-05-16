@@ -3,6 +3,7 @@ require('dotenv').config();
 const { Client, User, ReactionCollector, MessageEmbed, Message } = require('discord.js');
 const db = require('quick.db');
 const MDB = require('../MDB/data');
+const log = require('../log/log');
 const sdata = MDB.module.server();
 
 const quiz = require('../module/quiz/quiz');
@@ -31,7 +32,7 @@ async function go(client = new Client, reaction = new ReactionCollector, user = 
     }, async (err, db1) => {
         var sdb = MDB.object.server;
         sdb = db1;
-        if (err) console.log(err);
+        if (err) log.errlog(err);
         if (!sdb) {
             await MDB.set.server(message);
             return await reac(client, reaction, user);
@@ -85,7 +86,7 @@ async function go(client = new Client, reaction = new ReactionCollector, user = 
                     reaction.users.remove(user);
                     sdb.quiz.page.slide = sdb.quiz.page.slide+1;
                 }
-                await sdb.save().catch((err) => console.log(err));
+                await sdb.save().catch((err) => log.errlog(err));
                 try {
                     var vchannel = client.channels.cache.get(sdb.quiz.vcid);
                 } catch(err) {}

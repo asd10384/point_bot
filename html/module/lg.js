@@ -5,6 +5,7 @@ const { MessageEmbed, Client, Message, User } = require('discord.js');
 const { client } = require('../../index');
 const MDB = require('../../MDB/data');
 const request = require('request');
+const log = require('../../log/log');
 const sdata = MDB.module.server();
 const pdata = MDB.module.patchnote();
 
@@ -18,12 +19,13 @@ var namelist = [
     'bot',
     'quiz',
     'site',
-    'selfcheck'
+    'selfcheck',
+    'err'
 ];
 async function getlog(req, res, name = '') {
     if (namelist.includes(name)) {
         request(`${process.env.DOMAIN}/log/${name}.txt`, async (err, res2, body) => {
-            if (err) return console.log(err);
+            if (err) return log.errlog(err);
             return mdl.render(req, res, `log`, {
                 title: `로그확인 - ${name}`,
                 name: name,

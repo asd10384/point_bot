@@ -6,10 +6,10 @@ const { load } = require('cheerio');
 const ytdl = require('ytdl-core');
 const { MessageEmbed, Client, Message, Channel, User } = require('discord.js');
 const MDB = require('../../MDB/data');
+const log = require('../../log/log');
 
 const mqscore = require('./score');
 const msg = require('./msg');
-const log = require('../../log/log');
 const { play, broadcast } = require('../tts/play');
 
 const chack = /(?:http:\/\/|https:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?/gi;
@@ -336,7 +336,7 @@ async function anser(client = new Client, message = new Message, args = Array, s
             return;
         }, time * 1000);
     } catch(err) {
-        console.log(err);
+        log.errlog(err);
         return await end(client, message, sdb);
     }
 }
@@ -617,7 +617,7 @@ async function getmusic(client = new Client, message = new Message, args = Array
     complite: Boolean,
 }) {
     request(ulist.url.toString().toLocaleLowerCase().replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|\s]/g, encodeURIComponent), async (err, res, html) => {
-        if (err) console.log(err);
+        if (err) log.errlog(err);
         const $ = load(html);
         var dfname = [],
             dfvocal = [],
@@ -650,7 +650,7 @@ async function getmusic(client = new Client, message = new Message, args = Array
             link.push(dflink[r]);
             logtext += `${i+1}. ${dfvocal[r]}-${dfname[r]} [${r+1}]\n`;
         }
-        console.log(logtext);
+        log.quizlog(logtext);
         var music = sdb.quiz;
         music.quiz.name = name;
         music.quiz.vocal = vocal;

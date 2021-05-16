@@ -3,6 +3,7 @@ require('dotenv').config();
 const db = require('quick.db');
 const { MessageEmbed, Client, Message, User } = require('discord.js');
 const MDB = require('../MDB/data');
+const log = require('../log/log');
 
 const per = new MessageEmbed()
     .setTitle(`이 명령어를 사용할 권한이 없습니다.`)
@@ -26,7 +27,7 @@ module.exports = {
             topic: `봇을 사용한뒤 ${dfprefix}leave 명령어를 입력해 내보내 주세요.`
         }).then(channel => {
             sdb.tts.ttschannelid = channel.id;
-            sdb.save().catch(err => console.log(err));
+            sdb.save().catch(err => log.errlog(err));
             var tts = new MessageEmbed()
                 .setTitle(`채팅을 읽어줍니다.`)
                 .setDescription(`이 채팅방에 채팅을 치시면 봇이 읽어줍니다.`)

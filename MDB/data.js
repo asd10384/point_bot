@@ -2,6 +2,7 @@
 require('dotenv').config();
 const { User, Message } = require('discord.js');
 const { Schema, model, models, connect } = require('mongoose');
+const log = require('../log/log');
 const map = new Map();
 connect(process.env.mongourl, {
     useNewUrlParser: true,
@@ -125,7 +126,7 @@ async function set_user(user = new User) {
             password: '',
         },
     });
-    return newdata.save().catch(err => console.log(err));
+    return newdata.save().catch(err => log.errlog(err));
 }
 async function set_server(message = new Message) {
     var data = module_server(); //모듈
@@ -183,5 +184,5 @@ async function set_server(message = new Message) {
             tts: true,
         },
     });
-    return newdata.save().catch(err => console.log(err));
+    return newdata.save().catch(err => log.errlog(err));
 }

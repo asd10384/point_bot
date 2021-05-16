@@ -3,6 +3,7 @@ require('dotenv').config();
 const db = require('quick.db');
 const { MessageEmbed, Client, Message, User } = require('discord.js');
 const MDB = require('../MDB/data');
+const log = require('../log/log');
 
 const check = require('../module/quiz/check');
 const quiz = require('../module/quiz/quiz');
@@ -17,7 +18,7 @@ udata.findOne({
 }, async (err, db1) => {
     var udb = MDB.object.user;
     udb = db1;
-    if (err) console.log(err);
+    if (err) log.errlog(err);
     if (!udb) {
         await MDB.set.user(user);
         return client.commands.get(`${this.name}`).run(client, message, args, sdb, user);

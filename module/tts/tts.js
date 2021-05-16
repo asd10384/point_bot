@@ -4,6 +4,7 @@ const db = require('quick.db');
 const { MessageEmbed, Client, Message, Channel, User } = require('discord.js');
 const { broadcast, play } = require('./play');
 const MDB = require('../../MDB/data');
+const log = require('../../log/log');
 const udata = MDB.module.user();
 
 const ytdl = require('ytdl-core');
@@ -30,7 +31,7 @@ async function tts(client = new Client, message = new Message, args = Array, sdb
     }, async (err, db1) => {
         var udb = MDB.object.user;
         udb = db1;
-        if (err) console.log(err);
+        if (err) log.errlog(err);
         if (!udb) {
             await MDB.set.user(user);
             return await tts(client, message, args, sdb, user);
@@ -59,7 +60,7 @@ async function tts(client = new Client, message = new Message, args = Array, sdb
                 }
                 return await broadcast(message, sdb, channel, url.url, url.options);
             } catch (err) {
-                console.log(err);
+                log.errlog(err);
                 return message.channel.send(vcerr).then(m => msgdelete(m, Number(process.env.deletetime)));
             }
         } else {

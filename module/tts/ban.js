@@ -3,6 +3,7 @@ require('dotenv').config();
 const db = require('quick.db');
 const { MessageEmbed, Client, Message, User } = require('discord.js');
 const { format } = require('../mds');
+const log = require('../../log/log');
 
 const MDB = require('../../MDB/data');
 const udata = MDB.module.user();
@@ -22,7 +23,7 @@ async function ban(client = new Client, message = new Message, args = Array, sdb
     }, async (err, db1) => {
         var udb = MDB.object.user;
         udb = db1;
-        if (err) console.log(err);
+        if (err) log.errlog(err);
         if (!udb) {
             await MDB.set.user(user);
             return await ban(client, message, args, sdb, user, pp);
@@ -35,7 +36,7 @@ async function ban(client = new Client, message = new Message, args = Array, sdb
                 udata.findOne({
                     userID: user2.id
                 }, async (err, udb2) => {
-                    if (err) console.log(err);
+                    if (err) log.errlog(err);
                     if (!udb2) {
                         await MDB.set.user(user2);
                         return await ban(client, message, args, sdb, user, pp);
@@ -79,7 +80,7 @@ async function unban(client = new Client, message = new Message, args = Array, s
     }, async (err, db1) => {
         var udb = MDB.object.user;
         udb = db1;
-        if (err) console.log(err);
+        if (err) log.errlog(err);
         if (!udb) {
             await MDB.set.user(user);
             return await unban(client, message, args, sdb, pp);
@@ -91,7 +92,7 @@ async function unban(client = new Client, message = new Message, args = Array, s
                 udata.findOne({
                     userID: muser.id
                 }, async (err, udb2) => {
-                    if (err) console.log(err);
+                    if (err) log.errlog(err);
                     if (!udb2) {
                         await MDB.set.user(muser);
                         return await unban(client, message, args, sdb, user, pp);

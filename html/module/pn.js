@@ -4,6 +4,7 @@ const db = require('quick.db');
 const { MessageEmbed, Client, Message, User } = require('discord.js');
 const { client } = require('../../index');
 const MDB = require('../../MDB/data');
+const log = require('../../log/log');
 const sdata = MDB.module.server();
 const pdata = MDB.module.patchnote();
 
@@ -79,7 +80,7 @@ async function patchnote_write(req, res, note = '', notelist = [], date, text = 
             month: sdate[1],
             day: sdate[2],
             text: text
-        }).save().catch(err => console.log(err));
+        }).save().catch(err => log.errlog(err));
     }
     return res.send(`
         <script 'type=text/javascript'>
@@ -96,7 +97,7 @@ async function patchnote_check(req, res, note = '', notelist = [], date, text, e
             if (pdb.type === note && `${pdb.year}-${pdb.month}-${pdb.day}` === date) {
                 if (edit) {
                     pdb.text = text;
-                    pdb.save().catch(err => console.log(err));
+                    pdb.save().catch(err => log.errlog(err));
                     return res.send(`
                         <script 'type=text/javascript'>
                             alert('수정 성공');

@@ -32,7 +32,7 @@ module.exports = {
         }, async (err, db1) => {
             var udb = MDB.object.user;
             udb = db1;
-            if (err) console.log(err);
+            if (err) log.errlog(err);
             if (!udb) {
                 await MDB.set.user(user);
                 return client.commands.get(`${this.name}`).run(client, message, args, sdb, user);
@@ -81,7 +81,7 @@ module.exports = {
                     topic: `${process.env.prefix}자가진단 도움말`
                 }).then(channel => {
                     sdb.selfcheck.channelid = channel.id;
-                    sdb.save().catch(err => console.log(err));
+                    sdb.save().catch(err => log.errlog(err));
                     embed.setTitle(`**자가진단을 원터치로 간편하게**`)
                         .setDescription(`
                             이 메세지의 ⏭️ 이모지를 누르면
@@ -122,7 +122,7 @@ module.exports = {
                         ]
                     }).then(channel => {
                         sdb.selfcheck.autochannelid = channel.id;
-                        sdb.save().catch(err => console.log(err));
+                        sdb.save().catch(err => log.errlog(err));
                         const embed = new MessageEmbed()
                             .setTitle(`자가진단 결과가 자동으로 입력됩니다.`)
                             .setFooter(`기본 명령어 : ${process.env.prefix}자가진단`)
@@ -158,7 +158,7 @@ module.exports = {
                 } else {
                     sdb.selfcheck.autocheck.push(message.member.user.id);
                 }
-                sdb.save().catch((err) => console.log(err));
+                sdb.save().catch((err) => log.errlog(err));
                 embed.setTitle(`**자동 자가진단**`)
                     .setDescription(`
                         **${message.member.user.username}** 님의 자동 자가진단이
@@ -187,7 +187,7 @@ module.exports = {
                                     sc.birthday = args[4];
                                     sc.password = args[5];
                                     udb.selfcheck = sc;
-                                    udb.save().catch(err => console.log(err));
+                                    udb.save().catch(err => log.errlog(err));
                                     desc = `자가진단 정보가 정상적으로 등록되었습니다.\n\n**${pp}자가진단** 으로 자가진단을 하실수있습니다.\n**${pp}자가진단 확인** 으로 입력한 정보를 확인하실수 있습니다.`;
                                     return await sendem(message, embed, username, `성공`, desc, `ORANGE`, 5);
                                 }
@@ -231,7 +231,7 @@ module.exports = {
                     }, async (err, db2) => {
                         var udb2 = MDB.object.user;
                         udb2 = db2;
-                        if (err) console.log(err);
+                        if (err) log.errlog(err);
                         if (!udb2) {
                             await MDB.set.user(tuser);
                             return client.commands.get(`${this.name}`).run(client, message, args, sdb, user);
@@ -253,7 +253,7 @@ module.exports = {
                     udata.findOne({
                         userID: tuser.id
                     }, async (err, udb2) => {
-                        if (err) console.log(err);
+                        if (err) log.errlog(err);
                         if (!udb2) {
                             await MDB.set.user(tuser);
                             return client.commands.get(`${this.name}`).run(client, message, args, sdb, user);
@@ -356,7 +356,7 @@ async function autoselfcheck(client = new Client, message = new Message, sdb = M
         }, async (err, db1) => {
             var udb = MDB.object.user;
             udb = db1;
-            if (err) console.log(err);
+            if (err) log.errlog(err);
             if (!udb) {
                 if (user) {
                     await MDB.set.user(user);

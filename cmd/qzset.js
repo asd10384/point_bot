@@ -3,6 +3,7 @@ require('dotenv').config();
 const db = require('quick.db');
 const { MessageEmbed, Client, Message, User } = require('discord.js');
 const MDB = require('../MDB/data');
+const log = require('../log/log');
 
 const msg = require('../module/quiz/msg');
 const quiz = require('../module/quiz/quiz');
@@ -34,15 +35,15 @@ module.exports = {
             var np = await msg.np(time);
             c.send(score).then(async (m) => {
                 sdb.quiz.msg.scoreid = m.id;
-                await sdb.save().catch(err => console.log(err));
+                await sdb.save().catch(err => log.errlog(err));
             });
             c.send(list).then(async (m) => {
                 sdb.quiz.msg.listid = m.id;
-                await sdb.save().catch(err => console.log(err));
+                await sdb.save().catch(err => log.errlog(err));
             });
             c.send(np).then(async (m) => {
                 sdb.quiz.msg.npid = m.id;
-                await sdb.save().catch(err => console.log(err));
+                await sdb.save().catch(err => log.errlog(err));
             });
         });
         return setTimeout(async () => {

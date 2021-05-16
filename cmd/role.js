@@ -3,6 +3,7 @@ require('dotenv').config();
 const db = require('quick.db');
 const { MessageEmbed, Client, Message, User } = require('discord.js');
 const MDB = require('../MDB/data');
+const log = require('../log/log');
 
 const per = new MessageEmbed()
     .setTitle(`이 명령어를 사용할 권한이 없습니다.`)
@@ -63,7 +64,7 @@ module.exports = {
                     if (!roles.includes(role)) {
                         roles.push(role);
                         sdb.role = roles;
-                        await sdb.save().catch(err => console.log(err));
+                        await sdb.save().catch(err => log.errlog(err));
                         em.setTitle(`역할을 성공적으로 추가했습니다.`)
                             .setDescription(`추가된 역할 : <@&${role}>`)
                             .setFooter(`${pp}권한 확인`);
@@ -93,7 +94,7 @@ module.exports = {
                             }
                         }
                         sdb.role = roles;
-                        await sdb.save().catch(err => console.log(err));
+                        await sdb.save().catch(err => log.errlog(err));
                         em.setTitle(`역할을 성공적으로 제거했습니다.`)
                             .setDescription(`제거된 역할 : <@&${role}>`)
                             .setFooter(`${pp}권한 확인`);

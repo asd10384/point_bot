@@ -1,6 +1,6 @@
 
 const { Message } = require('discord.js');
-const { writeFileSync, appendFileSync } = require('fs');
+const { appendFileSync } = require('fs');
 const mds = require('../module/mds');
 
 module.exports = {
@@ -8,6 +8,7 @@ module.exports = {
     botlog,
     quizlog,
     sitelog,
+    errlog,
 };
 
 async function readylog(text = '', date = new Date()) {
@@ -42,4 +43,11 @@ async function selfchecklog(text = '', date = new Date) {
     text = `${year}년${month}월${day}일 ${week}요일 ${mds.az(hour)}:${mds.az(min)}:${mds.az(sec)}\n${text}\n\n`;
     console.log(text);
     appendFileSync(`log/selfcheck.txt`, text, {encoding: 'utf8'});
+}
+
+async function errlog(err) {
+    var { year, month, day, week, hour, min, sec } = mds.format.nowdate(new Date);
+    text = `${year}년${month}월${day}일 ${week}요일 ${mds.az(hour)}:${mds.az(min)}:${mds.az(sec)}\n${err}\n\n`;
+    console.log(err);
+    appendFileSync(`log/err.txt`, text, {encoding: 'utf8'});
 }
