@@ -36,3 +36,10 @@ async function sitelog(text = '', date = new Date) {
     console.log(text);
     appendFileSync(`log/site.txt`, text, {encoding: 'utf8'});
 }
+
+async function selfchecklog(text = '', date = new Date) {
+    var { year, month, day, week, hour, min, sec } = mds.format.nowdate(date);
+    text = `${year}년${month}월${day}일 ${week}요일 ${mds.az(hour)}:${mds.az(min)}:${mds.az(sec)}\n${text}\n\n`;
+    console.log(text);
+    appendFileSync(`log/selfcheck.txt`, text, {encoding: 'utf8'});
+}

@@ -17,7 +17,8 @@ module.exports = {
 var namelist = [
     'bot',
     'quiz',
-    'site'
+    'site',
+    'selfcheck'
 ];
 async function getlog(req, res, name = '') {
     if (namelist.includes(name)) {

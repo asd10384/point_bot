@@ -105,9 +105,41 @@ module.exports = {
                         .setFooter(`도움말 : ${process.env.prefix}자가진단 도움말`);
                     return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*2+2000));
                 }
-                if (args[1] == '실행' || args[1] == 'start') {
-                    return await autocheckinterval(client, message, sdb, true);
+                if (args[1] == '실행' || args[1] == 'start' || args[1] == '시작') {
+                    if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, Number(process.env.deletetime)));
+                    return await autoselfcheck(client, message, sdb);
                 }
+                if (args[1] == '채널생성' || args[1] == 'setchannel') {
+                    return message.guild.channels.create(`📃자동자가진단확인`, { // ${client.user.username}-음악퀴즈채널
+                        type: 'text',
+                        topic: `자가진단 결과가 자동으로 입력됩니다.`,
+                        permissionOverwrites: [
+                            {
+                                id: message.guild.roles.everyone,
+                                allow: ['VIEW_CHANNEL','READ_MESSAGE_HISTORY'],
+                                deny: ['SEND_MESSAGES','ADD_REACTIONS']
+                            }
+                        ]
+                    }).then(channel => {
+                        sdb.selfcheck.autochannelid = channel.id;
+                        sdb.save().catch(err => console.log(err));
+                        const embed = new MessageEmbed()
+                            .setTitle(`자가진단 결과가 자동으로 입력됩니다.`)
+                            .setFooter(`기본 명령어 : ${process.env.prefix}자가진단`)
+                            .setColor('ORANGE');
+                        channel.send(embed);
+                    });
+                }
+                if (args[1]) return message.channel.send(new MessageEmbed().setTitle(`**자동 자가진단 도움말**`)
+                    .setDescription(`
+                        **명령어**
+                        ${pp}자가진단 자동 : 자동자가진단을 활성화/비활성화 할수있습니다.
+
+                        **관리자 명령어**
+                        ${pp}자가진단 자동 채널설정 : 자동자가진단 결과를 확인할수있는 채널을 생성합니다.
+                        ${pp}자가진단 자동 확인 : 자동자가진단을 등록한 유저를 확인합니다.
+                        ${pp}자가진단 자동 실행[시작] : 강제로 자동자가진단을 실행합니다.
+                    `)).then(m => msgdelete(m, Number(process.env.deletetime)*4));
                 if (!(sc.name || sc.password)) {
                     const emerr = new MessageEmbed()
                         .setTitle(`**자동 자가진단 오류**`)
@@ -279,6 +311,7 @@ module.exports = {
 
                     \` 관리자 명령어 \`
                     ${pp}자가진단 채널생성 : 자가진단을 원클릭으로 할수있는 채널을 생성합니다.
+                    ${pp}자가진단 자동 채널생성 : 자동 자가진단의 결과를 볼수있는 채널을 생성합니다.
                     ${pp}자가진단 @USER : 유저가 입력한 정보로 자가진단을 합니다.
                     ${pp}자가진단 확인 @USER : 유저가 입력한 정보를 확인합니다.
                     ${pp}자가진단 자동 확인 : 자동 자가진단을 등록한 유저를 확인합니다.
@@ -289,7 +322,7 @@ module.exports = {
     },
     autocheckinterval: autocheckinterval,
 };
-async function autocheckinterval(client = new Client, message = new Message, sdb = MDB.object.server, go = false) {
+async function autocheckinterval(client = new Client, message = new Message, sdb = MDB.object.server) {
     const timer = setInterval(async function() {
         var autotime = eval(process.env.autoselfcheck);
         var date = format.nowdate(new Date());
@@ -308,75 +341,81 @@ async function autocheckinterval(client = new Client, message = new Message, sdb
             }
         }
         if (['토','일'].includes(date.week)) return ;
-        if (date.hour == Number(autotime[0]) && date.min == Number(autotime[1]) && (date.sec == 0 || go)) {
-            var userlist = sdb.selfcheck.autocheck;
-            for (i = 0; i<userlist.length; i++) {
-                var user = client.users.cache.get(userlist[i]) || undefined;
-                udata.findOne({
-                    userID: userlist[i]
-                }, async (err, db1) => {
-                    var udb = MDB.object.user;
-                    udb = db1;
-                    if (err) console.log(err);
-                    if (!udb) {
-                        if (user) {
-                            await MDB.set.user(user);
-                            clearInterval(timer);
-                            return await autocheckinterval(client, message, sdb, true);
-                        }
-                    }
-                    var sc = udb.selfcheck;
-                    var emobj;
-                    if (sc.name || sc.password) {
-                        emobj = await hcs({
-                            area: sc.area,
-                            school: sc.school,
-                            name: sc.name,
-                            birthday: sc.birthday,
-                            password: sc.password
-                        }).then((result) => {
-                            return {
-                                title: `성공`,
-                                desc: `**\` 시간 \`** : ${result.inveYmd}`,
-                                time: result.inveYmd,
-                                color: `ORANGE`,
-                            };
-                        }).catch(() => {
-                            return {
-                                title: `실패`,
-                                desc: `\` ${process.env.prefix}자가진단 확인 \`으로\n입력사항에 오류가있는지 확인해주세요.`,
-                                time: undefined,
-                                color: `RED`,
-                            };
-                        });
-                        var uname = (user) ? user.username : udb.name;
-                        embed.setTitle(`**\` ${uname} \`**님 자동 자가진단 **${emobj.title}**`)
-                            .setDescription(emobj.desc)
-                            .setFooter(`서버 : ${message.guild.name}`)
-                            .setColor(emobj.color);
-                        if (user) {
-                            user.send(embed);
-                        } else {
-                            var c = message.guild.channels.cache.get(sdb.selfcheck.channelid);
-                            if (c) c.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*4));
-                        }
-                    } else {
-                        embed.setTitle(`**\` ${uname} \`**님 자동 자가진단 **실패**`)
-                            .setDescription(`${uname}님의 정보가 등록되어있지 않습니다.\n${user.username}님이 먼저 **${process.env.prefix}자가진단 설정**을 해주셔야 합니다.`)
-                            .setFooter(`서버 : ${message.guild.name}`)
-                            .setColor('RED');
-                        if (user) {
-                            user.send(embed);
-                        } else {
-                            var c = message.guild.channels.cache.get(sdb.selfcheck.channelid);
-                            if (c) c.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*3));
-                        }
-                    }
-                });
-            }
+        if (date.hour == Number(autotime[0]) && date.min == Number(autotime[1])) {
+            return await autoselfcheck(client, message, sdb);
         }
     }, 1000);
     return;
+}
+async function autoselfcheck(client = new Client, message = new Message, sdb = MDB.object.server) {
+    var userlist = sdb.selfcheck.autocheck;
+    for (i = 0; i<userlist.length; i++) {
+        var user = client.users.cache.get(userlist[i]) || undefined;
+        udata.findOne({
+            userID: userlist[i]
+        }, async (err, db1) => {
+            var udb = MDB.object.user;
+            udb = db1;
+            if (err) console.log(err);
+            if (!udb) {
+                if (user) {
+                    await MDB.set.user(user);
+                    clearInterval(timer);
+                    return await autocheckinterval(client, message, sdb);
+                }
+            }
+            var sc = udb.selfcheck;
+            var emobj;
+            if (sc.name || sc.password) {
+                emobj = await hcs({
+                    area: sc.area,
+                    school: sc.school,
+                    name: sc.name,
+                    birthday: sc.birthday,
+                    password: sc.password
+                }).then((result) => {
+                    return {
+                        title: `성공`,
+                        desc: `**\` 시간 \`** : ${result.inveYmd}`,
+                        time: result.inveYmd,
+                        color: `ORANGE`,
+                    };
+                }).catch(() => {
+                    return {
+                        title: `실패`,
+                        desc: `\` ${process.env.prefix}자가진단 확인 \`으로\n입력사항에 오류가있는지 확인해주세요.`,
+                        time: undefined,
+                        color: `RED`,
+                    };
+                });
+                var uname = (user) ? user.username : udb.name;
+                embed.setTitle(`**\` ${uname} \`**님 자동 자가진단 **${emobj.title}**`)
+                    .setDescription(emobj.desc)
+                    .setFooter(`서버 : ${message.guild.name}`)
+                    .setColor(emobj.color);
+                log.selfchecklog(`${uname} 님 자동 자가진단 ${emobj.title}\n${emobj.desc}`, new Date());
+                try {
+                    user.send(embed);
+                } catch(err) {}
+                try {
+                    var c = message.guild.channels.cache.get(sdb.selfcheck.autochannelid);
+                    if (c) c.send(embed);
+                } catch(err) {}
+            } else {
+                embed.setTitle(`**\` ${uname} \`**님 자동 자가진단 **실패**`)
+                    .setDescription(`${uname}님의 정보가 등록되어있지 않습니다.\n${user.username}님이 먼저 **${process.env.prefix}자가진단 설정**을 해주셔야 합니다.`)
+                    .setFooter(`서버 : ${message.guild.name}`)
+                    .setColor('RED');
+                try {
+                    user.send(embed);
+                } catch(err) {}
+                try {
+                    var c = message.guild.channels.cache.get(sdb.selfcheck.autochannelid);
+                    if (c) c.send(embed);
+                } catch(err) {}
+            }
+        });
+    }
 }
 
 function msgdelete(m = new Message, t = Number) {

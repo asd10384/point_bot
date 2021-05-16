@@ -16,15 +16,16 @@ module.exports = {
 function now_date(time = new Date) {
     var year = time.getFullYear();
     var month = time.getMonth()+1;
-    var day = time.getDay();
+    var day = time.getDate();
+    var wday = time.getDay();
     var hour = time.getHours()+Number(process.env.addhour);
     var min = time.getMinutes();
     var sec = time.getSeconds();
-    var week = weeklist[day];
+    var week = weeklist[wday];
     if (hour >= 24) {
         hour = hour - 24;
-        day++;
-        week = (day >= 6) ? weeklist[day-6] : weeklist[day];
+        wday++;
+        week = (wday >= 6) ? weeklist[wday-6] : weeklist[wday];
     }
     var nowtime = {
         'year': year,
