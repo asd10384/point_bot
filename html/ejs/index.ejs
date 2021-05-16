@@ -4,18 +4,18 @@
     <head>
         <base href="/"/>
         <link rel="icon" href="<%= domain %>/favicon.ico" type="image/x-icon"/>
-        <meta name="title" content="유저확인"/>
-        <meta property="og:title" content="유저확인"/>
-        <meta name="description" content="유저확인"/>
-        <meta name="og:description" content="유저확인"/>
+        <meta name="title" content="마엔롤봇 사이트"/>
+        <meta property="og:title" content="마엔롤봇 사이트"/>
+        <meta name="description" content="마엔롤봇 사이트"/>
+        <meta name="og:description" content="마엔롤봇 사이트"/>
 
         <meta property="url" content="<%= domain %>"/>
         <meta property="og:url" content="<%= domain %>"/>
 
-        <meta property="image:alt" content="유저확인"/>
-        <meta property="og:image:alt" content="유저확인"/>
+        <meta property="image:alt" content="마엔롤봇 사이트"/>
+        <meta property="og:image:alt" content="마엔롤봇 사이트"/>
 
-        <title id="main_title">유저확인</title>
+        <title id="main_title">마엔롤봇 사이트</title>
     </head>
 
     <body>
@@ -42,26 +42,7 @@
             }
         </style>
         <div class="body">
+            <button class="btn" onclick="location.href='/log'">로그확인</button><br/>
             <button class="btn" onclick="location.href='/patchnote'">패치노트</button>
-            <p>유저확인</p>
-            <form action="/" method="POST">
-                <a>서버아이디 : </a><input class="id" type="text" name="serverid"/><br/>
-                <a>유저아이디 : </a><input class="id" type="text" name="userid"/><br/>
-                <input class="btn" type="submit" value="이동"/>
-            </form>
-            <p>서버확인</p>
-            <button class="btn" onclick="location.href='/name'">이동</button>
-            <p>user</p>
-        </div>
-        <div class="user">
-            <a>
-                <% if (data.user.guildid) { %>
-                    <%= JSON.stringify(data.user) %>
-                <% } else { %>
-                    <style>.user{text-align: center;font-size: 25px;}</style>
-                    없음
-                <% } %>
-            </a>
-        </div>
     </body>
 </html>

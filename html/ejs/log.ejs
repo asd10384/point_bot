@@ -40,18 +40,33 @@
                 padding: 1px 4px;
                 font-size: 25px;
             }
+            pre {
+                margin-top: 50px;
+                margin-bottom: 150px;
+                margin-left: 40px;
+                font-size: 15px;
+            }
         </style>
         <div class="body">
-            <p>관리자 아이디 비밀번호를 입력해주세요.</p>
-            <form action="/login" method="POST">
-                <input hidden name="url" value="<%- data.url %>"/>
-                <input hidden name="back" value="<%- data.back %>"/>
-                <input hidden name="isadmin" value="<%- data.isadmin %>"/>
-                <a>ID : </a><input class="id" type="text" name="id"/><br/>
-                <a>PW : </a><input class="id" type="password" name="pw"/><br/>
-                <input class="btn" type="submit" value="로그인"/>
-            </form>
-            <button class="btn" onclick="location.href='/'">돌아가기</button>
+            <button class="btn" onclick="location.href='/<%if(data.name){%>log<%}%>'">돌아가기</button>
+            <p>
+                로그확인
+                <% if (data.name) { %>
+                    - <%- data.name %>
+                <% } %>
+            </p>
+            <% if (!data.name) { %>
+                <button class="btn" onclick="location.href='/log/bot'">로그 - 봇</button><br/>
+                <button class="btn" onclick="location.href='/log/quiz'">로그 - 퀴즈</button><br/>
+                <button class="btn" onclick="location.href='/log/site'">로그 - 사이트</button><br/>
+            <% } %>
         </div>
+        <% if (data.name) { %>
+            <% if (data.text) { %>
+<pre><%= data.text %></pre>
+            <% } else { %>
+<p style="text-align: center; margin-top: 50px;">없음</p>
+            <% } %>
+        <% } %>
     </body>
 </html>

@@ -4,7 +4,6 @@ const db = require('quick.db');
 const { MessageEmbed, Client, Message, User } = require('discord.js');
 const { client } = require('../../index');
 const MDB = require('../../MDB/data');
-const request = require('request');
 const sdata = MDB.module.server();
 const pdata = MDB.module.patchnote();
 

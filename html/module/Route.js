@@ -11,6 +11,7 @@ const router = express.Router();
 
 const mdl = require('./mdl');
 const pn = require('./pn');
+const lg = require('./lg');
 
 const account = eval(process.env.ACCOUNT)[0];
 
@@ -19,31 +20,31 @@ router.get('/', async function(req, res) {
     req.session.login = false;
     return mdl.render(req, res, `index`, {user: {guildid: null}});
 });
-router.post('/', async function(req, res) {
-    var guild = client.guilds.cache.get(req.body.serverid) || null;
-    if (guild) {
-        var user = (guild.members.cache.get(req.body.userid)) ? guild.members.cache.get(req.body.userid).user : null;
-        var data = (user) ? {
-            user: {
-                guildid: guild.id || null,
-                user: {
-                    id: user.id || null,
-                    tag: user.tag || null,
-                    name: user.username || null,
-                    avatarURL: user.avatarURL({format: 'png', size: 4096 }) || null
-                }
-            }
-        } : {
-            user: {
-                guildid: guild.id || null,
-                user: {id: null}
-            }
-        };
-        return mdl.render(req, res, `index`, data);
-    } else {
-        return mdl.render(req, res, `index`, {user:{guildid: null}});
-    }
-});
+// router.post('/', async function(req, res) {
+//     var guild = client.guilds.cache.get(req.body.serverid) || null;
+//     if (guild) {
+//         var user = (guild.members.cache.get(req.body.userid)) ? guild.members.cache.get(req.body.userid).user : null;
+//         var data = (user) ? {
+//             user: {
+//                 guildid: guild.id || null,
+//                 user: {
+//                     id: user.id || null,
+//                     tag: user.tag || null,
+//                     name: user.username || null,
+//                     avatarURL: user.avatarURL({format: 'png', size: 4096 }) || null
+//                 }
+//             }
+//         } : {
+//             user: {
+//                 guildid: guild.id || null,
+//                 user: {id: null}
+//             }
+//         };
+//         return mdl.render(req, res, `index`, data);
+//     } else {
+//         return mdl.render(req, res, `index`, {user:{guildid: null}});
+//     }
+// });
 
 router.get('/name', async function(req, res) {
     return mdl.render(req, res, `name`, {
@@ -85,41 +86,42 @@ router.post('/name', async function(req, res) {
     });
 });
 
-router.get('/server/:serverId', async function(req, res) {
-    var guild = client.guilds.cache.get(req.params.serverId) || null;
-    if (guild) {
-        return res.send({
-            id: guild.id || null,
-            name: guild.name || null,
-            icon: guild.iconURL({format: 'png', size: 4096 }) || null,
-            owner: (guild.owner) ? {
-                id: guild.ownerID || null,
-                tag: guild.owner.user.tag || null,
-                name: guild.owner.user.username || null,
-                nickname: guild.owner.displayName || null,
-                avatarURL: guild.owner.user.avatarURL({format: 'png', size: 4096 }) || null,
-            } : {id: null},
-            channel: guild.channels || null,
-        });
-    } else {
-        return res.send({id: null});
-    }
-});
+// router.get('/server/:serverId', async function(req, res) {
+//     var guild = client.guilds.cache.get(req.params.serverId) || null;
+//     if (guild) {
+//         return res.send({
+//             id: guild.id || null,
+//             name: guild.name || null,
+//             icon: guild.iconURL({format: 'png', size: 4096 }) || null,
+//             owner: (guild.owner) ? {
+//                 id: guild.ownerID || null,
+//                 tag: guild.owner.user.tag || null,
+//                 name: guild.owner.user.username || null,
+//                 nickname: guild.owner.displayName || null,
+//                 avatarURL: guild.owner.user.avatarURL({format: 'png', size: 4096 }) || null,
+//             } : {id: null},
+//             channel: guild.channels || null,
+//         });
+//     } else {
+//         return res.send({id: null});
+//     }
+// });
 
-router.get('/user/:userId', async function(req, res) {
-    var user = client.users.cache.get(req.params.userId) || null;
-    if (user) {
-        return res.send({
-            id: user.id || null,
-            tag: user.tag || null,
-            name: user.username || null,
-            avatarURL: user.avatarURL({format: 'png', size: 4096 }) || null,
-        });
-    } else {
-        return res.send({id: null});
-    }
-});
+// router.get('/user/:userId', async function(req, res) {
+//     var user = client.users.cache.get(req.params.userId) || null;
+//     if (user) {
+//         return res.send({
+//             id: user.id || null,
+//             tag: user.tag || null,
+//             name: user.username || null,
+//             avatarURL: user.avatarURL({format: 'png', size: 4096 }) || null,
+//         });
+//     } else {
+//         return res.send({id: null});
+//     }
+// });
 
+// 패치노트 시작
 const notelist = {
     bot: `디스코드 봇`,
     site: `사이트`,
@@ -218,21 +220,50 @@ router.get(`/patchnote(/:note)?(/:date)?`, async function(req, res) {
         login: login
     });
 });
+// 패치노트 끝
 
-router.get('/login', async function(req, res) {
+// 로그인 시작
+router.get('/login(/:isadmin)?', async function(req, res) {
+    var isadmin = req.params.isadmin || null;
     req.session.login = false;
     return mdl.render(req, res, `login`, {
         title: '로그인',
-        url: '/',
-        back: '/'
+        url: (isadmin) ? '/log' : '/',
+        back: '/',
+        isadmin: isadmin
     });
 });
 router.post('/login', async function(req, res) {
+    var isadmin = req.body.isadmin || null;
     var id = req.body.id;
     var pw = req.body.pw;
     var url = req.body.url;
     var back = req.body.back;
+    if (isadmin === 'admin' && id === account.admin.id) {
+        if (isadmin === 'admin' && pw === account.admin.pw) {
+            req.session.login = true;
+            req.session.admin = true;
+            return res.send(`
+                <script 'type=text/javascript'>
+                    alert('최고등급 관리자로그인 성공');
+                    window.location='${(url) ? url : '/'}';
+                </script>
+            `);
+        }
+        return res.send(`
+            <script 'type=text/javascript'>
+                alert('로그인 에러 : 올바르지 않은 비밀번호');
+                window.location='${back}';
+            </script>
+        `);
+    }
     if (id === account.patchnote.id) {
+        if (isadmin === 'admin') return res.send(`
+            <script 'type=text/javascript'>
+                alert('로그인 에러 : 최고등급의 아이디가 필요합니다.');
+                window.location='${(back) ? back : '/'}';
+            </script>
+        `);
         if (pw === account.patchnote.pw) {
             req.session.login = true;
             return res.send(`
@@ -258,6 +289,7 @@ router.post('/login', async function(req, res) {
 });
 router.get('/logout', async function(req, res) {
     req.session.login = false;
+    req.session.admin = false;
     return res.send(`
         <script 'type=text/javascript'>
             alert('로그아웃 되셨습니다.');
@@ -265,5 +297,25 @@ router.get('/logout', async function(req, res) {
         </script>
     `);
 });
+// 로그인 끝
+
+// 로그 시작
+router.get('/log(/:name)?', async function(req, res) {
+    if (!req.session.login) return res.send(`
+        <script type='text/javascript'>
+        window.location='/login/admin';
+        </script>
+    `);
+    var name = req.params.name || null;
+    if (!name) {
+        return mdl.render(req, res, `log`, {
+            title: `로그확인`,
+            name: null,
+            text: null
+        });
+    }
+    return lg.getlog(req, res, name);
+});
+
 
 module.exports = router;

@@ -2,6 +2,7 @@
 require('dotenv').config();
 const db = require('quick.db');
 const { Client } = require('discord.js');
+const log = require('../log/log');
 
 const dfprefix = process.env.prefix;
 
@@ -28,18 +29,8 @@ module.exports = async function (client = new Client) {
         } catch(err) {
             db_text = '\n없음\n';
         }
-        console.log(`
-
-===============================
- 이름 : ${client.user.username}
-
- 태그 : ${client.user.tag}
-===============================
-
-        `);
-        console.log('===============================');
-        console.log((db_text === '') ? '\n없음\n' : db_text);
-        console.log('===============================\n');
+        log.readylog(`===============================\n 이름 : ${client.user.username}\n\n 태그 : ${client.user.tag}\n===============================\n`, new Date());
+        log.readylog(`===============================\n${(db_text === '') ? '\n없음\n' : db_text}\n===============================`, new Date());
 
         client.user.setPresence({
             activity: {

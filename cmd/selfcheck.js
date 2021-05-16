@@ -4,6 +4,7 @@ const db = require('quick.db');
 const { MessageEmbed, Client, Message, User } = require('discord.js');
 const { hcs } = require('selfcheck');
 const { format } = require('../module/mds');
+const log = require('../log/log');
 
 const MDB = require('../MDB/data');
 const udata = MDB.module.user();
@@ -103,6 +104,9 @@ module.exports = {
                         .setDescription(`**유저 확인**\n${(text == '') ? `없음` : text}`)
                         .setFooter(`도움말 : ${process.env.prefix}자가진단 도움말`);
                     return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*2+2000));
+                }
+                if (args[1] == '실행' || args[1] == 'start') {
+                    return await autocheckinterval(client, message, sdb, true);
                 }
                 if (!(sc.name || sc.password)) {
                     const emerr = new MessageEmbed()
@@ -294,8 +298,8 @@ async function autocheckinterval(client = new Client, message = new Message, sdb
             db.set(`db.${message.guild.id}.selfcheck.timerstatus`, false);
             var userid = db.get(`db.${message.guild.id}.selfcheck.timeruserid`);
             db.set(`db.${message.guild.id}.selfcheck.timeruserid`, '');
-            var text = `\n** ${message.guild.name} 서버 **\n자동 자가진단 타이머가 실행중입니다.\n현재시간 : ${date.week}요일 ${date.hour}시 ${date.min}분 ${date.sec}초\n설정시간 : ${autotime[0]}시 ${autotime[1]}분\n`;
-            console.log(text);
+            var text = `** ${message.guild.name} 서버 **\n자동 자가진단 타이머가 실행중입니다.\n현재시간 : ${date.week}요일 ${date.hour}시 ${date.min}분 ${date.sec}초\n설정시간 : ${autotime[0]}시 ${autotime[1]}분`;
+            log.botlog(message, text, new Date());
             var user = (message.guild.members.cache.get(userid)) ? message.guild.members.cache.get(userid).user : undefined;
             if (user) {
                 user.send(new MessageEmbed().setDescription(text).setColor('ORANGE'))

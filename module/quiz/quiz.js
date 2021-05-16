@@ -9,6 +9,7 @@ const MDB = require('../../MDB/data');
 
 const mqscore = require('./score');
 const msg = require('./msg');
+const log = require('../../log/log');
 const { play, broadcast } = require('../tts/play');
 
 const chack = /(?:http:\/\/|https:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?/gi;
@@ -538,7 +539,7 @@ async function getimg(client = new Client, message = new Message, args = Array, 
             link.push(dflink[r]);
             logtext += `${i+1}. ${dfvocal[r]}-${dfname[r]} [${r+1}]\n`;
         }
-        console.log(logtext);
+        log.quizlog(message, text, new Date());
         var img = sdb.quiz;
         img.quiz.name = name;
         img.quiz.vocal = vocal;
