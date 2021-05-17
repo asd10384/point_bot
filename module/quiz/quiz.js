@@ -650,7 +650,7 @@ async function getmusic(client = new Client, message = new Message, args = Array
             link.push(dflink[r]);
             logtext += `${i+1}. ${dfvocal[r]}-${dfname[r]} [${r+1}]\n`;
         }
-        log.quizlog(logtext);
+        log.quizlog(message, logtext, new Date());
         var music = sdb.quiz;
         music.quiz.name = name;
         music.quiz.vocal = vocal;
