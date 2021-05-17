@@ -4,6 +4,7 @@ const db = require('quick.db');
 const { MessageEmbed, Client, Message, User } = require('discord.js');
 const MDB = require('./MDB/data');
 const log = require('./log/log');
+const lg = require('./html/module/lg');
 const path = require('path');
 const http = require('http');
 const express = require('express');
@@ -62,7 +63,7 @@ app.listen(process.env.PORT, async function() {
 });
 
 async function clearlog() {
-    writeFileSync('log/bot.txt', '', { encoding: 'utf8' });
-    writeFileSync('log/quiz.txt', '', { encoding: 'utf8' });
-    writeFileSync('log/site.txt', '', { encoding: 'utf8' });
+    for (i of lg.logset.loglist) {
+        writeFileSync(`log/${i}.txt`, '', { encoding: 'utf8' });
+    }
 }

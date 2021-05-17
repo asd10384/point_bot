@@ -29,7 +29,7 @@ for (const file of commandFiles) {
 }
 
 // client errorcheck
-client.on('error', (err) => console.error(err));
+client.on('error', (err) => log.errlog(err));
 
 // client on
 require('./client/ready')(client);

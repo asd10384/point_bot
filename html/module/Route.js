@@ -308,10 +308,15 @@ router.get('/log(/:name)?', async function(req, res) {
     `);
     var name = req.params.name || null;
     if (!name) {
+        var btn = '';
+        for (i in lg.logset.logobj) {
+            btn += `<button class="btn" onclick="location.href='/log/${i}'">로그 - ${lg.logset.logobj[i]}</button><br/>`;
+        }
         return mdl.render(req, res, `log`, {
             title: `로그확인`,
             name: null,
-            text: null
+            text: null,
+            btn: btn
         });
     }
     return lg.getlog(req, res, name);

@@ -56,11 +56,7 @@
                 <% } %>
             </p>
             <% if (!data.name) { %>
-                <button class="btn" onclick="location.href='/log/err'">로그 - 에러</button><br/>
-                <button class="btn" onclick="location.href='/log/bot'">로그 - 봇</button><br/>
-                <button class="btn" onclick="location.href='/log/quiz'">로그 - 퀴즈</button><br/>
-                <button class="btn" onclick="location.href='/log/site'">로그 - 사이트</button><br/>
-                <button class="btn" onclick="location.href='/log/selfcheck'">로그 - 자가진단</button><br/>
+                <%- data.btn %>
             <% } %>
         </div>
         <% if (data.name) { %>
