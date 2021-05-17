@@ -389,33 +389,35 @@ async function autoselfcheck(client = new Client, message = new Message, sdb = M
                     };
                 });
                 var uname = (user) ? user.username : udb.name;
-                embed.setTitle(`**\` ${uname} \`**님 자동 자가진단 **${emobj.title}**`)
-                    .setDescription(emobj.desc)
-                    .setFooter(`서버 : ${message.guild.name}`)
-                    .setColor(emobj.color);
-                log.selfchecklog(`${uname} 님 자동 자가진단 ${emobj.title}\n${emobj.desc}`, new Date());
-                try {
-                    user.send(embed);
-                } catch(err) {}
-                try {
-                    var c = message.guild.channels.cache.get(sdb.selfcheck.autochannelid);
-                    if (c) c.send(embed);
-                } catch(err) {}
+                var uid = (user) ? user.id : udb.userID;
+                sendmsg(message, sdb, user, uname, uid, emobj, false);
             } else {
-                embed.setTitle(`**\` ${uname} \`**님 자동 자가진단 **실패**`)
-                    .setDescription(`${uname}님의 정보가 등록되어있지 않습니다.\n${user.username}님이 먼저 **${process.env.prefix}자가진단 설정**을 해주셔야 합니다.`)
-                    .setFooter(`서버 : ${message.guild.name}`)
-                    .setColor('RED');
-                try {
-                    user.send(embed);
-                } catch(err) {}
-                try {
-                    var c = message.guild.channels.cache.get(sdb.selfcheck.autochannelid);
-                    if (c) c.send(embed);
-                } catch(err) {}
+                sendmsg(message, sdb, user, uname, uid, emobj, true);
             }
         });
     }
+}
+
+async function sendmsg(message = new Message, sdb = MDB.object.server, user = new User, uname = '', uid = '', emobj = {}, err = false) {
+    log.selfchecklog(`${uname} 님 자동 자가진단 ${emobj.title}\n${emobj.desc}`, new Date());
+    if (err) {
+        embed.setTitle(`**\` ${uname} \`**님 자동 자가진단 **실패**`)
+            .setDescription(`<@${uid}>님의 정보가 등록되어있지 않습니다.\n${user.username}님이 먼저 **${process.env.prefix}자가진단 설정**을 해주셔야 합니다.`)
+            .setFooter(`서버 : ${message.guild.name}`)
+            .setColor('RED');
+    } else {
+        embed.setTitle(`**\` ${uname} \`**님 자동 자가진단 **${emobj.title}**`)
+            .setDescription(`**\` 유저 \`** : <@${uid}>\n${emobj.desc}`)
+            .setFooter(`서버 : ${message.guild.name}`)
+            .setColor(emobj.color);
+    }
+    try {
+        user.send(embed);
+    } catch(err) {}
+    try {
+        var c = message.guild.channels.cache.get(sdb.selfcheck.autochannelid);
+        if (c) c.send(embed);
+    } catch(err) {}
 }
 
 function msgdelete(m = new Message, t = Number) {
