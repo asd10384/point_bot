@@ -397,11 +397,11 @@ async function autoselfcheck(client = new Client, message = new Message, sdb = M
     }
 }
 
-async function sendmsg(message = new Message, sdb = MDB.object.server, user = new User, uname = '', uid = '', emobj = {}, err = false) {
+async function sendmsg(message = new Message, sdb = MDB.object.server, user, uname = '', uid = '', emobj = {}, err = false) {
     log.selfchecklog(`${uname} 님 자동 자가진단 ${emobj.title}\n${emobj.desc}`, new Date());
     if (err) {
         embed.setTitle(`**\` ${uname} \`**님 자동 자가진단 **실패**`)
-            .setDescription(`<@${uid}>님의 정보가 등록되어있지 않습니다.\n${user.username}님이 먼저 **${process.env.prefix}자가진단 설정**을 해주셔야 합니다.`)
+            .setDescription(`<@${uid}>님의 정보가 등록되어있지 않습니다.\n${uname}님이 먼저 **${process.env.prefix}자가진단 설정**을 해주셔야 합니다.`)
             .setFooter(`서버 : ${message.guild.name}`)
             .setColor('RED');
     } else {
