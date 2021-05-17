@@ -5,13 +5,14 @@
 
 ## Getting Started / 어떻게 시작하나요?
 
-먼저 `.env`파일을 수정하고, `node index.js`명령어로 봇을 실행해 사용하실수 있습니다.
+먼저 `.env`파일을 수정하고, `테스트실행` 명령어로 봇을 실행해 사용하실수 있습니다.
 
 ### Prerequisites / 선행 조건
 
 아래 사항들이 설치가 되어있어야합니다.
 
 ```
+npm
 package.json 참조
 ```
 
@@ -26,6 +27,8 @@ npm install
 ## Running the tests / 테스트의 실행
 
 `node index.js`로 봇을 실행할수있습니다.
+
+`node app.js`로 사이트와 봇을 실행할수있습니다.
 
 ## Deployment / 배포
 
