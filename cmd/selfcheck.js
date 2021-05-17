@@ -342,10 +342,9 @@ async function autocheckinterval(client = new Client, message = new Message, sdb
         }
         if (['토','일'].includes(date.week)) return ;
         if (date.hour == Number(autotime[0]) && date.min == Number(autotime[1]) && date.sec == 0) {
-            return await autoselfcheck(client, message, sdb);
+            await autoselfcheck(client, message, sdb);
         }
     }, 1000);
-    return;
 }
 async function autoselfcheck(client = new Client, message = new Message, sdb = MDB.object.server) {
     var userlist = sdb.selfcheck.autocheck;
