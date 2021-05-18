@@ -394,12 +394,12 @@ function bignum(num=1) {
 async function allmsgdelete(client = new Client, sdb = MDB.object.server, time = Number || 50) {
     try {
         var c = client.channels.cache.get(sdb.quiz.qzchannelid);
-        setTimeout(() => {
-            c.messages.fetch({ after: sdb.quiz.msg.npid }).then(function(msg) {
+        setTimeout(async function() {
+            await c.messages.fetch({ after: sdb.quiz.msg.npid }).then(function(msg) {
                 if (msg.size <= 1) return;
-                c.bulkDelete(msg.size);
+                await c.bulkDelete(msg.size);
             });
-        }, Math.floor(time));
+        }, time);
     } catch(err) {
         return;
     }
