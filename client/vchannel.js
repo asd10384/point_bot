@@ -25,7 +25,7 @@ async function vchanneljoin (client = new Client, vc = new VoiceState) {
         } else {
             for (i in sdb.autovch.set) {
                 if (sdb.autovch.set[i]['vc'] === vc.channelID) {
-                    vc.guild.channels.create(`${vc.member.user.username} - 음성채널`, {
+                    vc.guild.channels.create(eval(process.env.AUTOVCHANNELNAME), {
                         type: 'voice',
                         parent: sdb.autovch.set[i]['cart'],
                         userLimit: sdb.autovch.set[i]['lim'],
