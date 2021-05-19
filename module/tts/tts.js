@@ -45,8 +45,6 @@ async function tts(client = new Client, message = new Message, args = Array, sdb
 
         if (url.url == 'youtubelinkerror') {
             return message.channel.send(yterr).then(m => msgdelete(m, Number(process.env.deletetime)));
-        } else {
-            message.delete();
         }
         if (sdb.tts.tts) {
             db.set(`db.${message.guild.id}.tts.timertime`, 600);
@@ -84,6 +82,7 @@ async function geturl(message = new Message, text = String, options = Object) {
                 volume: 0.08
             };
             var yt = ytdl(`https://youtu.be/${text.replace(checkytid, '')}`, { bitrate: 512000 });
+            message.delete();
             return {
                 url: yt,
                 options: options,
