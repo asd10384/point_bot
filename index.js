@@ -137,10 +137,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
     await reac(client, reaction, user);
 });
 
-const { vchanneljoin, vchannelleave } = require('./client/vchannel');
+const { vchanneljoin, vchannelleave, vchanneldelete } = require('./client/vchannel');
 client.on('voiceStateUpdate', async (old, now) => {
     if (old) await vchannelleave(client, old);
     if (now) return await vchanneljoin(client, now);
+});
+client.on('channelDelete', async (channel) => {
+    return vchanneldelete(client, channel);
 });
 
 module.exports = {

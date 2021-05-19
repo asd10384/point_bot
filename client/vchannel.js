@@ -1,6 +1,6 @@
 
 require('dotenv').config();
-const { Client, MessageEmbed, Message, VoiceState } = require('discord.js');
+const { Client, MessageEmbed, Message, VoiceState, Channel } = require('discord.js');
 const db = require('quick.db');
 const MDB = require('../MDB/data');
 const log = require('../log/log');
@@ -9,6 +9,7 @@ const sdata = MDB.module.server();
 module.exports = {
     vchanneljoin,
     vchannelleave,
+    vchanneldelete,
 };
 
 async function vchanneljoin (client = new Client, vc = new VoiceState) {
@@ -60,6 +61,30 @@ async function vchannelleave (client = new Client, vc = new VoiceState) {
                     vc.channel.delete();
                 }
             }
+        }
+    });
+}
+
+async function vchanneldelete (client = new Client, ch = new Channel) {
+    await sdata.findOne({
+        serverid: ch.guild.id
+    }, async (err, db1) => {
+        var sdb = MDB.object.server;
+        sdb = db1;
+        if (err) log.errlog(err);
+        if (!sdb) {
+            await MDB.set.server(ch);
+            return await vchanneljoin(client, ch);
+        } else {
+            for (i in sdb.autovch.set) {
+                if (sdb.autovch.set[i]['cart'] === ch.id || sdb.autovch.set[i]['vc'] === ch.id) {
+                    sdb.autovch.set.pop(i);
+                }
+            }
+            if (sdb.autovch.make.includes(ch.id)) {
+                sdb.autovch.make.pop(sdb.autovch.make.indexOf(vc.channelID));
+            }
+            sdb.save().catch((err) => log.errlog(err));
         }
     });
 }
