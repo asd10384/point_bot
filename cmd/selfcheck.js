@@ -216,7 +216,7 @@ module.exports = {
                         **[5] : 비밀번호** (ex:1111) (자가진단 비밀번호)
                     `)
                     .setColor('ORANGE');
-                return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*3));
+                return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*8));
             }
             if (args[0] == '확인') {
                 if (args[1]) {
