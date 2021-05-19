@@ -67,7 +67,10 @@ module.exports = {
                         if (sdb.autovch.set[i]['vc'] === vc.id) sdb.autovch.set.pop(i);
                         sdb.save().catch((err) => log.errlog(err));
                         return message.channel.send(
-                            embed.setTitle(`**${vc.name}채널 제거완료**`)
+                            embed.setTitle(`**채널 제거완료**`)
+                            .setDescription(`
+                                \` 제거한 채널이름 \` : ${vc.name}
+                            `)
                             .setFooter(`${pp}자동음성채널 확인`)
                         ).then(m => msgdelete(m, Number(process.env.deletetime)*2));
                     }
@@ -92,11 +95,12 @@ module.exports = {
                         if (Number(args[2]) >= 0 && Number(args[2] < 100)) {
                             sdb.autovch.set.push({cart: vc.parentID, vc: args[1], lim: Number(args[2])});
                             sdb.save().catch((err) => log.errlog(err));
-                            embed.setTitle(`자동음성채널 등록 성공`)
+                            embed.setTitle(`**자동음성채널 등록 성공**`)
                                 .setDescription(`
                                     \` 등록한 채널이름 \` : **${vc.name}**
-                                    \` 유저수  \` : ${(Number(args[2]) == 0) ? '제한없음' : `${Number(args[2])}명`}
-                                `);
+                                    \` 유저수 \` : ${(Number(args[2]) == 0) ? '제한없음' : `${Number(args[2])}명`}
+                                `)
+                                .setFooter(`${pp}자동음성채널 확인`);
                             return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*2));
                         }
                         return emerr(message, pp, `멤버수는 0이상 100미만 까지 설정하실수 있습니다.\n(0은 제한없음)`);
