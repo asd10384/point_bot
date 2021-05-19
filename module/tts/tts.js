@@ -45,6 +45,8 @@ async function tts(client = new Client, message = new Message, args = Array, sdb
 
         if (url.url == 'youtubelinkerror') {
             return message.channel.send(yterr).then(m => msgdelete(m, Number(process.env.deletetime)));
+        } else {
+            message.delete();
         }
         if (sdb.tts.tts) {
             db.set(`db.${message.guild.id}.tts.timertime`, 600);
@@ -81,9 +83,9 @@ async function geturl(message = new Message, text = String, options = Object) {
             options = {
                 volume: 0.08
             };
-            message.delete();
+            var yt = ytdl(`https://youtu.be/${text.replace(checkytid, '')}`, { bitrate: 512000 });
             return {
-                url: ytdl(`https://youtu.be/${text.replace(checkytid, '')}`, { bitrate: 512000 }),
+                url: yt,
                 options: options,
                 text: false,
             };
@@ -122,6 +124,7 @@ function msg (text = '') {
         'ㅎㅇ':'하이',
         'ㅇㅋ':'오키'
     };
+    text = text.replace(/<@\!?[(0-9)]{18}>/, '');
     for (i in repobj) {
         if (text.includes(i)) text = text.split(i).join(repobj[i]);
     }

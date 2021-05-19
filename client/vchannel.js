@@ -56,9 +56,9 @@ async function vchannelleave (client = new Client, vc = new VoiceState) {
         } else {
             if (sdb.autovch.make.includes(vc.channelID)) {
                 if (vc.channel.members.size <= 0) {
+                    vc.channel.delete();
                     sdb.autovch.make.pop(sdb.autovch.make.indexOf(vc.channelID));
                     sdb.save().catch((err) => log.errlog(err));
-                    vc.channel.delete();
                 }
             }
         }
