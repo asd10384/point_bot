@@ -93,15 +93,18 @@ module.exports = {
                         if (Number(args[2]) >= 0 && Number(args[2] < 100)) {
                             sdb.autovch.set.push({cart: vc.parentID, vc: args[1], lim: Number(args[2])});
                             sdb.save().catch((err) => log.errlog(err));
-                            return message.channel.send(
-                                embed.setTitle(`자동음성채널에 \` **${vc.name}** \` 을 추가했습니다.`)
-                            ).then(m => msgdelete(m, Number(process.env.deletetime)*2));
+                            embed.setTitle(`자동음성채널 등록 성공`)
+                                .setDescription(`
+                                    \` 등록한 채널이름 \` : **${vc.name}**
+                                    \` 유저수  \` : ${(Number(args[2]) == 0) ? '제한없음' : `${Number(args[2])}명`}
+                                `);
+                            return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*2));
                         }
-                        return emerr(message, pp, `멤버수는 0이상 100미만 까지 설정하실수 있습니다.\n(0은 무한)`);
+                        return emerr(message, pp, `멤버수는 0이상 100미만 까지 설정하실수 있습니다.\n(0은 제한없음)`);
                     }
                     return emerr(message, pp, `멤버수는 숫자만 사용할수 있습니다.`);
                 }
-                return emerr(message, pp, `멤버수를 입력해주세요.\n(0은 무한)`);
+                return emerr(message, pp, `멤버수를 입력해주세요.\n(0은 제한없음)`);
             }
             return emerr(message, pp, `음성채널을 찾을수없습니다.`);
         }
@@ -125,7 +128,7 @@ async function help(message = new Message, pp = '') {
             ${pp}자동음성채널 확인 : 설정 확인
             ${pp}자동음성채널 등록 [음성채널아이디] [멤버수]
              : 등록한 음성채널에 유저가 들어가면 따로 음성채널방을 생성합니다.
-             : 멤버수는 숫자로만 쓸수있습니다. (0 은 무한)
+             : 멤버수는 숫자로만 쓸수있습니다. (0 은 제한없음)
              : (등록할 음성채널은 꼭 카테고리안에 있어야합니다.)
             ${pp}자동음성채널 제거 [음성채널아이디]
              : 등록한 음성채널을 등록취소합니다.
