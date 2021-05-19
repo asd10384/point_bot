@@ -51,8 +51,7 @@ module.exports = {
             for (i in sdb.autovch.set) {
                 cart = message.guild.channels.cache.get(sdb.autovch.set[i]['cart']);
                 vc = message.guild.channels.cache.get(sdb.autovch.set[i]['vc']);
-                console.log(cart);
-                text += `${cart.name} **->** ${vc.name}\n`;
+                text += `**카테고리** : ${cart.name}\n**채널이름** : ${vc.name}\n\n`;
             }
             return message.channel.send(
                 embed.setTitle(`**자동음성채널 확인**`)
