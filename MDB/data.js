@@ -86,6 +86,10 @@ const out = {
                 autocheck: Array,
             },
             role: Array,
+            autovch: {
+                set: Array,
+                make: Array,
+            },
         },
         patchnote: {
             type: String,
@@ -182,6 +186,11 @@ async function set_server(message = new Message) {
         tts: {
             ttschannelid: '',
             tts: true,
+        },
+        role: [],
+        autovch: {
+            set: [],
+            make: [],
         },
     });
     return newdata.save().catch(err => log.errlog(err));

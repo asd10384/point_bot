@@ -137,6 +137,12 @@ client.on('messageReactionAdd', async (reaction, user) => {
     await reac(client, reaction, user);
 });
 
+const { vchanneljoin, vchannelleave } = require('./client/vchannel');
+client.on('voiceStateUpdate', async (old, now) => {
+    if (old) await vchannelleave(client, old);
+    if (now) return await vchanneljoin(client, now);
+});
+
 module.exports = {
     client,
 };
