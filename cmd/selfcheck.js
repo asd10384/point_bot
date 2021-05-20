@@ -400,13 +400,15 @@ async function sendmsg(message = new Message, sdb = MDB.object.server, user, una
     log.selfchecklog(`${uname} 님 자동 자가진단 ${emobj.title}\n${emobj.desc}`, new Date());
     if (err) {
         embed.setTitle(`**\` ${uname} \`**님 자동 자가진단 **실패**`)
+            .setAuthor(`서버 : ${message.guild.name}`, message.guild.iconURL())
             .setDescription(`<@${uid}>님의 정보가 등록되어있지 않습니다.\n${uname}님이 먼저 **${process.env.prefix}자가진단 설정**을 해주셔야 합니다.`)
-            .setFooter(`서버 : ${message.guild.name}`)
+            .setFooter(`${process.env.prefix}자가진단 자동`)
             .setColor('RED');
     } else {
-        embed.setTitle(`**\` ${uname} \`**님 자동 자가진단 **${emobj.title}**`)
+        embed.setTitle(`**\` ${uname} \`**님 자동 자가진단 **성공**`)
+            .setAuthor(`서버 : ${message.guild.name}`, message.guild.iconURL())
             .setDescription(`**\` 유저 \`** : <@${uid}>\n${emobj.desc}`)
-            .setFooter(`서버 : ${message.guild.name}`)
+            .setFooter(`자동자가진단 시간 : ${eval(process.env.autoselfcheck).join('시 ')}분`)
             .setColor(emobj.color);
     }
     try {
@@ -445,6 +447,7 @@ async function check(message = new Message, embed = new MessageEmbed, username =
 
             ${text}
         `)
+        .setFooter(`자동자가진단 시간 : ${eval(process.env.autoselfcheck).join('시 ')}분`)
         .setColor('ORANGE');
     return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*2));
 }
