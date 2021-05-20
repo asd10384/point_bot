@@ -388,9 +388,9 @@ async function autoselfcheck(client = new Client, message = new Message, sdb = M
                     };
                 });
                 var uname = (user) ? user.username : udb.name;
-                sendmsg(message, sdb, user, uname, udb.userID, emobj, false);
+                sendmsg(message, sdb, user, uname, userlist[i], emobj, false);
             } else {
-                sendmsg(message, sdb, user, uname, udb.userID, emobj, true);
+                sendmsg(message, sdb, user, uname, userlist[i], emobj, true);
             }
         });
     }
