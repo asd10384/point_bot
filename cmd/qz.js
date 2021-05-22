@@ -32,11 +32,11 @@ const per = new MessageEmbed()
     .setTitle(`이 명령어를 사용할 권한이 없습니다.`)
     .setColor('RED');
 const vchannelerr = new MessageEmbed()
-    .setTitle(`**음악퀴즈 오류**`)
+    .setTitle(`**퀴즈 오류**`)
     .setDescription(`음성채널에 들어간 뒤 사용해주세요.`)
     .setColor('RED');
 const emerr = new MessageEmbed()
-    .setTitle(`**음악퀴즈 오류**`)
+    .setTitle(`**퀴즈 오류**`)
     .setColor('RED');
 
 module.exports = {
@@ -61,9 +61,9 @@ module.exports = {
                 return await quiz.start(client, message, args, sdb, vchannel, user);
             } else {
                 emerr.setDescription(`
-                    이미 음악퀴즈 시작을 입력하셨습니다.
+                    이미 퀴즈 시작을 입력하셨습니다.
 
-                    **${process.env.prefix}음악퀴즈 종료**
+                    **${process.env.prefix}퀴즈 종료**
                     를 입력하신뒤 다시 시도해주세요.
                 `);
                 return message.channel.send(emerr).then(m => msgdelete(m, Number(process.env.deletetime)));
@@ -88,7 +88,7 @@ module.exports = {
         }
         if (args[0] == '도움말' || args[0] == '명령어' || args[0] == 'help' || args[0] == 'info') {
             const help = new MessageEmbed()
-                .setTitle(`**음악퀴즈 도움말**`)
+                .setTitle(`**퀴즈 도움말**`)
                 .setDescription(`
                     \` 명령어 \`
                     ${pp}퀴즈 시작 : 퀴즈를 시작합니다.

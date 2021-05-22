@@ -236,7 +236,7 @@ async function start_em(client = new Client, message = new Message, args = Array
                         
                     (아래 이모지가 전부 로딩된 뒤 선택해주세요.)
                 `)
-                .setFooter(`기본 명령어 : ${process.env.prefix}음악퀴즈 도움말`)
+                .setFooter(`기본 명령어 : ${process.env.prefix}퀴즈 도움말`)
                 .setColor('ORANGE');
             try {
                 var c = client.channels.cache.get(data.qzchannelid);
