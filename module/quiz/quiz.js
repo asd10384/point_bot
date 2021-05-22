@@ -539,7 +539,7 @@ async function getimg(client = new Client, message = new Message, args = Array, 
             link.push(dflink[r]);
             logtext += `${i+1}. ${dfvocal[r]}-${dfname[r]} [${r+1}]\n`;
         }
-        log.quizlog(message, text, new Date());
+        log.quizlog(message, logtext, new Date());
         var img = sdb.quiz;
         img.quiz.name = name;
         img.quiz.vocal = vocal;
