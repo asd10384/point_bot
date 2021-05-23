@@ -92,6 +92,12 @@ module.exports = {
                     if (args[3]) {
                         if (!isNaN(args[3])) {
                             if (Number(args[3]) >= 0 && Number(args[3] < 100)) {
+                                for (i in sdb.autovch.set) {
+                                    var obj = sdb.autovch.set[i];
+                                    if (obj.vc === args[2]) {
+                                        return emerr(message, pp, `이 음성채널은 이미 등록되어있습니다.`);
+                                    }
+                                }
                                 sdb.autovch.set.push({cart: args[1], vc: args[2], lim: Number(args[3])});
                                 sdb.save().catch((err) => log.errlog(err));
                                 embed.setTitle(`**자동음성채널 등록 성공**`)
