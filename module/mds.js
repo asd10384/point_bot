@@ -25,7 +25,7 @@ function now_date(time = new Date) {
     if (hour >= 24) {
         hour = hour - 24;
         wday++;
-        week = (wday >= 6) ? weeklist[wday-6] : weeklist[wday];
+        week = (wday > 6) ? weeklist[wday-6] : weeklist[wday];
     }
     var nowtime = {
         'year': year,

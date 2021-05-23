@@ -323,7 +323,7 @@ module.exports = {
     autocheckinterval: autocheckinterval,
 };
 async function autocheckinterval(client = new Client, message = new Message, sdb = MDB.object.server) {
-    const timer = setInterval(async function() {
+    setInterval(async function() {
         var autotime = eval(process.env.autoselfcheck);
         var date = format.nowdate(new Date());
         var checktimer = db.get(`db.${message.guild.id}.selfcheck.timerstatus`);
@@ -340,15 +340,16 @@ async function autocheckinterval(client = new Client, message = new Message, sdb
                     .then(m => msgdelete(m, Number(process.env.deletetime)*3));
             }
         }
-        if (['토','일'].includes(date.week)) return ;
-        if (date.hour == Number(autotime[0]) && date.min == Number(autotime[1]) && date.sec == 0) {
-            await autoselfcheck(client, message, sdb);
+        if (!(['토','일'].includes(date.week))) {
+            if (date.hour == Number(autotime[0]) && date.min == Number(autotime[1]) && date.sec == 0) {
+                await autoselfcheck(client, message, sdb);
+            }
         }
     }, 1000);
 }
 async function autoselfcheck(client = new Client, message = new Message, sdb = MDB.object.server) {
     var userlist = sdb.selfcheck.autocheck;
-    for (i = 0; i<userlist.length; i++) {
+    for (i in userlist) {
         var user = client.users.cache.get(userlist[i]) || undefined;
         udata.findOne({
             userID: userlist[i]
@@ -359,7 +360,6 @@ async function autoselfcheck(client = new Client, message = new Message, sdb = M
             if (!udb) {
                 if (user) {
                     await MDB.set.user(user);
-                    clearInterval(timer);
                     return await autocheckinterval(client, message, sdb);
                 }
             }
@@ -388,9 +388,10 @@ async function autoselfcheck(client = new Client, message = new Message, sdb = M
                     };
                 });
                 var uname = (user) ? user.username : udb.name;
-                sendmsg(message, sdb, user, uname, userlist[i], emobj, false);
+                var uid = (user) ? user.id : udb.userID;
+                sendmsg(message, sdb, user, uname, uid, emobj, false);
             } else {
-                sendmsg(message, sdb, user, uname, userlist[i], emobj, true);
+                sendmsg(message, sdb, user, uname, uid, emobj, true);
             }
         });
     }
