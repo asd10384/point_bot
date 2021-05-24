@@ -15,6 +15,16 @@ const lg = require('./lg');
 
 const account = eval(process.env.ACCOUNT)[0];
 
+// http -> https
+router.all('*', async (req, res, next) => {
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    if (protocol == 'https' || req.hostname == 'localhost') {
+        next();
+    } else {
+        res.redirect(`https://${req.hostname}${req.url}`);
+    }
+});
+
 /* 페이지 이동 */
 router.get('/', async function(req, res) {
     req.session.login = false;
