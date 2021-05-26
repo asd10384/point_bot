@@ -152,7 +152,7 @@ module.exports = {
                     return message.channel.send(emerr).then(m => msgdelete(m, Number(process.env.deletetime)));
                 }
                 var t = `활성화`;
-                if (sdb.selfcheck.autocheck.includes(message.member.user.id)) {
+                if (sdb.selfcheck.autocheck.indexOf(message.member.user.id) > -1) {
                     sdb.selfcheck.autocheck.pop(sdb.selfcheck.autocheck.indexOf(message.member.user.id));
                     t = `비` + t;
                 } else {
