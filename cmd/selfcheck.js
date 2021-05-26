@@ -27,6 +27,8 @@ module.exports = {
         }
         // if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, Number(process.env.deletetime)));
 
+        const mandl = MDB.module.mandl();
+
         udata.findOne({
             userID: user.id
         }, async (err, db1) => {
@@ -96,14 +98,19 @@ module.exports = {
             if (args[0] == '자동' || args[0] == 'auto') {
                 if (args[1] == '확인' || args[1] == 'check') {
                     if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, Number(process.env.deletetime)));
-                    var text = '';
-                    for (i of sdb.selfcheck.autocheck) {
-                        text += `<@${i}>\n`;
-                    }
-                    embed.setTitle(`**자동 자가진단**`)
-                        .setDescription(`**유저 확인**\n${(text == '') ? `없음` : text}`)
-                        .setFooter(`도움말 : ${process.env.prefix}자가진단 도움말`);
-                    return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*2+2000));
+                    
+                    return await mandl.find({type: 'autoselfcheck', guildid: message.guild.id}).then(async (obj) => {
+                        var text = '';
+                        for (i in obj) {
+                            var mdb = MDB.object.mandl;
+                            mdb = obj[i];
+                            text += `<@${mdb.id}>\n`;
+                        }
+                        embed.setTitle(`**자동 자가진단**`)
+                            .setDescription(`**유저 확인**\n${(text == '') ? `없음` : text}`)
+                            .setFooter(`도움말 : ${process.env.prefix}자가진단 도움말`);
+                        return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*2+2000));
+                    });
                 }
                 if (args[1] == '실행' || args[1] == 'start' || args[1] == '시작') {
                     if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, Number(process.env.deletetime)));
@@ -152,28 +159,40 @@ module.exports = {
                     return message.channel.send(emerr).then(m => msgdelete(m, Number(process.env.deletetime)));
                 }
                 var t = `활성화`;
-                if (sdb.selfcheck.autocheck.indexOf(message.member.user.id) > -1) {
-                    sdb.selfcheck.autocheck.pop(sdb.selfcheck.autocheck.indexOf(message.member.user.id));
-                    t = `비` + t;
-                } else {
-                    sdb.selfcheck.autocheck.push(message.member.user.id);
-                }
-                sdb.save().catch((err) => log.errlog(err));
-                embed.setTitle(`**자동 자가진단**`)
-                    .setDescription(`
-                        **${message.member.user.username}** 님의 자동 자가진단이
-                        **  ${t}** 되었습니다.
-
-                        자동 자가진단은 매일 **오전 ${autotime[0]}시 ${autotime[1]}분** 마다
-                        실행됩니다.  ([토, 일] 요일 제외)
-
-                        자동 자가진단 성공 또는 실패 메세지도
-                        이 메시지와 같이 DM 으로 날아옵니다.
-                    `)
-                    .setFooter(`도움말 : ${process.env.prefix}자가진단 도움말`);
-                return user.send(embed).catch(() => {
-                    message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*3));
-                }).then(m => msgdelete(m, Number(process.env.deletetime)*3));
+                return await mandl.find({type: 'autoselfcheck', guildid: message.guild.id}).then(async (obj) => {
+                    for (i in obj) {
+                        var mdb = MDB.object.mandl;
+                        mdb = obj[i];
+                        if (mdb.id === message.member.user.id) {
+                            await mandl.findOneAndDelete({type: 'autoselfcheck', guildid: message.guild.id, id: message.member.user.id});
+                            t = `비` + t;
+                            break;
+                        }
+                    }
+                    if (t === '활성화') {
+                        new mandl({
+                            type: 'autoselfcheck',
+                            guildid: message.guild.id,
+                            id: message.member.user.id,
+                            name: message.member.user.username
+                        }).save();
+                    }
+                    embed.setTitle(`**자동 자가진단**`)
+                        .setDescription(`
+                            **${message.member.user.username}** 님의 자동 자가진단이
+                            **  ${t}** 되었습니다.
+    
+                            자동 자가진단은 매일 **오전 ${autotime[0]}시 ${autotime[1]}분** 마다
+                            실행됩니다.  ([토, 일] 요일 제외)
+    
+                            자동 자가진단 성공 또는 실패 메세지도
+                            이 메시지와 같이 DM 으로 날아옵니다.
+                        `)
+                        .setFooter(`도움말 : ${process.env.prefix}자가진단 도움말`);
+                    return user.send(embed).catch(() => {
+                        message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*3));
+                    }).then(m => msgdelete(m, Number(process.env.deletetime)*3));
+                });
             }
             if (args[0] == '설정') {
                 if (args[1]) {
@@ -348,53 +367,55 @@ async function autocheckinterval(client = new Client, message = new Message, sdb
     }, 1000);
 }
 async function autoselfcheck(client = new Client, message = new Message, sdb = MDB.object.server) {
-    var userlist = sdb.selfcheck.autocheck;
-    for (i in userlist) {
-        var user = client.users.cache.get(userlist[i]) || undefined;
-        udata.findOne({
-            userID: userlist[i]
-        }, async (err, db1) => {
-            var udb = MDB.object.user;
-            udb = db1;
-            if (err) log.errlog(err);
-            if (!udb) {
-                if (user) {
-                    await MDB.set.user(user);
-                    return await autocheckinterval(client, message, sdb);
+    return await mandl.find({type: 'autoselfcheck', guildid: message.guild.id}).then(async (obj) => {
+        for (i in obj) {
+            var mdb = MDB.object.mandl;
+            mdb = obj[i];
+
+            var user = client.users.cache.get(mdb.id) || undefined;
+            udata.findOne({
+                userID: mdb.id
+            }, async (err, db1) => {
+                var udb = MDB.object.user;
+                udb = db1;
+                if (err) log.errlog(err);
+                if (!udb) {
+                    if (user) {
+                        await MDB.set.user(user);
+                        return await autocheckinterval(client, message, sdb);
+                    }
                 }
-            }
-            var sc = udb.selfcheck;
-            var emobj;
-            if (sc.name || sc.password) {
-                emobj = await hcs({
-                    area: sc.area,
-                    school: sc.school,
-                    name: sc.name,
-                    birthday: sc.birthday,
-                    password: sc.password
-                }).then((result) => {
-                    return {
-                        title: `성공`,
-                        desc: `**\` 시간 \`** : ${result.inveYmd}`,
-                        time: result.inveYmd,
-                        color: `ORANGE`,
-                    };
-                }).catch(() => {
-                    return {
-                        title: `실패`,
-                        desc: `\` ${process.env.prefix}자가진단 확인 \`으로\n입력사항에 오류가있는지 확인해주세요.`,
-                        time: undefined,
-                        color: `RED`,
-                    };
-                });
-                var uname = (user) ? user.username : udb.name;
-                var uid = (user) ? user.id : udb.userID;
-                sendmsg(message, sdb, user, uname, uid, emobj, false);
-            } else {
-                sendmsg(message, sdb, user, uname, uid, emobj, true);
-            }
-        });
-    }
+                var sc = udb.selfcheck;
+                var emobj;
+                if (sc.name || sc.password) {
+                    emobj = await hcs({
+                        area: sc.area,
+                        school: sc.school,
+                        name: sc.name,
+                        birthday: sc.birthday,
+                        password: sc.password
+                    }).then((result) => {
+                        return {
+                            title: `성공`,
+                            desc: `**\` 시간 \`** : ${result.inveYmd}`,
+                            time: result.inveYmd,
+                            color: `ORANGE`,
+                        };
+                    }).catch(() => {
+                        return {
+                            title: `실패`,
+                            desc: `\` ${process.env.prefix}자가진단 확인 \`으로\n입력사항에 오류가있는지 확인해주세요.`,
+                            time: undefined,
+                            color: `RED`,
+                        };
+                    });
+                    sendmsg(message, sdb, user, mdb.name, mdb.id, emobj, false);
+                } else {
+                    sendmsg(message, sdb, user, mdb.name, mdb.id, emobj, true);
+                }
+            });
+        }
+    });
 }
 
 async function sendmsg(message = new Message, sdb = MDB.object.server, user, uname = '', uid = '', emobj = {}, err = false) {

@@ -4,6 +4,7 @@ const db = require('quick.db');
 const { MessageEmbed, Client, Message, User } = require('discord.js');
 const MDB = require('../MDB/data');
 const log = require('../log/log');
+const mandl = MDB.module.mandl();
 
 /*
 const MDB = require('../../MDB/data');
@@ -46,35 +47,49 @@ module.exports = {
             return help(message, pp);
         }
         if (args[0] == '확인') {
-            var text = '';
-            var cart, vc;
-            for (i in sdb.autovch.set) {
-                cart = message.guild.channels.cache.get(sdb.autovch.set[i]['cart']);
-                vc = message.guild.channels.cache.get(sdb.autovch.set[i]['vc']);
-                text += `**카테고리** : ${cart.name}\n**채널이름** : ${vc.name}\n\n`;
-            }
-            return message.channel.send(
-                embed.setTitle(`**자동음성채널 확인**`)
-                .setDescription((text == '') ? '없음' : text)
-                .setFooter(`${pp}자동음성채널 도움말`)
-            ).then(m => msgdelete(m, Number(process.env.deletetime)*3));
+            return await mandl.find({type: 'vchannel', guildid: message.guild.id}).then(async (obj) => {
+                var text = '';
+                var cart, vc;
+                for (i in obj) {
+                    var mdb = MDB.object.mandl;
+                    mdb = obj[i];
+
+                    if (mdb.vc[0].type === 'set') {
+                        cart = message.guild.channels.cache.get(mdb.vc.cart);
+                        vc = message.guild.channels.cache.get(mdb.id);
+                        text += `**카테고리** : <#${mdb.vc.cart}>\n**채널이름** : <#${mdb.id}>\n\n`;
+                    }
+                }
+                return message.channel.send(
+                    embed.setTitle(`**자동음성채널 확인**`)
+                    .setDescription((text == '') ? '없음' : text)
+                    .setFooter(`${pp}자동음성채널 도움말`)
+                ).then(m => msgdelete(m, Number(process.env.deletetime)*3));
+            });
         }
         if (args[0] == '삭제' || args[0] == '제거') {
             if (args[1]) {
                 var vc = message.guild.channels.cache.get(args[1]);
                 if (vc) {
-                    for (i in sdb.autovch.set) {
-                        if (sdb.autovch.set[i]['vc'] === vc.id) sdb.autovch.set.pop(i);
-                        sdb.save().catch((err) => log.errlog(err));
-                        return message.channel.send(
-                            embed.setTitle(`**채널 제거완료**`)
-                            .setDescription(`
-                                \` 제거한 채널이름 \` : ${vc.name}
-                            `)
-                            .setFooter(`${pp}자동음성채널 확인`)
-                        ).then(m => msgdelete(m, Number(process.env.deletetime)*2));
-                    }
-                    return emerr(message, pp, `등록되지 않은 채널입니다.`);
+                    return await mandl.find({type: 'vchannel', guildid: message.guild.id}).then(async (obj) => {
+                        for (i in obj) {
+                            var mdb = MDB.object.mandl;
+                            mdb = obj[i];
+        
+                            if (mdb.vc[0].type === 'set' && mdb.id === vc.id) {
+                                await mandl.findOneAndDelete({type: 'vchannel', guildid: message.guild.id, vc: {type: 'set'}});
+                                return message.channel.send(
+                                    embed.setTitle(`**채널 제거완료**`)
+                                    .setDescription(`
+                                        \` 제거한 채널이름 \` : ${vc.name}
+                                    `)
+                                    .setFooter(`${pp}자동음성채널 확인`)
+                                ).then(m => msgdelete(m, Number(process.env.deletetime)*2));
+                            }
+                            return emerr(message, pp, `등록되지 않은 채널입니다.`);
+                        }
+                        return emerr(message, pp, `채널을 찾을수 없습니다.`);
+                    });
                 }
                 return emerr(message, pp, `채널을 찾을수 없습니다.`);
             }
@@ -92,21 +107,34 @@ module.exports = {
                     if (args[3]) {
                         if (!isNaN(args[3])) {
                             if (Number(args[3]) >= 0 && Number(args[3] < 100)) {
-                                for (i in sdb.autovch.set) {
-                                    var obj = sdb.autovch.set[i];
-                                    if (obj.vc === args[2]) {
-                                        return emerr(message, pp, `이 음성채널은 이미 등록되어있습니다.`);
+                                return await mandl.find({type: 'vchannel', guildid: message.guild.id}).then(async (obj) => {
+                                    for (i in obj) {
+                                        var mdb = MDB.object.mandl;
+                                        mdb = obj[i];
+
+                                        if (mdb.vc[0].type === 'set' && mdb.id === args[2]) {
+                                            emerr(message, pp, `이 음성채널은 이미 등록되어있습니다.`);
+                                            break;
+                                        }
                                     }
-                                }
-                                sdb.autovch.set.push({cart: args[1], vc: args[2], lim: Number(args[3])});
-                                sdb.save().catch((err) => log.errlog(err));
-                                embed.setTitle(`**자동음성채널 등록 성공**`)
-                                    .setDescription(`
-                                        \` 등록한 채널이름 \` : **${vc.name}**
-                                        \` 유저수 \` : ${(Number(args[3]) == 0) ? '제한없음' : `${Number(args[3])}명`}
-                                    `)
-                                    .setFooter(`${pp}자동음성채널 확인`);
-                                return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*2));
+                                    new mandl({
+                                        type: 'vchannel',
+                                        id: args[2],
+                                        guildid: message.guild.id,
+                                        vc: [{
+                                            type: 'set',
+                                            cart: args[1],
+                                            lim: args[3]
+                                        }]
+                                    }).save();
+                                    embed.setTitle(`**자동음성채널 등록 성공**`)
+                                        .setDescription(`
+                                            \` 등록한 채널이름 \` : **${vc.name}**
+                                            \` 유저수 \` : ${(Number(args[3]) == 0) ? '제한없음' : `${Number(args[3])}명`}
+                                        `)
+                                        .setFooter(`${pp}자동음성채널 확인`);
+                                    return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*2));
+                                });
                             }
                             return emerr(message, pp, `멤버수는 0이상 100미만 까지 설정하실수 있습니다.\n(0은 제한없음)`);
                         }

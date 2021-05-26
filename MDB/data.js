@@ -14,6 +14,7 @@ const out = {
         user: module_user,
         server: module_server,
         patchnote: module_patchnote,
+        mandl: module_mandl,
     },
     set: {
         user: set_user,
@@ -83,7 +84,6 @@ const out = {
             selfcheck: {
                 channelid: String,
                 autochannelid: String,
-                autocheck: Array,
             },
             role: Array,
             autovch: {
@@ -98,6 +98,13 @@ const out = {
             day: String,
             text: String,
         },
+        mandl: {
+            type: String,
+            id: String,
+            name: String,
+            guildid: String,
+            vc: Array
+        }
     },
 };
 
@@ -114,6 +121,10 @@ function module_server() {
 function module_patchnote() {
     var dataSchema = Schema(out.object.patchnote);
     return models.Mandl_patchnote || model('Mandl_patchnote', dataSchema);
+}
+function module_mandl() {
+    var dataSchema = Schema(out.object.mandl);
+    return models.Mandl_mandl || model('Mandl_mandl', dataSchema);
 }
 
 async function set_user(user = new User) {
@@ -181,7 +192,6 @@ async function set_server(message = new Message) {
         selfcheck: {
             channelid: '',
             autochannelid: '',
-            autocheck: [],
         },
         tts: {
             ttschannelid: '',
