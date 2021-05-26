@@ -379,36 +379,35 @@ async function autoselfcheck(client = new Client, message = new Message, sdb = M
                 var udb = MDB.object.user;
                 udb = db1;
                 if (err) log.errlog(err);
-                if (!udb) {
-                    continue;
-                }
-                var sc = udb.selfcheck;
-                var emobj;
-                if (sc.name || sc.password) {
-                    emobj = await hcs({
-                        area: sc.area,
-                        school: sc.school,
-                        name: sc.name,
-                        birthday: sc.birthday,
-                        password: sc.password
-                    }).then((result) => {
-                        return {
-                            title: `성공`,
-                            desc: `**\` 시간 \`** : ${result.inveYmd}`,
-                            time: result.inveYmd,
-                            color: `ORANGE`,
-                        };
-                    }).catch(() => {
-                        return {
-                            title: `실패`,
-                            desc: `\` ${process.env.prefix}자가진단 확인 \`으로\n입력사항에 오류가있는지 확인해주세요.`,
-                            time: undefined,
-                            color: `RED`,
-                        };
-                    });
-                    sendmsg(message, sdb, user, mdb.name, mdb.id, emobj, false);
-                } else {
-                    sendmsg(message, sdb, user, mdb.name, mdb.id, emobj, true);
+                if (udb) {
+                    var sc = udb.selfcheck;
+                    var emobj;
+                    if (sc.name || sc.password) {
+                        emobj = await hcs({
+                            area: sc.area,
+                            school: sc.school,
+                            name: sc.name,
+                            birthday: sc.birthday,
+                            password: sc.password
+                        }).then((result) => {
+                            return {
+                                title: `성공`,
+                                desc: `**\` 시간 \`** : ${result.inveYmd}`,
+                                time: result.inveYmd,
+                                color: `ORANGE`,
+                            };
+                        }).catch(() => {
+                            return {
+                                title: `실패`,
+                                desc: `\` ${process.env.prefix}자가진단 확인 \`으로\n입력사항에 오류가있는지 확인해주세요.`,
+                                time: undefined,
+                                color: `RED`,
+                            };
+                        });
+                        sendmsg(message, sdb, user, mdb.name, mdb.id, emobj, false);
+                    } else {
+                        sendmsg(message, sdb, user, mdb.name, mdb.id, emobj, true);
+                    }
                 }
             });
         }
