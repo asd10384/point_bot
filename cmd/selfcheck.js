@@ -371,18 +371,16 @@ async function autoselfcheck(client = new Client, message = new Message, sdb = M
             var mdb = MDB.object.mandl;
             mdb = obj[i];
 
+            console.log('ID =', mdb.id);
             var user = client.users.cache.get(mdb.id) || undefined;
-            udata.findOne({
+            await udata.findOne({
                 userID: mdb.id
             }, async (err, db1) => {
                 var udb = MDB.object.user;
                 udb = db1;
                 if (err) log.errlog(err);
                 if (!udb) {
-                    if (user) {
-                        await MDB.set.user(user);
-                        return await autocheckinterval(client, message, sdb);
-                    }
+                    continue;
                 }
                 var sc = udb.selfcheck;
                 var emobj;

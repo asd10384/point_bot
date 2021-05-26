@@ -49,7 +49,7 @@ async function vchannelleave (client = new Client, vc = new VoiceState) {
         for (i in obj) {
             var mdb = MDB.object.mandl;
             mdb = obj[i];
-            console.log(mdb);
+            
             if (mdb.vc[0].type === 'make' && mdb.id === vc.channelID) {
                 if (vc.channel.members.size <= 0) {
                     await mandl.findOneAndDelete({type: 'vchannel', guildid: vc.guild.id, id: vc.channelID});
