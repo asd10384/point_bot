@@ -28,6 +28,21 @@ module.exports = {
         }
         // if (!(message.member.permissions.has('ADMINISTRATOR') || message.member.roles.cache.some(r=>sdb.role.includes(r.id)))) return message.channel.send(per).then(m => msgdelete(m, Number(process.env.deletetime)));
 
+        return message.channel.send(
+            embed.setTitle(`**\` 자가진단 안내 \`**`)
+                .setDescription(`
+                    디스코드 자가진단에 문제가 발생해
+                    자가진단을 디스코드에서 사이트로
+                    변경했습니다.
+
+                    사이트에서 회원가입을 하고 자가진단이나
+                    자동 자가진단을 사용해주세요.
+
+                    **[[사이트 바로가기](https://namilselfcheck.kro.kr)]**
+                `)
+                .setFooter(`https://namilselfcheck.kro.kr`)
+        ).then(m => msgdelete(m, Number(process.env.deletetime)*6));
+        
         udata.findOne({
             userID: user.id
         }, async (err, db1) => {
