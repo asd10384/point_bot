@@ -33,6 +33,7 @@ module.exports = {
                 ${pp}권한 확인 : 봇 관리자 명령어 권한을 확인합니다.
                 ${pp}권한 추가 : 봇 관리자 명령어 권한을 추가합니다.
                 ${pp}권한 제거 : 봇 관리자 명령어 권한을 제거합니다.
+                ${pp}권한 초기화 : 봇 관리자 명령어 권한을 초기화 합니다.
             `)
             .setColor('RANDOM');
         
@@ -108,6 +109,14 @@ module.exports = {
             }
             emerr.setDescription(`${pp}권한 제거 @역할`);
             return message.channel.send(emerr).then(m => msgdelete(m, msg_time));
+        }
+        if (args[0] == '초기화') {
+            if (!(message.member.permissions.has('ADMINISTRATOR'))) return message.channel.send(per).then(m => msgdelete(m, Number(process.env.deletetime)));
+            sdb.role = [];
+            sdb.save(err => log.errlog(err));
+            em.setTitle(`역할을 성공적으로 초기화.`)
+                .setFooter(`${pp}권한 확인`);
+            return message.channel.send(em).then(m => msgdelete(m, help_time - (help_time / 2)));
         }
         return message.channel.send(help).then(m => msgdelete(m, msg_time));
     },
