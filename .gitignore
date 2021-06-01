@@ -22,3 +22,5 @@ json.sqlite
 googlettsapi.json
 
 log/*.txt
+
+*.wav
