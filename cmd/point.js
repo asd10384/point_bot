@@ -155,7 +155,7 @@ module.exports = {
                                         await point.then(async (db1) => {
                                             var udb = MDB.object.server;
                                             udb = db1;
-                                            if (udb.point - num > 0) {
+                                            if (udb.point - num >= 0) {
                                                 num = udb.point - num;
                                                 udb.point = udb.point - Number(args[3]);
                                                 udb.save().catch(err => console.log(err));
