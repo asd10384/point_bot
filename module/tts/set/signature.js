@@ -16,6 +16,13 @@ const snobj = [
             '쿠쿠루삥뽕'
         ],
         url: '찬구/ㅋㅋ뤀삥뽕'
+    },
+    {
+        name: [
+            '멈춰',
+            '멈춰!'
+        ],
+        url: '멈춰'
     }
 ];
 var sncheckobj = {};
