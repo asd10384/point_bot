@@ -64,13 +64,20 @@ module.exports = {
             if (getuser) {
                 sdata.find({serverid: message.guild.id, userid: getuser.user.id}, async (err, res) => {
                     var udb = MDB.object.server;
+                    var total;
                     var text = '';
                     for (i in res) {
                         udb = res[i];
                         text += `${udb.pointname} : ${udb.point}\n`;
+                        total = total + udb.point;
+                    }
+                    if (text === '') {
+                        text = `없음`;
+                    } else {
+                        text += `\n합계 : ${total}`;
                     }
                     embed.setTitle(`**${getuser.user.username}님 포인트 확인**`)
-                        .setDescription((text === '') ? '없음' : text);
+                        .setDescription(text);
                     return message.channel.send(embed);
                 });
                 return;
@@ -274,10 +281,6 @@ function help(message = new Message, pp = `${process.env.prefix}`) {
     embed.setTitle(`**포인트 도움말**`)
         .setDescription(`
             **명령어**
-            ${pp}포인트 [경기이름] 추가 [@유저] [숫자]
-             : @유저에게 숫자만큼 포인트 지급
-            ${pp}포인트 [경기이름] 차감 [@유저] [숫자]
-             : @유저에게 숫자만큼 포인트 차감
             ${pp}포인트 확인
              : 경기 확인
             ${pp}포인트 확인 [@유저]
