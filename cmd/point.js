@@ -281,8 +281,6 @@ function help(message = new Message, pp = `${process.env.prefix}`) {
     embed.setTitle(`**포인트 도움말**`)
         .setDescription(`
             **명령어**
-            ${pp}포인트 확인
-             : 경기 확인
             ${pp}포인트 확인 [@유저]
              : 유저의 경기마다 포인트 확인
             ${pp}포인트 [경기이름] 확인
