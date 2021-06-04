@@ -1,46 +1,34 @@
 {
-  "name": "mandl_discord_bot",
+  "name": "point_discord_bot",
   "version": "1.0.0",
-  "description": "마엔롤 디스코드 봇",
+  "description": "**[개인 서버에서 사용하기 위해 제작한 디스코드 봇 입니다.]**  \r 여러가지 명령어들과 편의사항을 계속 추가중입니다.",
   "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asd10384/point_discord_bot.git"
+  },
+  "author": "tkrmagid",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/asd10384/point_discord_bot/issues"
+  },
+  "homepage": "https://github.com/asd10384/point_discord_bot#readme",
   "dependencies": {
     "@discordjs/opus": "^0.3.3",
-    "@google-cloud/text-to-speech": "^3.2.0",
-    "avconv": "^3.1.0",
-    "axios": "^0.21.1",
-    "body-parser": "^1.19.0",
-    "cheerio": "^1.0.0-rc.3",
-    "connect-flash": "^0.1.1",
-    "cookie-parser": "^1.4.5",
     "discord-giveaways": "^4.2.1",
     "discord.js": "^12.5.1",
     "discord.js-pagination": "^1.0.3",
     "dotenv": "^8.2.0",
-    "download": "^8.0.0",
-    "ejs": "^3.1.6",
-    "express": "^4.17.1",
-    "express-session": "^1.17.1",
-    "ffmpeg": "0.0.4",
-    "ffmpeg-static": "^4.2.7",
     "fs": "0.0.1-security",
-    "google-auth-library": "^7.0.4",
     "http": "*",
     "mongoose": "^5.11.14",
     "ms": "^2.1.2",
     "node-fetch": "^2.6.1",
     "os": "^0.1.1",
     "path": "^0.12.7",
-    "quick.db": "^7.1.3",
-    "request": "^2.88.2",
-    "selfcheck": "^8.0.1",
-    "simple-youtube-api": "^5.2.1",
-    "sleep": "^6.3.0",
-    "ytdl-core": "^4.8.2"
-  },
-  "scripts": {
-    ".": "node index.js",
-    "web": "node app.js"
-  },
-  "author": "tkrmaid",
-  "license": "ISC"
+    "quick.db": "^7.1.3"
+  }
 }
