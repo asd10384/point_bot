@@ -1,4 +1,4 @@
-# mandl discord bot / 마엔롤 디스코드 봇
+# point discord bot / 포인트 디스코드 봇
 
 **[개인 서버에서 사용하기 위해 제작한 디스코드 봇 입니다.]**  
 여러가지 명령어들과 편의사항을 계속 추가중입니다.
@@ -29,8 +29,6 @@ npm install
 
 `node index.js`로 봇을 실행할수있습니다.
 
-`node app.js`로 사이트와 봇을 실행할수있습니다.
-
 ## Deployment / 배포
 
 github + heroku
@@ -38,8 +36,3 @@ github + heroku
 ## Built With / 누구랑 만들었나요?
 
 * [tkrmagid](https://github.com/asd10384) - 봇 제작
-* [Kacarong](https://github.com/Kacarong) - 음악퀴즈 사이트 제작
-
-## musicquiz site / 음악퀴즈 사이트
-
-* 현재 사용하고있는 음악을 가져오는 사이트는 이 봇을위해 개인적으로 만든 사이트 입니다.
