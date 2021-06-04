@@ -55,6 +55,7 @@ async function tts(client = new Client, message = new Message, args = Array, sdb
                 } else if (message.guild.me.voice.channel) {
                     channel = message.guild.voice.channel;
                 }
+                if (!channel) return message.channel.send(vcerr).then(m => msgdelete(m, Number(process.env.deletetime)));
                 if (url.text) {
                     return await play(message, sdb, channel, url.url, url.options);
                 }
