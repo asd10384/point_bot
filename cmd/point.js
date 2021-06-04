@@ -54,7 +54,7 @@ module.exports = {
                         }
                     }
                     embed.setTitle(`**포인트 경기 확인**`)
-                        .setDescription(`**${list.join('**\n**')}**`)
+                        .setDescription(`${list.join('\n')}`)
                         .setFooter(`${pp}포인트 도움말`);
                     return message.channel.send(embed);
                 });
@@ -64,12 +64,12 @@ module.exports = {
             if (getuser) {
                 sdata.find({serverid: message.guild.id, userid: getuser.user.id}, async (err, res) => {
                     var udb = MDB.object.server;
-                    var total;
+                    var total = 0;
                     var text = '';
                     for (i in res) {
                         udb = res[i];
                         text += `${udb.pointname} : ${udb.point}\n`;
-                        total = total + udb.point;
+                        total = total + Number(udb.point);
                     }
                     if (text === '') {
                         text = `없음`;
@@ -234,7 +234,7 @@ module.exports = {
                             if (!getuser) return errmsg(message, pp, `유저를 찾을 수 없습니다.`);
                             uname = getuser.user.id;
                         }
-                        embed.setTitle(`**${args[0]}경기 <@${uid}>님 등수 확인**`)
+                        embed.setTitle(`${args[0]}경기 **<@${uid}>님 등수 확인**`)
                             .setDescription(`${list.indexOf(uid)+1}등. <@${uid}> [${sort[list.indexOf(uid)]}]`);
                         return message.channel.send(embed);
                     });
@@ -260,7 +260,7 @@ module.exports = {
                             }
                         }
                     }
-                    embed.setTitle(`**${args[0]}경기 등수 확인**`)
+                    embed.setTitle(`${args[0]}경기 **등수 확인**`)
                         .setDescription(text);
                         return message.channel.send(embed);
                 });
