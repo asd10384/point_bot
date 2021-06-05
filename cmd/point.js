@@ -129,6 +129,49 @@ module.exports = {
                                 }
                                 return errmsg(message, pp, `포인트는 1이상 지급 가능`);
                             }
+                            // var getuser_arg3 = message.guild.members.cache.get(args[2].replace(/[^0-9]/g, '')) || null;
+                            // if (getuser_arg3) {
+                            //     var number = args[args.length-1];
+                            //     if (!isNaN(args[3])) {
+                            //         if (Number(args[3]) > 0) {
+                            //             var num = Number(args[3]);
+                            //             var point = sdata.findOne({
+                            //                 serverid: message.guild.id,
+                            //                 userid: getuser.user.id,
+                            //                 pointname: args[0],
+                            //             });
+                            //             await point.then(async (db1) => {
+                            //                 var udb = MDB.object.server;
+                            //                 udb = db1;
+                            //                 if (udb) {
+                            //                     num = num + udb.point;
+                            //                     udb.point = udb.point + Number(args[3]);
+                            //                     udb.save().catch(err => console.log(err));
+                            //                 } else {
+                            //                     new sdata({
+                            //                         serverid: message.guild.id,
+                            //                         name: message.guild.name,
+                            //                         userid: getuser.user.id,
+                            //                         username: getuser.user.username,
+                            //                         pointname: args[0],
+                            //                         point: Number(args[3]),
+                            //                     }).save().catch(err => console.log(err));
+                            //                 }
+                            //             });
+                            //             embed.setTitle(`**포인트 지급 성공**`)
+                            //                 .setDescription(`
+                            //                     \` 지급된 경기 \` : ${args[0]}
+                            //                     \` 지급된 유저 \` : <@${getuser.user.id}>
+                            //                     \` 지금된 포인트 \` : ${args[3]}
+                            //                     \` 최종 포인트 \` : ${num}
+                            //                 `)
+                            //                 .setFooter(`지금한 유저 : ${user.username}`);
+                            //             return message.channel.send(embed);
+                            //         }
+                            //         return errmsg(message, pp, `포인트는 1이상 지급 가능`);
+                            //     }
+                            //     return errmsg(message, pp, `포인트는 숫자만 입력가능`);
+                            // }
                             return errmsg(message, pp, `포인트는 숫자만 입력가능`);
                         }
                         return errmsg(message, pp, `포인트를 입력해주세요.`);
@@ -215,7 +258,9 @@ module.exports = {
                             obj[udb.userid] = udb.point;
                         }
                         var sort = Object.values(obj);
-                        sort.sort();
+                        sort.sort((a, b) => {
+                            return b - a;
+                        });
                         var list = [];
                         for (i in sort) {
                             for (j in res) {
@@ -223,31 +268,39 @@ module.exports = {
                                 udb = res[j];
                                 if (sort[i] == udb.point) {
                                     udb.point = 0;
-                                    var getuser = message.guild.members.cache.get(udb.userid) || null;
-                                    list.push(getuser.user.username);
+                                    list.push(udb.userid);
                                 }
                             }
                         }
-                        var uid = user.userid;
+                        var uname = user.username;
+                        var uid = user.id;
                         if (args[3]) {
                             var getuser = message.guild.members.cache.get(args[3].replace(/[^0-9]/g, '')) || null;
                             if (!getuser) return errmsg(message, pp, `유저를 찾을 수 없습니다.`);
-                            uname = getuser.user.id;
+                            uname = getuser.user.username;
+                            uid = getuser.user.id;
                         }
-                        embed.setTitle(`${args[0]}경기 **<@${uid}>님 등수 확인**`)
+                        embed.setTitle(`${args[0]}경기 **${uname}님 등수 확인**`)
                             .setDescription(`${list.indexOf(uid)+1}등. <@${uid}> [${sort[list.indexOf(uid)]}]`);
                         return message.channel.send(embed);
                     });
+                    return;
                 }
                 sdata.find({serverid: message.guild.id, pointname: args[0]}, async (err, res) => {
                     var udb = MDB.object.server;
+                    // var obj = res.sort((a, b) => {
+                    //     return b.point - a.point;
+                    // });
+
                     var obj = {};
                     for (i in res) {
                         udb = res[i];
                         obj[udb.id] = udb.point;
                     }
                     var sort = Object.values(obj);
-                    sort.sort();
+                    sort.sort((a, b) => {
+                        return b - a;
+                    });
                     var text = '';
                     for (i in sort) {
                         for (j in res) {
@@ -255,8 +308,7 @@ module.exports = {
                             udb = res[j];
                             if (sort[i] == udb.point) {
                                 udb.point = 0;
-                                var getuser = message.guild.members.cache.get(udb.userid) || null;
-                                text += `${Number(i)+1}등. <@${(getuser) ? getuser.user.id : udb.userid}> [${sort[i]}]\n`;
+                                text += `${Number(i)+1}등. <@${udb.userid}> [${sort[i]}]\n`;
                             }
                         }
                     }
@@ -279,18 +331,24 @@ function errmsg(message = new Message, pp = `${process.env.prefix}`, why = '') {
 }
 function help(message = new Message, pp = `${process.env.prefix}`) {
     embed.setTitle(`**포인트 도움말**`)
+        /**
+         * 포인트 [경기이름] 지급 [@유저] 숫자
+         * 포인트 [경기이름] 차감 [@유저] 숫자
+         */
         .setDescription(`
-            **명령어**
+            **포인트 확인**
+            ${pp}포인트 확인
+             - 생성된 경기 확인
             ${pp}포인트 확인 [@유저]
-             : 유저의 경기마다 포인트 확인
-            ${pp}포인트 [경기이름] 확인
-             : 경기 포인트를 확인
+             - 유저의 경기마다 포인트 확인
+            
+            **등수**
             ${pp}포인트 [경기이름] 등수
-            : 경기 전체 등수 확인
+            - 경기 전체 등수 확인
             ${pp}포인트 [경기이름] 등수 확인
-            : 경기 나의 등수 확인
+            - 경기 나의 등수 확인
             ${pp}포인트 [경기이름] 등수 확인 [@유저]
-            : 경기 유저의 등수 확인
+            - 경기 유저의 등수 확인
         `);
     return message.channel.send(embed);
 }
