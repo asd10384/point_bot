@@ -129,49 +129,59 @@ module.exports = {
                                 }
                                 return errmsg(message, pp, `포인트는 1이상 지급 가능`);
                             }
-                            // var getuser_arg3 = message.guild.members.cache.get(args[2].replace(/[^0-9]/g, '')) || null;
-                            // if (getuser_arg3) {
-                            //     var number = args[args.length-1];
-                            //     if (!isNaN(args[3])) {
-                            //         if (Number(args[3]) > 0) {
-                            //             var num = Number(args[3]);
-                            //             var point = sdata.findOne({
-                            //                 serverid: message.guild.id,
-                            //                 userid: getuser.user.id,
-                            //                 pointname: args[0],
-                            //             });
-                            //             await point.then(async (db1) => {
-                            //                 var udb = MDB.object.server;
-                            //                 udb = db1;
-                            //                 if (udb) {
-                            //                     num = num + udb.point;
-                            //                     udb.point = udb.point + Number(args[3]);
-                            //                     udb.save().catch(err => console.log(err));
-                            //                 } else {
-                            //                     new sdata({
-                            //                         serverid: message.guild.id,
-                            //                         name: message.guild.name,
-                            //                         userid: getuser.user.id,
-                            //                         username: getuser.user.username,
-                            //                         pointname: args[0],
-                            //                         point: Number(args[3]),
-                            //                     }).save().catch(err => console.log(err));
-                            //                 }
-                            //             });
-                            //             embed.setTitle(`**포인트 지급 성공**`)
-                            //                 .setDescription(`
-                            //                     \` 지급된 경기 \` : ${args[0]}
-                            //                     \` 지급된 유저 \` : <@${getuser.user.id}>
-                            //                     \` 지금된 포인트 \` : ${args[3]}
-                            //                     \` 최종 포인트 \` : ${num}
-                            //                 `)
-                            //                 .setFooter(`지금한 유저 : ${user.username}`);
-                            //             return message.channel.send(embed);
-                            //         }
-                            //         return errmsg(message, pp, `포인트는 1이상 지급 가능`);
-                            //     }
-                            //     return errmsg(message, pp, `포인트는 숫자만 입력가능`);
-                            // }
+                            var getuser_arg3 = message.guild.members.cache.get(args[2].replace(/[^0-9]/g, '')) || null;
+                            if (getuser_arg3) {
+                                var number = args[args.length-1];
+                                var userlist = args.slice(2, -1);
+                                if (!isNaN(number)) {
+                                    if (Number(number) > 0) {
+                                        var num = Number(number);
+                                        var numlist = [];
+                                        for (i in userlist) {
+                                            var uid = userlist[i].replace(/[^0-9]/g, '');
+                                            var point = sdata.findOne({
+                                                serverid: message.guild.id,
+                                                userid: uid,
+                                                pointname: args[0],
+                                            });
+                                            await point.then(async (db1) => {
+                                                var udb = MDB.object.server;
+                                                udb = db1;
+                                                if (udb) {
+                                                    numlist.push(num + udb.point);
+                                                    udb.point = udb.point + Number(number);
+                                                    udb.save().catch(err => console.log(err));
+                                                } else {
+                                                    numlist.push(num);
+                                                    new sdata({
+                                                        serverid: message.guild.id,
+                                                        name: message.guild.name,
+                                                        userid: uid,
+                                                        username: getuser.user.username,
+                                                        pointname: args[0],
+                                                        point: Number(number),
+                                                    }).save().catch(err => console.log(err));
+                                                }
+                                            });
+                                        }
+                                        var text = ``;
+                                        for (i in userlist) {
+                                            text += `${userlist[i]} [최종 : ${numlist[i]}]\n`;
+                                        }
+                                        embed.setTitle(`**포인트 지급 성공**`)
+                                            .setDescription(`
+                                                \` 지급된 경기 \` : ${args[0]}
+                                                \` 지금된 포인트 \` : ${number}
+                                                \` 지급된 유저 \`
+                                                ${text}
+                                            `)
+                                            .setFooter(`지금한 유저 : ${user.username}`);
+                                        return message.channel.send(embed);
+                                    }
+                                    return errmsg(message, pp, `포인트는 1이상 지급 가능`);
+                                }
+                                return errmsg(message, pp, `포인트는 숫자만 입력가능`);
+                            }
                             return errmsg(message, pp, `포인트는 숫자만 입력가능`);
                         }
                         return errmsg(message, pp, `포인트를 입력해주세요.`);
@@ -239,6 +249,54 @@ module.exports = {
                                     }
                                 }
                                 return errmsg(message, pp, `포인트는 1이상 가능`);
+                            }
+                            var getuser_arg3 = message.guild.members.cache.get(args[2].replace(/[^0-9]/g, '')) || null;
+                            if (getuser_arg3) {
+                                var number = args[args.length-1];
+                                var userlist = args.slice(2, -1);
+                                if (!isNaN(number)) {
+                                    if (Number(number) > 0) {
+                                        var num = Number(number);
+                                        var numlist = [];
+                                        var succ = [];
+                                        for (i in userlist) {
+                                            var uid = userlist[i].replace(/[^0-9]/g, '');
+                                            var point = sdata.findOne({
+                                                serverid: message.guild.id,
+                                                userid: uid,
+                                                pointname: args[0],
+                                            });
+                                            await point.then(async (db1) => {
+                                                var udb = MDB.object.server;
+                                                udb = db1;
+                                                if (udb.point - num >= 0) {
+                                                    numlist.push(udb.point - num);
+                                                    succ.push('성공');
+                                                    udb.point = udb.point - num;
+                                                    udb.save().catch(err => console.log(err));
+                                                } else {
+                                                    numlist.push(-1);
+                                                    succ.push('실패');
+                                                }
+                                            });
+                                        }
+                                        var text = ``;
+                                        for (i in userlist) {
+                                            text += `${succ[i]} - ${userlist[i]} ${Number(numlist[i]) < 0 ? '' : `[최종 : ${numlist[i]}]`}\n`;
+                                        }
+                                        embed.setTitle(`**포인트 차감 성공**`)
+                                            .setDescription(`
+                                                \` 차감된 경기 \` : ${args[0]}
+                                                \` 차감된 포인트 \` : ${number}
+                                                \` 차감된 유저 \`
+                                                ${text}
+                                            `)
+                                            .setFooter(`차감한 유저 : ${user.username}`);
+                                        return message.channel.send(embed);
+                                    }
+                                    return errmsg(message, pp, `포인트는 1이상 지급 가능`);
+                                }
+                                return errmsg(message, pp, `포인트는 숫자만 입력가능`);
                             }
                             return errmsg(message, pp, `포인트는 숫자만 입력가능`);
                         }
@@ -308,13 +366,15 @@ module.exports = {
                             udb = res[j];
                             if (sort[i] == udb.point) {
                                 udb.point = 0;
-                                text += `${Number(i)+1}등. <@${udb.userid}> [${sort[i]}]\n`;
+                                var getuserc = message.guild.members.cache.get(udb.userid) || null;
+                                text += `${Number(i)+1}등. ${(getuserc) ? (getuserc.nickname) ? getuserc.nickname : getuserc.user.username : udb.username} [${sort[i]}]\n`;
                             }
                         }
                     }
-                    embed.setTitle(`${args[0]}경기 **등수 확인**`)
-                        .setDescription(text);
-                        return message.channel.send(embed);
+                    var emtxt = `\`\`\`fix\n${args[0]}경기 **등수 확인**\`\`\`\`\`\`${text}\`\`\``;
+                    // embed.setTitle(`${args[0]}경기 **등수 확인**`)
+                    //     .setDescription(text);
+                    return message.channel.send(emtxt);
                 });
                 return;
             }
