@@ -27,7 +27,7 @@ udata.findOne({
 const per = new MessageEmbed()
     .setTitle(`이 명령어를 사용할 권한이 없습니다.`)
     .setColor('RED');
-const embed = new MessageEmbed()
+var embed = new MessageEmbed()
     .setColor('ORANGE')
     .setFooter(`${process.env.prefix}포인트 도움말`);
 
@@ -41,6 +41,10 @@ module.exports = {
             await db.set(`db.prefix.${message.member.id}`, process.env.prefix);
             pp = process.env.prefix;
         }
+
+        embed = new MessageEmbed()
+            .setColor('ORANGE')
+            .setFooter(`${process.env.prefix}포인트 도움말`);
 
         if (args[0] == '확인') {
             if (!args[1]) {
@@ -360,21 +364,32 @@ module.exports = {
                         return b - a;
                     });
                     var text = '';
+                    var textf = '';
+                    var textlist = [];
                     for (i in sort) {
                         for (j in res) {
                             //if (Number(j)+1 > 10) break;
                             udb = res[j];
+                            if (udb.point == 0) continue;
                             if (sort[i] == udb.point) {
-                                udb.point = 0;
+                                udb.point = -1;
                                 var getuserc = message.guild.members.cache.get(udb.userid) || null;
-                                text += `${Number(i)+1}등. ${(getuserc) ? (getuserc.nickname) ? getuserc.nickname : getuserc.user.username : udb.username} [${sort[i]}]\n`;
+                                textf = `${Number(i)+1}등. ${(getuserc) ? (getuserc.nickname) ? getuserc.nickname : getuserc.user.username : udb.username} [${sort[i]}]\n`;
+                                if (text.length + textf.length > 3990) {
+                                    textlist.push(text);
+                                    text = '';
+                                }
+                                text += textf;
                             }
                         }
                     }
-                    var emtxt = `\`\`\`fix\n${args[0]}경기 **등수 확인**\`\`\`\`\`\`${text}\`\`\``;
+                    textlist.push(text);
+                    message.channel.send(`\`\`\`fix\n${args[0]}경기 **등수 확인**\`\`\``);
+                    for (i in textlist) {
+                        message.channel.send(`\`\`\`${textlist[i]}\`\`\``);
+                    }
                     // embed.setTitle(`${args[0]}경기 **등수 확인**`)
                     //     .setDescription(text);
-                    return message.channel.send(emtxt);
                 });
                 return;
             }
