@@ -366,6 +366,7 @@ module.exports = {
                     var text = '';
                     var textf = '';
                     var textlist = [];
+                    var allmember = 0;
                     for (i in sort) {
                         for (j in res) {
                             //if (Number(j)+1 > 10) break;
@@ -379,12 +380,13 @@ module.exports = {
                                     textlist.push(text);
                                     text = '';
                                 }
+                                allmember++;
                                 text += textf;
                             }
                         }
                     }
                     textlist.push(text);
-                    message.channel.send(`\`\`\`fix\n${args[0]}경기 **등수 확인**\`\`\``);
+                    message.channel.send(`\`\`\`fix\n${args[0]}경기 **등수 확인** - 총 ${allmember}명\`\`\``);
                     for (i in textlist) {
                         message.channel.send(`\`\`\`${textlist[i]}\`\`\``);
                     }
