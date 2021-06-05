@@ -371,7 +371,7 @@ module.exports = {
                         for (j in res) {
                             //if (Number(j)+1 > 10) break;
                             udb = res[j];
-                            if (udb.point == 0) continue;
+                            //if (udb.point == 0) continue;
                             if (sort[i] == udb.point) {
                                 udb.point = -1;
                                 var getuserc = message.guild.members.cache.get(udb.userid) || null;
