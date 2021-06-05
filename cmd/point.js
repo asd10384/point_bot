@@ -137,6 +137,9 @@ module.exports = {
                             if (getuser_arg3) {
                                 var number = args[args.length-1];
                                 var userlist = args.slice(2, -1);
+                                userlist = userlist.filter((element, index) => {
+                                    return userlist.indexOf(element) === index;
+                                });
                                 if (!isNaN(number)) {
                                     if (Number(number) > 0) {
                                         var num = Number(number);
@@ -168,19 +171,25 @@ module.exports = {
                                                 }
                                             });
                                         }
-                                        var text = ``;
+                                        var textlist = [];
+                                        var text = '';
+                                        var textf = '';
                                         for (i in userlist) {
-                                            text += `${userlist[i]} [최종 : ${numlist[i]}]\n`;
+                                            var getuser = message.guild.members.cache.get(userlist[i].replace(/[^0-9]/g, '')) || null;
+                                            textf = `. \* ${(getuser) ? (getuser.nickname) ? getuser.nickname : getuser.user.username : userlist[i]} [최종 : ${numlist[i]}]\n`;
+                                            if (text.length + textf.length > 3990) {
+                                                textlist.push(text);
+                                                text = '';
+                                            }
+                                            text += textf;
                                         }
-                                        embed.setTitle(`**포인트 지급 성공**`)
-                                            .setDescription(`
-                                                \` 지급된 경기 \` : ${args[0]}
-                                                \` 지금된 포인트 \` : ${number}
-                                                \` 지급된 유저 \`
-                                                ${text}
-                                            `)
-                                            .setFooter(`지금한 유저 : ${user.username}`);
-                                        return message.channel.send(embed);
+                                        textlist.push(text);
+                                        
+                                        message.channel.send(`\* **포인트 지급 성공** **\***\n \` 지급된 경기 \` : ${args[0]}\n \` 지급된 포인트 \` : ${number}\n \` 지급된 유저 \``);
+                                        for (i in textlist) {
+                                            message.channel.send(textlist[i]);
+                                        }
+                                        return;
                                     }
                                     return errmsg(message, pp, `포인트는 1이상 지급 가능`);
                                 }
@@ -258,6 +267,9 @@ module.exports = {
                             if (getuser_arg3) {
                                 var number = args[args.length-1];
                                 var userlist = args.slice(2, -1);
+                                userlist = userlist.filter((element, index) => {
+                                    return userlist.indexOf(element) === index;
+                                });
                                 if (!isNaN(number)) {
                                     if (Number(number) > 0) {
                                         var num = Number(number);
@@ -284,19 +296,25 @@ module.exports = {
                                                 }
                                             });
                                         }
-                                        var text = ``;
+                                        var textlist = [];
+                                        var text = '';
+                                        var textf = '';
                                         for (i in userlist) {
-                                            text += `${succ[i]} - ${userlist[i]} ${Number(numlist[i]) < 0 ? '' : `[최종 : ${numlist[i]}]`}\n`;
+                                            var getuser = message.guild.members.cache.get(userlist[i].replace(/[^0-9]/g, '')) || null;
+                                            textf = `. \* ${succ[i]} - ${(getuser) ? (getuser.nickname) ? getuser.nickname : getuser.user.username : userlist[i]} ${(Number(numlist[i]) >= 0) ? `[최종 : ${numlist[i]}]` : '[포인트부족]'}\n`;
+                                            if (text.length + textf.length > 3990) {
+                                                textlist.push(text);
+                                                text = '';
+                                            }
+                                            text += textf;
                                         }
-                                        embed.setTitle(`**포인트 차감 성공**`)
-                                            .setDescription(`
-                                                \` 차감된 경기 \` : ${args[0]}
-                                                \` 차감된 포인트 \` : ${number}
-                                                \` 차감된 유저 \`
-                                                ${text}
-                                            `)
-                                            .setFooter(`차감한 유저 : ${user.username}`);
-                                        return message.channel.send(embed);
+                                        textlist.push(text);
+                                        
+                                        message.channel.send(`\* **포인트 차감 성공** \*\n\` 차감된 경기 \` : ${args[0]}\n\` 차감된 포인트 \` : ${number}\n\` 차감된 유저 \``);
+                                        for (i in textlist) {
+                                            message.channel.send(textlist[i]);
+                                        }
+                                        return;
                                     }
                                     return errmsg(message, pp, `포인트는 1이상 지급 가능`);
                                 }
@@ -310,7 +328,7 @@ module.exports = {
                 }
                 return errmsg(message, pp, `유저를 입력해주세요.`);
             }
-            if (['순위','등수'].includes(args[1])) {
+            if (['순위','등수','포인트'].includes(args[1])) {
                 if (args[2] && args[2] == '확인') {
                     sdata.find({serverid: message.guild.id, pointname: args[0]}, async (err, res) => {
                         var udb = MDB.object.server;
@@ -342,7 +360,7 @@ module.exports = {
                             uname = getuser.user.username;
                             uid = getuser.user.id;
                         }
-                        embed.setTitle(`${args[0]}경기 **${uname}님 등수 확인**`)
+                        embed.setTitle(`${args[0]}경기 **${uname}님 포인트 확인**`)
                             .setDescription(`${list.indexOf(uid)+1}등. <@${uid}> [${sort[list.indexOf(uid)]}]`);
                         return message.channel.send(embed);
                     });
@@ -386,11 +404,11 @@ module.exports = {
                         }
                     }
                     textlist.push(text);
-                    message.channel.send(`\`\`\`fix\n${args[0]}경기 **등수 확인** - 총 ${allmember}명\`\`\``);
+                    message.channel.send(`\`\`\`fix\n${args[0]}경기 **포인트 확인** - 총 ${allmember}명\`\`\``);
                     for (i in textlist) {
                         message.channel.send(`\`\`\`${textlist[i]}\`\`\``);
                     }
-                    // embed.setTitle(`${args[0]}경기 **등수 확인**`)
+                    // embed.setTitle(`${args[0]}경기 **포인트 확인**`)
                     //     .setDescription(text);
                 });
                 return;
@@ -419,13 +437,13 @@ function help(message = new Message, pp = `${process.env.prefix}`) {
             ${pp}포인트 확인 [@유저]
              - 유저의 경기마다 포인트 확인
             
-            **등수**
-            ${pp}포인트 [경기이름] 등수
-            - 경기 전체 등수 확인
-            ${pp}포인트 [경기이름] 등수 확인
-            - 경기 나의 등수 확인
-            ${pp}포인트 [경기이름] 등수 확인 [@유저]
-            - 경기 유저의 등수 확인
+            **포인트**
+            ${pp}포인트 [경기이름] 포인트
+            - 경기 전체 포인트 확인
+            ${pp}포인트 [경기이름] 포인트 확인
+            - 경기 나의 포인트 확인
+            ${pp}포인트 [경기이름] 포인트 확인 [@유저]
+            - 경기 유저의 포인트 확인
         `);
     return message.channel.send(embed);
 }
