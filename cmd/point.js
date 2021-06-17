@@ -395,8 +395,8 @@ module.exports = {
                                 textf = '';
                                 udb.point = -1;
                                 var getuserc = message.guild.members.cache.get(udb.userid) || null;
-                                if (String(Number(i)+1).length < sort.length) {
-                                    for (az=0; az<sort.length-String(Number(i)+1).length; az++) {
+                                if (String(Number(i)+1).length < String(sort.length).length) {
+                                    for (az=0; az<String(sort.length).length-String(Number(i)+1).length; az++) {
                                         textf += '0';
                                     }
                                 }
