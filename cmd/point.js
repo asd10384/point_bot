@@ -362,7 +362,7 @@ module.exports = {
                             uid = getuser.user.id;
                         }
                         embed.setTitle(`${args[0]}경기 **${uname}님 포인트 확인**`)
-                            .setDescription(`${(list.indexOf(uid)+1 < 10) ? '0' : ''}${list.indexOf(uid)+1}등. <@${uid}> [${sort[list.indexOf(uid)]}]`);
+                            .setDescription(`${list.indexOf(uid)+1}등. <@${uid}> [${sort[list.indexOf(uid)]}]`);
                         return message.channel.send(embed);
                     });
                     return;
@@ -392,9 +392,15 @@ module.exports = {
                             udb = res[j];
                             //if (udb.point == 0) continue;
                             if (sort[i] == udb.point) {
+                                textf = '';
                                 udb.point = -1;
                                 var getuserc = message.guild.members.cache.get(udb.userid) || null;
-                                textf = `${(Number(i)+1 < 10) ? '0' : ''}${Number(i)+1}등. ${(getuserc) ? (getuserc.nickname) ? getuserc.nickname : getuserc.user.username : udb.username} [${sort[i]}]\n`;
+                                if (String(Number(i)+1).length < sort.length) {
+                                    for (az=0; az<sort.length-String(Number(i)+1).length; az++) {
+                                        textf += '0';
+                                    }
+                                }
+                                textf += `${Number(i)+1}등. ${(getuserc) ? (getuserc.nickname) ? getuserc.nickname : getuserc.user.username : udb.username} [${sort[i]}]\n`;
                                 if (text.length + textf.length > 3990) {
                                     textlist.push(text);
                                     text = '';
