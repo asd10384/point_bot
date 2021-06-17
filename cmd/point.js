@@ -115,7 +115,7 @@ module.exports = {
                                                 serverid: message.guild.id,
                                                 name: message.guild.name,
                                                 userid: getuser.user.id,
-                                                username: getuser.user.username,
+                                                username: (getuser.nickname) ? getuser.nickname : getuser.user.username,
                                                 pointname: args[0],
                                                 point: Number(args[3]),
                                             }).save().catch(err => console.log(err));
@@ -160,11 +160,12 @@ module.exports = {
                                                     udb.save().catch(err => console.log(err));
                                                 } else {
                                                     numlist.push(num);
+                                                    var getuser = message.guild.members.cache.get(uid) || null;
                                                     new sdata({
                                                         serverid: message.guild.id,
                                                         name: message.guild.name,
                                                         userid: uid,
-                                                        username: getuser.user.username,
+                                                        username: (getuser.nickname) ? getuser.nickname : getuser.user.username,
                                                         pointname: args[0],
                                                         point: Number(number),
                                                     }).save().catch(err => console.log(err));
@@ -406,7 +407,7 @@ module.exports = {
                     textlist.push(text);
                     message.channel.send(`\`\`\`fix\n${args[0]}경기 **포인트 확인** - 총 ${allmember}명\`\`\``);
                     for (i in textlist) {
-                        message.channel.send(`\`\`\`${textlist[i]}\`\`\``);
+                        message.channel.send(`\`\`\`${(textlist[i]) ? textlist[i] : '없음'}\`\`\``);
                     }
                     // embed.setTitle(`${args[0]}경기 **포인트 확인**`)
                     //     .setDescription(text);
