@@ -80,7 +80,7 @@ module.exports = {
                     } else {
                         text += `\n합계 : ${total}`;
                     }
-                    embed.setTitle(`**${getuser.user.username}님 포인트 확인**`)
+                    embed.setTitle(`**${(getuser.nickname) ? getuser.nickname : getuser.user.username}님 포인트 확인**`)
                         .setDescription(text);
                     return message.channel.send(embed);
                 });
@@ -128,7 +128,7 @@ module.exports = {
                                             \` 지금된 포인트 \` : ${args[3]}
                                             \` 최종 포인트 \` : ${num}
                                         `)
-                                        .setFooter(`지금한 유저 : ${user.username}`);
+                                        .setFooter(`지금한 유저 : ${(message.member.nickname) ? message.member.nickname : user.username}`);
                                     return message.channel.send(embed);
                                 }
                                 return errmsg(message, pp, `포인트는 1이상 지급 가능`);
@@ -235,7 +235,7 @@ module.exports = {
                                                         \` 차감된 포인트 \` : ${args[3]}
                                                         \` 최종 포인트 \` : ${num}
                                                     `)
-                                                    .setFooter(`차감한 유저 : ${user.username}`);
+                                                    .setFooter(`차감한 유저 : ${(message.member.nickname) ? message.member.nickname : user.username}`);
                                                 return message.channel.send(embed);
                                             } else {
                                                 embed.setTitle(`**포인트 차감 오류**`)
@@ -245,7 +245,7 @@ module.exports = {
                                                         \` 오류난 포인트 \` : ${args[3]}
                                                         \` 오류난 유저의 보유 포인트 \` : ${udb.point}
                                                     `)
-                                                    .setFooter(`차감한 유저 : ${user.username}`);
+                                                    .setFooter(`차감한 유저 : ${(message.member.nickname) ? message.member.nickname : user.username}`);
                                             return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*4));
                                             }
                                         });
@@ -258,7 +258,7 @@ module.exports = {
                                                 \` 오류난 포인트 \` : ${args[3]}
                                                 \` 오류난 유저의 보유 포인트 \` : 0
                                             `)
-                                            .setFooter(`차감한 유저 : ${user.username}`);
+                                            .setFooter(`차감한 유저 : ${(message.member.nickname) ? message.member.nickname : user.username}`);
                                         return message.channel.send(embed).then(m => msgdelete(m, Number(process.env.deletetime)*4));
                                     }
                                 }
@@ -353,12 +353,12 @@ module.exports = {
                                 }
                             }
                         }
-                        var uname = user.username;
+                        var uname = (message.member.nickname) ? message.member.nickname : user.username;
                         var uid = user.id;
                         if (args[3]) {
                             var getuser = message.guild.members.cache.get(args[3].replace(/[^0-9]/g, '')) || null;
                             if (!getuser) return errmsg(message, pp, `유저를 찾을 수 없습니다.`);
-                            uname = getuser.user.username;
+                            uname = (getuser.nickname) ? getuser.nickname : getuser.user.username;
                             uid = getuser.user.id;
                         }
                         embed.setTitle(`${args[0]}경기 **${uname}님 포인트 확인**`)
@@ -445,7 +445,7 @@ function help(message = new Message, pp = `${process.env.prefix}`) {
              - 유저의 경기마다 포인트 확인
             
             **포인트**
-            ${pp}포인트 [경기이름] 포인트
+            ${pp}포인트 [경기이름] 포인트 (등수)
             - 경기 전체 포인트 확인
             ${pp}포인트 [경기이름] 포인트 확인
             - 경기 나의 포인트 확인
