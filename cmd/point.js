@@ -46,6 +46,14 @@ module.exports = {
             .setColor('ORANGE')
             .setFooter(`${process.env.prefix}포인트 도움말`);
 
+        if (args[0] == '전체초기화') {
+            await sdata.remove({});
+            embed.setTitle(`**포인트 전체초기화**`)
+                .setDescription(`전체 초기화 완료`)
+                .setFooter(`${pp}포인트 도움말`);
+            return message.channel.send(embed);
+        }
+
         if (args[0] == '확인') {
             if (!args[1]) {
                 sdata.find({serverid: message.guild.id}, async (err, res) => {
@@ -443,6 +451,8 @@ function help(message = new Message, pp = `${process.env.prefix}`) {
              - 생성된 경기 확인
             ${pp}포인트 확인 [@유저]
              - 유저의 경기마다 포인트 확인
+            ${pp}포인트 전체초기화
+             - 현재까지의 모든 포인트 초기화
             
             **포인트**
             ${pp}포인트 [경기이름] 포인트 (등수)
