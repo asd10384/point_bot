@@ -47,11 +47,30 @@ module.exports = {
             .setFooter(`${process.env.prefix}포인트 도움말`);
 
         if (args[0] == '전체초기화') {
-            await sdata.remove({});
-            embed.setTitle(`**포인트 전체초기화**`)
-                .setDescription(`전체 초기화 완료`)
-                .setFooter(`${pp}포인트 도움말`);
-            return message.channel.send(embed);
+            const filter = ((response) => {
+                return ['네','YES','아니요','NO'].some((answer) === response.content);
+            })
+            let checkem = new MessageEmbed()
+                .setTitle(`**포인트 전체초기화**`)
+                .setDescription(`초기화를 하시겠습니까?\n\n하신다면 채팅에 \` 네 \` 또는 \` YES \`\n안하신다면 채팅에 \` 아니요 \` 또는 \` NO \``)
+                .setFooter(`10초안에 입력해주세요.`)
+                .setColor('ORANGE');
+            message.channel.send(checkem).then(() => {
+                message.channel.awaitMessages(filter, { max: 1, time: 10 * 1000 }).then((collected) => {
+                    sdata.remove({}).then(() => {
+                        embed.setTitle(`**포인트 전체초기화**`)
+                            .setDescription(`전체 초기화 완료`)
+                            .setFooter(`${pp}포인트 도움말`);
+                        return message.channel.send(embed);
+                    }).catch((err) => {
+                        embed.setTitle(`**포인트 전체초기화 오류**`)
+                            .setDescription(`전체 초기화중 오류발생`)
+                            .setFooter(`${pp}포인트 도움말`)
+                            .setColor('RED');
+                        return message.channel.send(embed);
+                    })
+                });
+            });
         }
 
         if (args[0] == '확인') {
