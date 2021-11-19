@@ -463,6 +463,7 @@ function help(message = new Message, pp = `${process.env.prefix}`) {
         /**
          * 포인트 [경기이름] 지급 [@유저] 숫자
          * 포인트 [경기이름] 차감 [@유저] 숫자
+         * 포인트 전체초기화
          */
         .setDescription(`
             **포인트 확인**
@@ -470,8 +471,6 @@ function help(message = new Message, pp = `${process.env.prefix}`) {
              - 생성된 경기 확인
             ${pp}포인트 확인 [@유저]
              - 유저의 경기마다 포인트 확인
-            ${pp}포인트 전체초기화
-             - 현재까지의 모든 포인트 초기화
             
             **포인트**
             ${pp}포인트 [경기이름] 포인트 (등수)
