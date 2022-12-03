@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/asd10384/point_discord_bot#readme",
   "dependencies": {
-    "@discordjs/opus": "^0.3.3",
+    "@discordjs/opus": "^0.9.0",
     "discord-giveaways": "^4.2.1",
     "discord.js": "^12.5.1",
     "discord.js-pagination": "^1.0.3",
