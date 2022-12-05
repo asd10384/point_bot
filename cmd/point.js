@@ -428,7 +428,7 @@ module.exports = {
                                     }
                                 }
                                 textf += `${Number(i)+1}등. ${(getuserc) ? (getuserc.nickname) ? getuserc.nickname : getuserc.user.username : udb.username} [${sort[i]}]\n`;
-                                if (text.length + textf.length > 3990) {
+                                if (text.length + textf.length > 1900) {
                                     textlist.push(text);
                                     text = '';
                                 }
